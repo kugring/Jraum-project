@@ -3,6 +3,7 @@ package com.kugring.back.service;
 import org.springframework.http.ResponseEntity;
 
 import com.kugring.back.dto.request.order.PostOrderRequestDto;
+import com.kugring.back.dto.response.order.GetCashNameResponseDto;
 import com.kugring.back.dto.response.order.PostOrderResponseDto;
 // import com.kugring.back.dto.request.order.FilterOrderListRequestDto;
 // import com.kugring.back.dto.request.order.PatchOrderListRequestDto;
@@ -16,6 +17,7 @@ public interface OrderService {
   // ResponseEntity<? super FilterOrderListResponseDto> filterOrderList(FilterOrderListRequestDto dto);
 
   ResponseEntity<? super PostOrderResponseDto> postOrderList(String user, PostOrderRequestDto dto);
+  ResponseEntity<? super GetCashNameResponseDto> getCashName();
 
   // ResponseEntity<? super PatchOrderListResponseDto> patchOrderList(Integer orderListId, PatchOrderListRequestDto dto);
 

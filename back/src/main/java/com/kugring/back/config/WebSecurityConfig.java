@@ -40,45 +40,42 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable())
-            .httpBasic(basic -> basic.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(request -> request
-                // 기존 경로 설정
-                .requestMatchers(
-                    "/", "/api/v1/auth/**", "/oauth2/**", "/api/v1/board/**",
-                    "/api/v1/point/**", "/api/v1/menu/**", "/api/v1/user/**",
-                    "/api/v1/order/**", "/api/v1/option/**", "/api/v1/manager/**"
-                ).permitAll()
-                
-                // 웹소켓 엔드포인트 허용
-                .requestMatchers("/ws/**").permitAll()
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .httpBasic(basic -> basic.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(request -> request
+                        // WebSocket 엔드포인트 허용, JwtAuthenticationFilter를 거치지 않음
+                        .requestMatchers("/ws/**").permitAll()
 
-                // 권한이 필요한 요청 설정
-                .requestMatchers("/api/v1/user/**").hasRole("USER")
-                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        // 기존 API 경로 설정
+                        .requestMatchers(
+                                "/", "/api/v1/auth/**", "/oauth2/**", "/api/v1/board/**",
+                                "/api/v1/point/**", "/api/v1/menu/**", "/api/v1/user/**",
+                                "/api/v1/order/**", "/api/v1/option/**", "/api/v1/manager/**")
+                        .permitAll()
 
-                .anyRequest().authenticated()
-            )
-            .oauth2Login(oauth2 -> oauth2
-                .authorizationEndpoint(endpoint -> endpoint.baseUri("/api/v1/auth/oauth2"))
-                .redirectionEndpoint(endpoint -> endpoint.baseUri("/oauth2/callback/*"))
-                .userInfoEndpoint(endpoint -> endpoint.userService(oAuth2UserService))
-                .successHandler(oAuth2SuccessHandler)
-            )
-            .exceptionHandling(exception -> exception
-                .authenticationEntryPoint(new FailedAuthenticationEntryPoint())
-            )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessHandler(logoutSuccessHandler())
-                .permitAll()
-            );
+                        // 권한이 필요한 요청 설정
+                        .requestMatchers("/api/v1/user/**").hasRole("USER")
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+
+                        .anyRequest().authenticated())
+                .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(endpoint -> endpoint.baseUri("/api/v1/auth/oauth2"))
+                        .redirectionEndpoint(endpoint -> endpoint.baseUri("/oauth2/callback/*"))
+                        .userInfoEndpoint(endpoint -> endpoint.userService(oAuth2UserService))
+                        .successHandler(oAuth2SuccessHandler))
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(new FailedAuthenticationEntryPoint()))
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터 적용
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessHandler(logoutSuccessHandler())
+                        .permitAll());
 
         return httpSecurity.build();
     }
+
     @Bean
     protected LogoutSuccessHandler logoutSuccessHandler() {
         return new SimpleUrlLogoutSuccessHandler(); // 로그아웃 후 홈 페이지로 리디렉션

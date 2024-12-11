@@ -2,12 +2,14 @@ package com.kugring.back.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kugring.back.dto.request.order.PostOrderRequestDto;
+import com.kugring.back.dto.response.order.GetCashNameResponseDto;
 import com.kugring.back.dto.response.order.PostOrderResponseDto;
 import com.kugring.back.service.OrderService;
 
@@ -34,6 +36,12 @@ public class OrderController {
       @RequestBody @Valid PostOrderRequestDto reqeustBody,
       @AuthenticationPrincipal String userId) {
     ResponseEntity<? super PostOrderResponseDto> resposne = orderService.postOrderList(userId, reqeustBody);
+    return resposne;
+  }
+
+  @GetMapping("/cash/name")
+  public ResponseEntity<? super GetCashNameResponseDto> getCashName() {
+    ResponseEntity<? super GetCashNameResponseDto> resposne = orderService.getCashName();
     return resposne;
   }
 
