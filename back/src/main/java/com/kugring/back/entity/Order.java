@@ -50,7 +50,6 @@ public class Order {
 
   public Order(PostOrderRequestDto dto, User user) {
     this.user = user;
-    this.payMethod = dto.getPayMethod();
     this.createdAt = LocalDateTime.now();
     this.status = "대기";
   }

@@ -36,26 +36,32 @@ public class OrderServiceImplement implements OrderService {
 
     @Override
     @Transactional
-    public ResponseEntity<? super PostOrderResponseDto> postOrderList(PostOrderRequestDto dto) {
+    public ResponseEntity<? super PostOrderResponseDto> postOrderList(String userId, PostOrderRequestDto dto) {
+
+        int balance = 0;
+        long waitingNum = 0;
 
         try {
 
             // 주문요청자의 회원 존재 여부 확인
-            User user = userRepository.findByUserId(dto.getUserId());
+            User user = userRepository.findByUserId(userId);
 
             // 메뉴 ID들 추출 후에 모두 존재하는지 확인
-            List<Long> menuIds = dto.getOrderDetails().stream().map(PostOrderDetailRequestDto::getMenuId).collect(Collectors.toList());
+            List<Long> menuIds = dto.getOrderList().stream().map(PostOrderDetailRequestDto::getMenuId).collect(Collectors.toList());
             if (!menuRepository.existsByMenuIdIn(menuIds)) return PostOrderResponseDto.noExistMenu();
             
             // 옵션 ID들 추출 후에 모두 존재하는지 확인
-            List<Long> optionIds = dto.getOrderDetails().stream().flatMap(orderDetail -> orderDetail.getOptions().stream()).map(PostOrderDetailOptionRequestDto::getOptionId).collect(Collectors.toList());
+            List<Long> optionIds = dto.getOrderList().stream().flatMap(orderDetail -> orderDetail.getOptions().stream()).map(PostOrderDetailOptionRequestDto::getOptionId).collect(Collectors.toList());
             if (!optionRepository.existsByOptionIdIn(optionIds)) return PostOrderResponseDto.noExistOption();
             
+            // 주문 대기중인 팀 갯수 확인
+            waitingNum = OrderRepository.countByStatus("대기");
+
             // Order 생성
             Order order = new Order();
 
             // OrderDetail 리스트 생성 및 추가
-            List<OrderDetail> orderDetails = dto.getOrderDetails().stream().map(detailDto -> {
+            List<OrderDetail> orderDetails = dto.getOrderList().stream().map(detailDto -> {
                 // 등록할 아이템 생성
                 OrderDetail orderDetail = new OrderDetail();
                 // OrderList와 OrderItem 연결
@@ -101,13 +107,13 @@ public class OrderServiceImplement implements OrderService {
                 }).sum();
 
             // 잔액 확인
-            int updatedPoint = user.getPoint() - totalPrice;
+            balance = user.getPoint() - totalPrice;
 
             // 포인트가 음수가 되지 않도록 설정
-            if (updatedPoint < 0) return PostOrderResponseDto.insufficientBlance();
+            if (balance < 0) return PostOrderResponseDto.insufficientBlance();
 
             // 잔여금 저장
-            user.setPoint(updatedPoint);
+            user.setPoint(balance);
             
             // 주문_아이템 담기
             order.setOrderDetails(orderDetails);
@@ -118,7 +124,7 @@ public class OrderServiceImplement implements OrderService {
             // 주문 상태 등록
             order.setStatus("대기");
             // 주문 결제 방법 등록
-            order.setPayMethod(dto.getPayMethod());
+            order.setPayMethod("포인트결제");
 
             // 저장
             userRepository.save(user);
@@ -129,7 +135,7 @@ public class OrderServiceImplement implements OrderService {
             ResponseDto.databaseError();
         }
 
-        return PostOrderResponseDto.success();
+        return PostOrderResponseDto.success(balance, waitingNum);
 
     }
 
@@ -193,7 +199,7 @@ public class OrderServiceImplement implements OrderService {
 //             else if ((preOrderStatus.equals("대기") && orderStatus.equals("취소")) ||
 //                 (preOrderStatus.equals("취소") && (orderStatus.equals("대기") || orderStatus.equals("완료")))) {
 //                 Order.setCompleteOrderDate(LocalDateTime.now());
-//                 int totalPrice = Order.getOrderDetails().stream()
+//                 int totalPrice = Order.getOrderList().stream()
 //                     .mapToInt(orderItem -> {
 //                         int menuPrice = orderItem.getMenu().getMenuPrice();
 //                         int optionTotalPrice = orderItem.getOrderItemOptions().stream()
@@ -243,11 +249,11 @@ public class OrderServiceImplement implements OrderService {
 //             if(!orderList.getOrderStatus().equals("대기")) return PutOrderListResponseDto.orderFail();
 
 //             // 예외처리_(메뉴ID)
-//             List<Integer> menuIds = dto.getOrderDetails().stream().map(OrderItemObject::getMenuId).collect(Collectors.toList());
+//             List<Integer> menuIds = dto.getOrderList().stream().map(OrderItemObject::getMenuId).collect(Collectors.toList());
 //             if (menuRepository.countByMenuIdIn(menuIds) != menuIds.size()) return PutOrderListResponseDto.noExistMenu();
 
 //             // 예외처리_(옵션코드) // todo: 여기에 문제 있음
-//             List<Integer> optionIds = dto.getOrderDetails().stream().flatMap(orderItem -> orderItem.getOrderItemOptions().stream())
+//             List<Integer> optionIds = dto.getOrderList().stream().flatMap(orderItem -> orderItem.getOrderItemOptions().stream())
 //                     .map(OrderItemOptionObject::getOptionId).collect(Collectors.toList());
 //             if (optionRepository.countByOptionIdIn(optionIds) != optionIds.size()) return PutOrderListResponseDto.noExistOption();
 
@@ -256,7 +262,7 @@ public class OrderServiceImplement implements OrderService {
 //             User User = orderList.getUser();
 
 //             // 기존 OrderDetail 리스트 가져오기
-//             List<OrderDetail> preOrderItems = orderList.getOrderDetails();
+//             List<OrderDetail> preOrderItems = orderList.getOrderList();
 
 //             // 취소된 가격
 //             int rollBackPrice = preOrderItems.stream()
@@ -276,13 +282,13 @@ public class OrderServiceImplement implements OrderService {
 //             User.pointCharge(rollBackPrice);
 
 //             // orderItems 리스트를 비우면 종속된 order_item 데이터도 삭제됩니다.
-//             orderList.getOrderDetails().clear();
+//             orderList.getOrderList().clear();
 
 //             // todo: 클린하고 저장을 해야 삭제되나?  결론: 안해도됨
 //             // OrderRepository.save(orderList);
 
 //             // OrderDetail 리스트 생성 및 추가
-//             List<OrderDetail> orderItems = dto.getOrderDetails().stream().map(itemDto -> {
+//             List<OrderDetail> orderItems = dto.getOrderList().stream().map(itemDto -> {
 //                 // 등록할 아이템 생성
 //                 OrderDetail orderItem = new OrderDetail();
 //                 // OrderList와 OrderItem 연결
@@ -338,7 +344,7 @@ public class OrderServiceImplement implements OrderService {
 //             User.setPoint(updatedPoint);
 
 //             // 수정된_주문_아이템 담기
-//             orderList.getOrderDetails().addAll(orderItems);
+//             orderList.getOrderList().addAll(orderItems);
 //             // 수정된_주문자 등록
 //             orderList.setUser(User);
 

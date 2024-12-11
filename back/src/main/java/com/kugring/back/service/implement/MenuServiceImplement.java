@@ -1,21 +1,14 @@
 package com.kugring.back.service.implement;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import com.kugring.back.dto.request.menu.PostMenuRequestDto;
 import com.kugring.back.dto.response.ResponseDto;
 import com.kugring.back.dto.response.menu.GetActiveMenuResponseDto;
-import com.kugring.back.dto.response.menu.PostMenuResponseDto;
-import com.kugring.back.entity.Menu;
-import com.kugring.back.entity.MenuOption;
 import com.kugring.back.repository.MenuRepository;
-import com.kugring.back.repository.OptionRepository;
 import com.kugring.back.repository.resultSet.GetActiveMenuListResultSet;
 import com.kugring.back.service.MenuService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service

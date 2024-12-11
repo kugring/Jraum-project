@@ -1,29 +1,17 @@
 package com.kugring.back.service.implement;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+// import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+// import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.kugring.back.common.CertificationNumber;
-import com.kugring.back.dto.request.auth.CheckCertificationRequestDto;
-import com.kugring.back.dto.request.auth.EmailCertificationRequestDto;
-import com.kugring.back.dto.request.auth.IdCheckRequestDto;
 import com.kugring.back.dto.request.auth.PinCheckRequestDto;
-import com.kugring.back.dto.request.auth.SignInRequestDto;
-import com.kugring.back.dto.request.auth.SignUpRequestDto;
 import com.kugring.back.dto.response.ResponseDto;
-import com.kugring.back.dto.response.auth.CheckCertificationResponseDto;
-import com.kugring.back.dto.response.auth.EmailCertificationResponseDto;
-import com.kugring.back.dto.response.auth.IdCheckResponseDto;
 import com.kugring.back.dto.response.auth.PinCheckResponseDto;
-import com.kugring.back.dto.response.auth.SignInResponseDto;
-import com.kugring.back.dto.response.auth.SignUpResponseDto;
-import com.kugring.back.entity.Certification;
 import com.kugring.back.entity.User;
-import com.kugring.back.provider.EmailProvider;
+// import com.kugring.back.provider.EmailProvider;
 import com.kugring.back.provider.JwtProvider;
-import com.kugring.back.repository.CertificationRepository;
+// import com.kugring.back.repository.CertificationRepository;
 import com.kugring.back.repository.UserRepository;
 import com.kugring.back.service.AuthService;
 
@@ -34,12 +22,11 @@ import lombok.RequiredArgsConstructor;
 public class AuthServiceImplement implements AuthService {
 
   private final UserRepository userRepository;
-  private final CertificationRepository certificationRepository;
 
   private final JwtProvider jwtProvider;
-  private final EmailProvider emailProvider;
+  // private final EmailProvider emailProvider;
 
-  private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(); // 스프링 시큐리티 cryto에서 제공하는
+  // private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(); // 스프링 시큐리티 cryto에서 제공하는
                                                                          // passwordEncoder이다!
 
 //   @Override

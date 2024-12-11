@@ -13,13 +13,18 @@ import lombok.Getter;
 @Getter
 public class PostOrderResponseDto extends ResponseDto {
 
-  private PostOrderResponseDto() {
+  private int balance;
+  private long waitingNum;
+
+  private PostOrderResponseDto(int balance, long waitingNum) {
     super();
+    this.balance = balance;
+    this.waitingNum = waitingNum;
   }
 
   // 성공 응답
-  public static ResponseEntity<PostOrderResponseDto> success() {
-    PostOrderResponseDto result = new PostOrderResponseDto();
+  public static ResponseEntity<PostOrderResponseDto> success(int balance, long waitingNum) {
+    PostOrderResponseDto result = new PostOrderResponseDto(balance, waitingNum);
     return ResponseEntity.status(HttpStatus.OK).body(result);
   }
 

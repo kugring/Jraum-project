@@ -1,20 +1,13 @@
 package com.kugring.back.controller;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import com.kugring.back.dto.response.option.GetMenuOptionResponseDto;
-import com.kugring.back.service.OptionService;
 import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequestMapping("/api/v1/option")
 @RequiredArgsConstructor
 public class OptionController {
-
-    private final OptionService optionService;
 
 
     
