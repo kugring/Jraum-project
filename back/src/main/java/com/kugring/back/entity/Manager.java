@@ -8,10 +8,12 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import com.kugring.back.dto.request.manager.AddNewManagerRequestDto;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "`manager`")
@@ -21,14 +23,14 @@ public class Manager {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-  private int managerId;
-  private String managerName;
+  private String managerId;
+  private String name;
   private String position;
   private String password;
   private String pin;
 
   public Manager(AddNewManagerRequestDto dto) {
-    this.managerName = dto.getNewManagerName();
+    this.name = dto.getNewManagerName();
     this.position = dto.getNewManagerDuty();
     this.password = dto.getNewManagerPassword();
     this.pin = dto.getNewManagerPin();

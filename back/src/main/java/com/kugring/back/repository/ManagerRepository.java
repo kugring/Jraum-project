@@ -9,12 +9,13 @@ import com.kugring.back.entity.Manager;
 @Repository
 public interface ManagerRepository extends JpaRepository<Manager, Integer> {
 
-  boolean existsByManagerId(int managerId);
+  boolean existsByManagerId(String managerId);
 
   boolean existsByPin(String pin);
 
-  // 먐먀?
   @Query(value = "SELECT manager_id FROM manager WHERE pin = ?1 AND password = ?2", nativeQuery = true)
   Integer findIdByManagerPinAndManagerPassword(String managerPin, String managerPassword);
+
+  Manager findByPin(String pin);
 
 }
