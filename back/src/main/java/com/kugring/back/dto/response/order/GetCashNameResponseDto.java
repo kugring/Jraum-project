@@ -9,16 +9,16 @@ import lombok.Getter;
 @Getter
 public class GetCashNameResponseDto extends ResponseDto {
 
-  private String cashName;
+  private String biblePerson;
 
-  private GetCashNameResponseDto(String cashName) {
+  private GetCashNameResponseDto(String biblePerson) {
     super();
-    this.cashName = cashName;
+    this.biblePerson = biblePerson;
   }
 
   // 성공 응답
-  public static ResponseEntity<GetCashNameResponseDto> success(String cashName) {
-    GetCashNameResponseDto result = new GetCashNameResponseDto(cashName);
+  public static ResponseEntity<GetCashNameResponseDto> success(String biblePerson) {
+    GetCashNameResponseDto result = new GetCashNameResponseDto(biblePerson);
     return ResponseEntity.status(HttpStatus.OK).body(result);
   }
 

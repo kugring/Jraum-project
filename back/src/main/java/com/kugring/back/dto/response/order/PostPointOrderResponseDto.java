@@ -11,20 +11,20 @@ import com.kugring.back.dto.response.ResponseDto;
 import lombok.Getter;
 
 @Getter
-public class PostOrderResponseDto extends ResponseDto {
+public class PostPointOrderResponseDto extends ResponseDto {
 
   private int balance;
   private long waitingNum;
 
-  private PostOrderResponseDto(int balance, long waitingNum) {
+  private PostPointOrderResponseDto(int balance, long waitingNum) {
     super();
     this.balance = balance;
     this.waitingNum = waitingNum;
   }
 
   // 성공 응답
-  public static ResponseEntity<PostOrderResponseDto> success(int balance, long waitingNum) {
-    PostOrderResponseDto result = new PostOrderResponseDto(balance, waitingNum);
+  public static ResponseEntity<PostPointOrderResponseDto> success(int balance, long waitingNum) {
+    PostPointOrderResponseDto result = new PostPointOrderResponseDto(balance, waitingNum);
     return ResponseEntity.status(HttpStatus.OK).body(result);
   }
 

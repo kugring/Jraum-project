@@ -3,7 +3,7 @@ package com.kugring.back.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.kugring.back.dto.request.order.PostOrderRequestDto;
+import com.kugring.back.dto.request.order.PostPointOrderRequestDto;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -48,7 +48,7 @@ public class Order {
   private List<OrderDetail> orderDetails; // 주문 항목들
 
 
-  public Order(PostOrderRequestDto dto, User user) {
+  public Order(PostPointOrderRequestDto dto, User user) {
     this.user = user;
     this.createdAt = LocalDateTime.now();
     this.status = "대기";

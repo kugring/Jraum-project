@@ -2,21 +2,19 @@ package com.kugring.back.service;
 
 import org.springframework.http.ResponseEntity;
 
-import com.kugring.back.dto.request.order.PostOrderRequestDto;
+import com.kugring.back.dto.request.order.PostOrderCashRequestDto;
+import com.kugring.back.dto.request.order.PostPointOrderRequestDto;
 import com.kugring.back.dto.response.order.GetCashNameResponseDto;
-import com.kugring.back.dto.response.order.PostOrderResponseDto;
-// import com.kugring.back.dto.request.order.FilterOrderListRequestDto;
-// import com.kugring.back.dto.request.order.PatchOrderListRequestDto;
-// import com.kugring.back.dto.request.order.PutOrderListRequestDto;
-// import com.kugring.back.dto.response.order.FilterOrderListResponseDto;
-// import com.kugring.back.dto.response.order.PatchOrderListResponseDto;
-// import com.kugring.back.dto.response.order.PutOrderListResponseDto;
+import com.kugring.back.dto.response.order.PostOrderCashResponseDto;
+import com.kugring.back.dto.response.order.PostPointOrderResponseDto;
+
 
 public interface OrderService {
 
   // ResponseEntity<? super FilterOrderListResponseDto> filterOrderList(FilterOrderListRequestDto dto);
 
-  ResponseEntity<? super PostOrderResponseDto> postOrderList(String user, PostOrderRequestDto dto);
+  ResponseEntity<? super PostPointOrderResponseDto> postPointOrderList(String user, PostPointOrderRequestDto dto);
+  ResponseEntity<? super PostOrderCashResponseDto> postCashOrderList(PostOrderCashRequestDto dto);
   ResponseEntity<? super GetCashNameResponseDto> getCashName();
 
   // ResponseEntity<? super PatchOrderListResponseDto> patchOrderList(Integer orderListId, PatchOrderListRequestDto dto);

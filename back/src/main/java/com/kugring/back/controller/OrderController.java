@@ -8,9 +8,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kugring.back.dto.request.order.PostOrderRequestDto;
+import com.kugring.back.dto.request.order.PostOrderCashRequestDto;
+import com.kugring.back.dto.request.order.PostPointOrderRequestDto;
 import com.kugring.back.dto.response.order.GetCashNameResponseDto;
-import com.kugring.back.dto.response.order.PostOrderResponseDto;
+import com.kugring.back.dto.response.order.PostOrderCashResponseDto;
+import com.kugring.back.dto.response.order.PostPointOrderResponseDto;
 import com.kugring.back.service.OrderService;
 
 import jakarta.validation.Valid;
@@ -31,11 +33,18 @@ public class OrderController {
   // return resposne;
   // }
 
-  @PostMapping("")
-  public ResponseEntity<? super PostOrderResponseDto> postOrder(
-      @RequestBody @Valid PostOrderRequestDto reqeustBody,
+  @PostMapping("/payment/point")
+  public ResponseEntity<? super PostPointOrderResponseDto> postOrder(
+      @RequestBody @Valid PostPointOrderRequestDto reqeustBody,
       @AuthenticationPrincipal String userId) {
-    ResponseEntity<? super PostOrderResponseDto> resposne = orderService.postOrderList(userId, reqeustBody);
+    ResponseEntity<? super PostPointOrderResponseDto> resposne = orderService.postPointOrderList(userId, reqeustBody);
+    return resposne;
+  }
+
+  @PostMapping("/payment/cash")
+  public ResponseEntity<? super PostOrderCashResponseDto> postOrder(
+      @RequestBody @Valid PostOrderCashRequestDto reqeustBody) {
+    ResponseEntity<? super PostOrderCashResponseDto> resposne = orderService.postCashOrderList(reqeustBody);
     return resposne;
   }
 

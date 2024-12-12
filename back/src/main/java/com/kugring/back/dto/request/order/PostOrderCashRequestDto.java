@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PostOrderRequestDto {
+public class PostOrderCashRequestDto {
 
   @NotNull
   private List<PostOrderDetailRequestDto> orderList; // 주문 항목 리스트
