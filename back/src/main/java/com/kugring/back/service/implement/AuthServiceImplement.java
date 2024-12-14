@@ -221,13 +221,13 @@ public class AuthServiceImplement implements AuthService {
       if (!user.getRole().trim().equals("ROLE_ADMIN")){return PinCheckResponseDto.pinCheckFail();}
 
       token = jwtProvider.create(user.getUserId());
+      
 
     } catch (Exception exception) {
       exception.printStackTrace();
+      System.out.println("여기서 문제가 생겨서 잡힘");
       return ResponseDto.databaseError();
     }
-
     return PinCheckManagerResponseDto.success(user, token);
-
   }
 }

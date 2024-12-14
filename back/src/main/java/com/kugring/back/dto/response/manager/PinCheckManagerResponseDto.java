@@ -22,7 +22,7 @@ public class PinCheckManagerResponseDto extends ResponseDto {
         super(); // 이놈이 가장 위에 있어야 오류 없이 작동한다.
         this.token = token;
         this.expirationTime = 3600;
-        this.user = user;
+        this.user.setName(user.getName());
     }
 
     public static ResponseEntity<PinCheckManagerResponseDto> success(User user, String token) {
