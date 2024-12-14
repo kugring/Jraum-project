@@ -6,7 +6,9 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
 import com.kugring.back.dto.object.OrderPageListItem;
+import com.kugring.back.dto.request.webSocket.CashPayOkRequestDto;
 import com.kugring.back.dto.request.webSocket.CashPayRequestDto;
+import com.kugring.back.dto.response.webSocket.CashPayOkResponseDto;
 import com.kugring.back.dto.response.webSocket.CashPayResponseDto;
 
 @Controller
@@ -39,8 +41,8 @@ public class WebSocketController {
 
     @MessageMapping("/sendCashPayOk")
     @SendTo("/topic/cashPay/user")
-    public boolean sendCashPayOk(boolean cashPayOk) {
-        return cashPayOk;
+    public CashPayOkResponseDto sendCashPayOk(@Payload CashPayOkRequestDto request) {
+        boolean cashPayOk = request.isChashPayOk();
+        return new CashPayOkResponseDto(cashPayOk);
     }
-
 }
