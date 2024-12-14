@@ -47,6 +47,7 @@ public class OrderServiceImplement implements OrderService {
     public ResponseEntity<? super PostPointOrderResponseDto> postPointOrderList(String userId,
             PostPointOrderRequestDto dto) {
 
+        GetOrderPageResultSet result = null;
         int balance = 0;
         long waitingNum = 0;
 
@@ -141,14 +142,15 @@ public class OrderServiceImplement implements OrderService {
 
             // 저장
             userRepository.save(user);
-            orderRepository.save(order);
+            Order newOrder = orderRepository.save(order);
+            result = orderRepository.findOrderDetailsByOrderId(newOrder.getOrderId());
 
         } catch (Exception exception) {
             exception.printStackTrace();
             ResponseDto.databaseError();
         }
 
-        return PostPointOrderResponseDto.success(balance, waitingNum);
+        return PostPointOrderResponseDto.success(balance, waitingNum, result);
 
     }
 
@@ -180,6 +182,7 @@ public class OrderServiceImplement implements OrderService {
     @Override
     public ResponseEntity<? super PostOrderCashResponseDto> postCashOrderList(PostOrderCashRequestDto dto) {
 
+        GetOrderPageResultSet result = null;
         String userId = null;
         long waitingNum = 0;
 
@@ -262,14 +265,14 @@ public class OrderServiceImplement implements OrderService {
 
             // 저장
             userRepository.save(user);
-            orderRepository.save(order);
+            Order newOrder = orderRepository.save(order);
+            result = orderRepository.findOrderDetailsByOrderId(newOrder.getOrderId());
 
         } catch (Exception exception) {
             exception.printStackTrace();
             ResponseDto.databaseError();
         }
-
-        return PostOrderCashResponseDto.success(userId, waitingNum);
+        return PostOrderCashResponseDto.success(userId, waitingNum, result);
     }
 
     @Override

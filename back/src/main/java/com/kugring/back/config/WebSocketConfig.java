@@ -14,14 +14,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(@NonNull StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("http://172.30.1.52:3000") // 특정 포트 번호 명시
+                .setAllowedOrigins("http://localhost:3000") // 특정 포트 번호 명시
                 // .setAllowedOriginPatterns("http://localhost:*") // 허용할 출처 패턴 지정
                 .withSockJS();
     }
 
     @Override
     public void configureMessageBroker(@NonNull MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/order", "/pointCharge");
+        config.enableSimpleBroker("/topic", "/order", "/pointCharge");  // /topic 경로 추가
         config.setApplicationDestinationPrefixes("/app");
     }
+    
 }
