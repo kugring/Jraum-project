@@ -2,11 +2,14 @@ package com.kugring.back.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import com.kugring.back.entity.Order;
+import com.kugring.back.repository.resultSet.GetOrderPageResultSet;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Integer> {
@@ -26,17 +29,9 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
             @Param("startCompleteDate") LocalDateTime startCompleteDate,
             @Param("endCompleteDate") LocalDateTime endCompleteDate);
 
-    // 주문 ID로 데이터 찾기
-    @Query("SELECT ol FROM Order ol "
-            + "JOIN FETCH ol.orderDetails oi "
-            + "JOIN FETCH oi.menu "
-            + "WHERE ol.orderId = :orderId")
-    Order findByOrderId(@Param("orderId") Long orderId);
-
     // 주문 상태에 따린 count값 가져오는 함수
     @Query("SELECT COUNT(o) FROM Order o WHERE o.status = :status")
     long countByStatus(@Param("status") String status);
-
 
     // status가 '미승인'이면서 payMethod가 '현금결제'인 주문에 해당하는 사용자 이름 목록 반환
     @Query("SELECT o.user.name FROM Order o " +
@@ -44,4 +39,21 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
             "AND o.payMethod = '현금결제'")
     String[] findUserNamesByUnapprovedAndCashPayment();
 
+    @Query("SELECT " +
+            "o as order, " +
+            "o.orderId as orderId, " +
+            "o.user.name as name, " +
+            "o.user.position as position, " +
+            "o.user.office as office, " +
+            "SUM(oi.quantity) as totalQuantity, " +
+            "SUM(CASE WHEN m.temperature = 'HOT' THEN oi.quantity ELSE 0 END) as hotCount, " +
+            "SUM(CASE WHEN m.temperature = 'COLD' THEN oi.quantity ELSE 0 END) as coldCount " +
+            "FROM Order o " +
+            "JOIN o.orderDetails oi " +
+            "JOIN oi.menu m " +
+            "WHERE o.status = :status " +
+            "GROUP BY o.user.name, o.user.position, o.user.office, o.orderId")
+    List<GetOrderPageResultSet> findOrderDetailsWithTemperatureCount(@Param("status") String status);
+
+    Order findByOrderId(Long orderId);
 }

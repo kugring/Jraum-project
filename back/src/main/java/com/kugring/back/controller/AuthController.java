@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kugring.back.dto.request.auth.PinCheckRequestDto;
 import com.kugring.back.dto.response.auth.PinCheckResponseDto;
+import com.kugring.back.dto.response.manager.PinCheckManagerResponseDto;
 import com.kugring.back.service.AuthService;
 
 import jakarta.validation.Valid;
@@ -55,6 +56,12 @@ public class AuthController {
   @PostMapping("/pin-check")
   public ResponseEntity<? super PinCheckResponseDto> pinCheck(@RequestBody @Valid PinCheckRequestDto requestBody) {
     ResponseEntity<? super PinCheckResponseDto> response = authService.pinCheck(requestBody);
+    return response;
+  }
+
+  @PostMapping("/pin-check/manager")
+  public ResponseEntity<? super PinCheckManagerResponseDto> managerPinCheck(@RequestBody @Valid PinCheckRequestDto requestBody) {
+    ResponseEntity<? super PinCheckManagerResponseDto> response = authService.managerPinCheck(requestBody);
     return response;
   }
 }

@@ -3,14 +3,18 @@ package com.kugring.back.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kugring.back.dto.request.order.PatchOrderApproveRequestDto;
 import com.kugring.back.dto.request.order.PostOrderCashRequestDto;
 import com.kugring.back.dto.request.order.PostPointOrderRequestDto;
 import com.kugring.back.dto.response.order.GetCashNameResponseDto;
+import com.kugring.back.dto.response.order.GetOrderBadgeResponseDto;
+import com.kugring.back.dto.response.order.PatchOrderApproveResponseDto;
 import com.kugring.back.dto.response.order.PostOrderCashResponseDto;
 import com.kugring.back.dto.response.order.PostPointOrderResponseDto;
 import com.kugring.back.service.OrderService;
@@ -37,6 +41,8 @@ public class OrderController {
   public ResponseEntity<? super PostPointOrderResponseDto> postOrder(
       @RequestBody @Valid PostPointOrderRequestDto reqeustBody,
       @AuthenticationPrincipal String userId) {
+    System.out.println("userId: " + userId);
+
     ResponseEntity<? super PostPointOrderResponseDto> resposne = orderService.postPointOrderList(userId, reqeustBody);
     return resposne;
   }
@@ -54,14 +60,22 @@ public class OrderController {
     return resposne;
   }
 
-  // @PatchMapping("/{orderListId}")
-  // public ResponseEntity<? super PatchOrderListResponseDto>
-  // patchOrder(@RequestBody @Valid PatchOrderListRequestDto requestBody,
-  // @PathVariable("orderListId") Integer orderListId) {
-  // ResponseEntity<? super PatchOrderListResponseDto> resposne =
-  // orderService.patchOrderList(orderListId, requestBody);
-  // return resposne;
-  // }
+  @GetMapping("/orderPage/badge")
+  public ResponseEntity<? super GetOrderBadgeResponseDto> getOrderBadge(
+      @AuthenticationPrincipal String userId) {
+    ResponseEntity<? super GetOrderBadgeResponseDto> resposne = orderService.getOrderBadge();
+    return resposne;
+  }
+ 
+  @PatchMapping("/approve")
+  public ResponseEntity<? super PatchOrderApproveResponseDto> patchOrder(
+      @AuthenticationPrincipal String userId,
+      @RequestBody @Valid PatchOrderApproveRequestDto reqeustBody) {
+    System.out.println("userId: " + userId);
+    ResponseEntity<? super PatchOrderApproveResponseDto> response = orderService.patchOrderApprove(userId, reqeustBody);
+
+    return response;
+  }
 
   // @PutMapping("/{orderListId}")
   // public ResponseEntity<? super PutOrderListResponseDto>

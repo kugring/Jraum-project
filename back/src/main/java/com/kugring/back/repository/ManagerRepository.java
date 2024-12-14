@@ -18,4 +18,6 @@ public interface ManagerRepository extends JpaRepository<Manager, Integer> {
 
   Manager findByPin(String pin);
 
+  Manager findByName(String name);
+
 }

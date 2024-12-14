@@ -7,12 +7,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.kugring.back.common.BiblePeople;
+import com.kugring.back.dto.request.order.PatchOrderApproveRequestDto;
 import com.kugring.back.dto.request.order.PostOrderCashRequestDto;
 import com.kugring.back.dto.request.order.PostOrderDetailOptionRequestDto;
 import com.kugring.back.dto.request.order.PostOrderDetailRequestDto;
 import com.kugring.back.dto.request.order.PostPointOrderRequestDto;
 import com.kugring.back.dto.response.ResponseDto;
 import com.kugring.back.dto.response.order.GetCashNameResponseDto;
+import com.kugring.back.dto.response.order.GetOrderBadgeResponseDto;
+import com.kugring.back.dto.response.order.PatchOrderApproveResponseDto;
 import com.kugring.back.dto.response.order.PostOrderCashResponseDto;
 import com.kugring.back.dto.response.order.PostPointOrderResponseDto;
 import com.kugring.back.entity.Menu;
@@ -25,6 +28,7 @@ import com.kugring.back.repository.MenuRepository;
 import com.kugring.back.repository.OptionRepository;
 import com.kugring.back.repository.OrderRepository;
 import com.kugring.back.repository.UserRepository;
+import com.kugring.back.repository.resultSet.GetOrderPageResultSet;
 import com.kugring.back.service.OrderService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -266,6 +270,45 @@ public class OrderServiceImplement implements OrderService {
         }
 
         return PostOrderCashResponseDto.success(userId, waitingNum);
+    }
+
+    @Override
+    public ResponseEntity<? super GetOrderBadgeResponseDto> getOrderBadge() {
+
+        List<GetOrderPageResultSet> list = null;
+
+        try {
+            list = orderRepository.findOrderDetailsWithTemperatureCount("대기");
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            ResponseDto.databaseError();
+        }
+        return GetOrderBadgeResponseDto.success(list);
+    }
+
+    @Override
+    public ResponseEntity<? super PatchOrderApproveResponseDto> patchOrderApprove(String userId, PatchOrderApproveRequestDto dto) {
+
+        try {
+            System.out.println("userId: "+ userId);
+            System.out.println("orderId: "+ dto.getOrderId());
+            User user = userRepository.findByUserId(userId);
+
+            if (!user.getRole().equals("ROLE_ADMIN")) {
+                return PatchOrderApproveResponseDto.managerNotExisted();
+            }
+
+            Order order = orderRepository.findByOrderId(dto.getOrderId());
+            order.setStatus("완료");
+            order.setUpdatedAt(LocalDateTime.now());
+
+            orderRepository.save(order);
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            ResponseDto.databaseError();
+        }
+        return PatchOrderApproveResponseDto.success();
     }
 
     // @Override

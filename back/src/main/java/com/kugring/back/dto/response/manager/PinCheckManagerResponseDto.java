@@ -5,28 +5,28 @@ import org.springframework.http.ResponseEntity;
 import com.kugring.back.common.ResponseCode;
 import com.kugring.back.common.ResponseMessage;
 import com.kugring.back.dto.response.ResponseDto;
-import com.kugring.back.entity.Manager;
+import com.kugring.back.entity.User;
+
 import lombok.Getter;
 
 @Getter
 public class PinCheckManagerResponseDto extends ResponseDto {
 
-    private Manager manager = new Manager();
+    private User user = new User();
     private String token;
     private int point;
     private int expirationTime;
 
-    private PinCheckManagerResponseDto(Manager manager, String token) {
+    private PinCheckManagerResponseDto(User user, String token) {
 
         super(); // 이놈이 가장 위에 있어야 오류 없이 작동한다.
         this.token = token;
         this.expirationTime = 3600;
-        this.manager.setName(manager.getName());
-        this.manager.setPosition(manager.getPosition());
-}
+        this.user = user;
+    }
 
-    public static ResponseEntity<PinCheckManagerResponseDto> success(Manager manager, String token) {
-        PinCheckManagerResponseDto result = new PinCheckManagerResponseDto(manager, token);
+    public static ResponseEntity<PinCheckManagerResponseDto> success(User user, String token) {
+        PinCheckManagerResponseDto result = new PinCheckManagerResponseDto(user, token);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 

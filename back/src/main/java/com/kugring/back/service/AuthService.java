@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.kugring.back.dto.request.auth.PinCheckRequestDto;
 import com.kugring.back.dto.response.auth.PinCheckResponseDto;
+import com.kugring.back.dto.response.manager.PinCheckManagerResponseDto;
 
 
 public interface AuthService {
@@ -20,4 +21,8 @@ public interface AuthService {
 
   ResponseEntity<? super PinCheckResponseDto> pinCheck(PinCheckRequestDto dto);
 
+  ResponseEntity<? super PinCheckManagerResponseDto> managerPinCheck(PinCheckRequestDto dto);
+
+
+  
 }
