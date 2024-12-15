@@ -3,18 +3,26 @@ package com.kugring.back.config;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+
+import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.lang.NonNull;
+
+
 
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    @Value("${tdomain}")
+    private String tdomain;
+
     @Override
     public void registerStompEndpoints(@NonNull StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("http://localhost:3000") // 특정 포트 번호 명시
+                .setAllowedOrigins("http://"+ tdomain +":3000")
                 // .setAllowedOriginPatterns("http://localhost:*") // 허용할 출처 패턴 지정
                 .withSockJS();
     }
