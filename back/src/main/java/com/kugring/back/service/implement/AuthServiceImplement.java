@@ -211,13 +211,8 @@ public class AuthServiceImplement implements AuthService {
 
       // pin으로 데이터 조회
       user = userRepository.findByPin(pin);
-
       // 정보가 없다면 예외처리
       if (user == null) return PinCheckResponseDto.pinCheckFail();
-
-      System.out.println("Role: "+ user.getRole());
-      System.out.println(user.getRole().trim().equals("ROLE_ADMIN"));
-
       if (!user.getRole().trim().equals("ROLE_ADMIN")){return PinCheckResponseDto.pinCheckFail();}
 
       token = jwtProvider.create(user.getUserId());
@@ -225,7 +220,6 @@ public class AuthServiceImplement implements AuthService {
 
     } catch (Exception exception) {
       exception.printStackTrace();
-      System.out.println("여기서 문제가 생겨서 잡힘");
       return ResponseDto.databaseError();
     }
     return PinCheckManagerResponseDto.success(user, token);

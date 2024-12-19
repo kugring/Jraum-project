@@ -2,7 +2,7 @@ package com.kugring.back.repository.resultSet;
 
 import com.kugring.back.entity.Order;
 
-public interface GetOrderPageResultSet {
+public interface GetOrderManageMentResultSet {
     int getHotCount();
     int getColdCount();
     int getTotalQuantity();

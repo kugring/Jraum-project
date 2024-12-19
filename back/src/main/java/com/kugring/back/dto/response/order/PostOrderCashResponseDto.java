@@ -5,9 +5,9 @@ import org.springframework.http.ResponseEntity;
 
 import com.kugring.back.common.ResponseCode;
 import com.kugring.back.common.ResponseMessage;
-import com.kugring.back.dto.object.OrderPageListItem;
+import com.kugring.back.dto.object.OrderManagementListItem;
 import com.kugring.back.dto.response.ResponseDto;
-import com.kugring.back.repository.resultSet.GetOrderPageResultSet;
+import com.kugring.back.repository.resultSet.GetOrderManageMentResultSet;
 
 import lombok.Getter;
 
@@ -16,17 +16,17 @@ public class PostOrderCashResponseDto extends ResponseDto {
 
   private String cashName;
   private long waitingNum;
-  private OrderPageListItem order;
+  private OrderManagementListItem order;
 
-  private PostOrderCashResponseDto(String cashName, long waitingNum, GetOrderPageResultSet resultSet) {
+  private PostOrderCashResponseDto(String cashName, long waitingNum, GetOrderManageMentResultSet resultSet) {
     super();
     this.cashName = cashName;
     this.waitingNum = waitingNum;
-    this.order = new OrderPageListItem(resultSet);
+    this.order = new OrderManagementListItem(resultSet);
   }
 
   // 성공 응답
-  public static ResponseEntity<PostOrderCashResponseDto> success(String cashName, long waitingNum, GetOrderPageResultSet resultSet) {
+  public static ResponseEntity<PostOrderCashResponseDto> success(String cashName, long waitingNum, GetOrderManageMentResultSet resultSet) {
     PostOrderCashResponseDto result = new PostOrderCashResponseDto(cashName, waitingNum, resultSet);
     return ResponseEntity.status(HttpStatus.OK).body(result);
   }

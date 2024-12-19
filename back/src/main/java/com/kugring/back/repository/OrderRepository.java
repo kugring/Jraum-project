@@ -8,10 +8,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import com.kugring.back.entity.Order;
-import com.kugring.back.repository.resultSet.GetOrderPageResultSet;
+import com.kugring.back.repository.resultSet.GetOrderListResultSet;
+import com.kugring.back.repository.resultSet.GetOrderManageMentResultSet;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Integer> {
+
+  Order findByOrderId(Long orderId);
 
   // userId, orderStatus, createDate, completeDate 동적 필터링
   @Query("SELECT o FROM Order o " +
@@ -53,7 +56,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
       "JOIN oi.menu m " +
       "WHERE o.status = :status " +
       "GROUP BY o.user.name, o.user.position, o.user.office, o.orderId")
-  List<GetOrderPageResultSet> findOrderDetailsWithTemperatureCount(@Param("status") String status);
+  List<GetOrderManageMentResultSet> findOrderDetailsWithTemperatureCount(@Param("status") String status);
 
   @Query("SELECT " +
       "o as order, " +
@@ -70,7 +73,31 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
       "JOIN oi.menu m " +
       "WHERE o.status = '대기' AND o.orderId = :orderId " +
       "GROUP BY o.orderId, o.user.name, o.user.position, o.user.office")
-  GetOrderPageResultSet findOrderDetailsByOrderId(@Param("orderId") Long orderId);
+  GetOrderManageMentResultSet findOrderDetailsByOrderId(@Param("orderId") Long orderId);
+  @Query("SELECT " +
+  "o as order, " +
+  "o.orderId as orderId, " +
+  "o.user.name as name, " +
+  "o.status as status, " +
+  "o.user.office as office, " +
+  "o.user.position as position, " +
+  "o.payMethod as payMethod, " +
+  "o.createdAt as createdAt, " +
+  "o.updatedAt as updatedAt, " +
+  "o.user.profileImage as profileImage, " +
+  "SUM(oi.quantity) as totalQuantity, " +
+  "SUM(oi.quantity * m.price + " +
+  "    COALESCE((SELECT SUM(odOpt.quantity * mo.price) " +
+  "              FROM OrderDetailOption odOpt " +
+  "              JOIN odOpt.menuOption mo " +
+  "              WHERE odOpt.orderDetail = oi), 0)) as totalPrice " +  // `o.orderDetails` 제거
+  "FROM Order o " +
+  "JOIN o.orderDetails oi " +
+  "JOIN oi.menu m " +
+  "GROUP BY o.orderId, o.user.name, o.status, o.user.office, o.user.position, " +
+  "o.payMethod, o.createdAt, o.updatedAt, o.user.profileImage")
+  List<GetOrderListResultSet> findOrderList();
+  
 
-  Order findByOrderId(Long orderId);
+
 }

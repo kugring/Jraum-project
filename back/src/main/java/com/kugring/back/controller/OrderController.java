@@ -13,7 +13,8 @@ import com.kugring.back.dto.request.order.PatchOrderApproveRequestDto;
 import com.kugring.back.dto.request.order.PostOrderCashRequestDto;
 import com.kugring.back.dto.request.order.PostPointOrderRequestDto;
 import com.kugring.back.dto.response.order.GetCashNameResponseDto;
-import com.kugring.back.dto.response.order.GetOrderBadgeResponseDto;
+import com.kugring.back.dto.response.order.GetOrderListResponseDto;
+import com.kugring.back.dto.response.order.GetOrderManagementResponseDto;
 import com.kugring.back.dto.response.order.PatchOrderApproveResponseDto;
 import com.kugring.back.dto.response.order.PostOrderCashResponseDto;
 import com.kugring.back.dto.response.order.PostPointOrderResponseDto;
@@ -41,7 +42,6 @@ public class OrderController {
   public ResponseEntity<? super PostPointOrderResponseDto> postOrder(
       @RequestBody @Valid PostPointOrderRequestDto reqeustBody,
       @AuthenticationPrincipal String userId) {
-    System.out.println("userId: " + userId);
 
     ResponseEntity<? super PostPointOrderResponseDto> resposne = orderService.postPointOrderList(userId, reqeustBody);
     return resposne;
@@ -60,10 +60,18 @@ public class OrderController {
     return resposne;
   }
 
-  @GetMapping("/orderPage/badge")
-  public ResponseEntity<? super GetOrderBadgeResponseDto> getOrderBadge(
+  @GetMapping("/manager/order-management")
+  public ResponseEntity<? super GetOrderManagementResponseDto> getOrderManagement(
       @AuthenticationPrincipal String userId) {
-    ResponseEntity<? super GetOrderBadgeResponseDto> resposne = orderService.getOrderBadge();
+    ResponseEntity<? super GetOrderManagementResponseDto> resposne = orderService.getOrderManagement(userId);
+    return resposne;
+  }
+ 
+
+  @GetMapping("/manager/order-list")
+  public ResponseEntity<? super GetOrderListResponseDto> getOrderList(
+      @AuthenticationPrincipal String userId) {
+    ResponseEntity<? super GetOrderListResponseDto> resposne = orderService.getOrderList(userId);
     return resposne;
   }
  

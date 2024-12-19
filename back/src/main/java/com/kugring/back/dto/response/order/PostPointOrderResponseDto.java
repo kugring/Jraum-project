@@ -5,9 +5,9 @@ import org.springframework.http.ResponseEntity;
 
 import com.kugring.back.common.ResponseCode;
 import com.kugring.back.common.ResponseMessage;
-import com.kugring.back.dto.object.OrderPageListItem;
+import com.kugring.back.dto.object.OrderManagementListItem;
 import com.kugring.back.dto.response.ResponseDto;
-import com.kugring.back.repository.resultSet.GetOrderPageResultSet;
+import com.kugring.back.repository.resultSet.GetOrderManageMentResultSet;
 
 import lombok.Getter;
 
@@ -16,17 +16,17 @@ public class PostPointOrderResponseDto extends ResponseDto {
 
   private int balance;
   private long waitingNum;
-  private OrderPageListItem order;
+  private OrderManagementListItem order;
 
-  private PostPointOrderResponseDto(int balance, long waitingNum, GetOrderPageResultSet resultSet) {
+  private PostPointOrderResponseDto(int balance, long waitingNum, GetOrderManageMentResultSet resultSet) {
     super();
     this.balance = balance;
     this.waitingNum = waitingNum;
-    this.order = new OrderPageListItem(resultSet);
+    this.order = new OrderManagementListItem(resultSet);
   }
 
   // 성공 응답
-  public static ResponseEntity<PostPointOrderResponseDto> success(int balance, long waitingNum, GetOrderPageResultSet resultSet) {
+  public static ResponseEntity<PostPointOrderResponseDto> success(int balance, long waitingNum, GetOrderManageMentResultSet resultSet) {
     PostPointOrderResponseDto result = new PostPointOrderResponseDto(balance, waitingNum, resultSet);
     return ResponseEntity.status(HttpStatus.OK).body(result);
   }

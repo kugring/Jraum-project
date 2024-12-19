@@ -23,6 +23,7 @@ public class OrderDetailListItem {
     private int status;
     private int sequence;
     private int quantity;
+    private int totalPrice;
     private int espressoShot;
     private List<OrderDetailOptionListItem> options; 
 
@@ -39,6 +40,7 @@ public class OrderDetailListItem {
         this.espressoShot = orderDetail.getMenu().getEspressoShot();
         this.orderDetailId = orderDetail.getOrderDetailId();
         this.quantity = orderDetail.getQuantity();
+        this.totalPrice = orderDetail.getQuantity() * orderDetail.getMenu().getPrice();
         this.options = OrderDetailOptionListItem.getOrderDetailOptionList(orderDetail.getOptions()); 
     }
 

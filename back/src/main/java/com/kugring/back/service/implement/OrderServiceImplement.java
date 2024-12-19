@@ -13,8 +13,10 @@ import com.kugring.back.dto.request.order.PostOrderDetailOptionRequestDto;
 import com.kugring.back.dto.request.order.PostOrderDetailRequestDto;
 import com.kugring.back.dto.request.order.PostPointOrderRequestDto;
 import com.kugring.back.dto.response.ResponseDto;
+import com.kugring.back.dto.response.auth.PinCheckResponseDto;
 import com.kugring.back.dto.response.order.GetCashNameResponseDto;
-import com.kugring.back.dto.response.order.GetOrderBadgeResponseDto;
+import com.kugring.back.dto.response.order.GetOrderListResponseDto;
+import com.kugring.back.dto.response.order.GetOrderManagementResponseDto;
 import com.kugring.back.dto.response.order.PatchOrderApproveResponseDto;
 import com.kugring.back.dto.response.order.PostOrderCashResponseDto;
 import com.kugring.back.dto.response.order.PostPointOrderResponseDto;
@@ -28,7 +30,8 @@ import com.kugring.back.repository.MenuRepository;
 import com.kugring.back.repository.OptionRepository;
 import com.kugring.back.repository.OrderRepository;
 import com.kugring.back.repository.UserRepository;
-import com.kugring.back.repository.resultSet.GetOrderPageResultSet;
+import com.kugring.back.repository.resultSet.GetOrderListResultSet;
+import com.kugring.back.repository.resultSet.GetOrderManageMentResultSet;
 import com.kugring.back.service.OrderService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +50,7 @@ public class OrderServiceImplement implements OrderService {
     public ResponseEntity<? super PostPointOrderResponseDto> postPointOrderList(String userId,
             PostPointOrderRequestDto dto) {
 
-        GetOrderPageResultSet result = null;
+        GetOrderManageMentResultSet result = null;
         int balance = 0;
         long waitingNum = 0;
 
@@ -182,7 +185,7 @@ public class OrderServiceImplement implements OrderService {
     @Override
     public ResponseEntity<? super PostOrderCashResponseDto> postCashOrderList(PostOrderCashRequestDto dto) {
 
-        GetOrderPageResultSet result = null;
+        GetOrderManageMentResultSet result = null;
         String userId = null;
         long waitingNum = 0;
 
@@ -276,25 +279,35 @@ public class OrderServiceImplement implements OrderService {
     }
 
     @Override
-    public ResponseEntity<? super GetOrderBadgeResponseDto> getOrderBadge() {
+    public ResponseEntity<? super GetOrderManagementResponseDto> getOrderManagement(String userId) {
 
-        List<GetOrderPageResultSet> list = null;
+        List<GetOrderManageMentResultSet> list = null;
 
         try {
+
+            // userId로 데이터 조회
+            User user = userRepository.findByUserId(userId);
+            // 정보가 없다면 예외처리
+            if (user == null)
+                return PinCheckResponseDto.pinCheckFail();
+            if (!user.getRole().trim().equals("ROLE_ADMIN")) {
+                return PinCheckResponseDto.pinCheckFail();
+            }
+
             list = orderRepository.findOrderDetailsWithTemperatureCount("대기");
+
         } catch (Exception exception) {
             exception.printStackTrace();
             ResponseDto.databaseError();
         }
-        return GetOrderBadgeResponseDto.success(list);
+        return GetOrderManagementResponseDto.success(list);
     }
 
     @Override
-    public ResponseEntity<? super PatchOrderApproveResponseDto> patchOrderApprove(String userId, PatchOrderApproveRequestDto dto) {
+    public ResponseEntity<? super PatchOrderApproveResponseDto> patchOrderApprove(String userId,
+            PatchOrderApproveRequestDto dto) {
 
         try {
-            System.out.println("userId: "+ userId);
-            System.out.println("orderId: "+ dto.getOrderId());
             User user = userRepository.findByUserId(userId);
 
             if (!user.getRole().equals("ROLE_ADMIN")) {
@@ -312,6 +325,39 @@ public class OrderServiceImplement implements OrderService {
             ResponseDto.databaseError();
         }
         return PatchOrderApproveResponseDto.success();
+    }
+
+    @Override
+    public ResponseEntity<? super GetOrderListResponseDto> getOrderList(String userId) {
+
+        List<GetOrderListResultSet> list = null;
+
+        try {
+            // userId로 데이터 조회
+            User user = userRepository.findByUserId(userId);
+            // 정보가 없다면 예외처리
+            if (user == null)
+                return PinCheckResponseDto.pinCheckFail();
+            if (!user.getRole().trim().equals("ROLE_ADMIN")) {
+                return PinCheckResponseDto.pinCheckFail();
+            }
+
+            list = orderRepository.findOrderList();
+
+            if (list != null) {
+                List<GetOrderListResultSet> resultList = list.stream().collect(Collectors.toList());
+                System.out.println(resultList);
+            } else {
+                System.out.println("resultSets is null");
+            }
+
+            
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            ResponseDto.databaseError();
+        }
+
+        return GetOrderListResponseDto.success(list);
     }
 
     // @Override

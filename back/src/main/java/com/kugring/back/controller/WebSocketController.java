@@ -5,7 +5,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
-import com.kugring.back.dto.object.OrderPageListItem;
+import com.kugring.back.dto.object.OrderManagementListItem;
 import com.kugring.back.dto.request.webSocket.CashPayOkRequestDto;
 import com.kugring.back.dto.request.webSocket.CashPayRequestDto;
 import com.kugring.back.dto.response.webSocket.CashPayOkResponseDto;
@@ -24,7 +24,7 @@ public class WebSocketController {
 
     @MessageMapping("/sendOrder")
     @SendTo("/topic/order")
-    public OrderPageListItem handleOrder(OrderPageListItem order) {
+    public OrderManagementListItem handleOrder(OrderManagementListItem order) {
         System.out.println("Received order: " + order.getPosition());
         System.out.println("Received order: " + order.getName());
         return order;
