@@ -9,6 +9,7 @@ public interface GetOrderPageResultSet {
     Long getOrderId();
     String getName();
     String getPosition();
+    String getProfileImage();
     String getOffice();
     Order getOrder();
 }

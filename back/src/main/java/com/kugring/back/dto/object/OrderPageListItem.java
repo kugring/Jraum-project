@@ -20,8 +20,10 @@ public class OrderPageListItem {
     private int totalQuantity;
     private Long orderId;
     private String name;
-    private String position;
     private String office;
+    private String position;
+    private String payMethod;
+    private String profileImage;
     private List<OrderDetailListItem> orderDetails;
 
     public OrderPageListItem(GetOrderPageResultSet resultSet){
@@ -30,7 +32,10 @@ public class OrderPageListItem {
         this.orderId = resultSet.getOrderId();
         this.hotCount = resultSet.getHotCount();
         this.position = resultSet.getPosition();
+        this.payMethod = resultSet.getOrder().getPayMethod();
         this.coldCount = resultSet.getColdCount();
+        this.profileImage = resultSet.getProfileImage();
+
         this.totalQuantity = resultSet.getTotalQuantity();
         this.orderDetails =  OrderDetailListItem.getOrderDetailList(resultSet.getOrder().getOrderDetails());
     }
