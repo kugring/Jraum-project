@@ -14,6 +14,7 @@ public interface GetOrderListResultSet {
     String getProfileImage();
     LocalDateTime getCreatedAt();
     LocalDateTime getUpdatedAt();
+    int getPoint();
     int getTotalPrice();
     int getTotalQuantity();
 }

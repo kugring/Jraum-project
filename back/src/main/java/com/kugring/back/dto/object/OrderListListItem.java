@@ -23,12 +23,14 @@ public class OrderListListItem {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String profileImage;
+    private int point;
     private int totalPrice;
     private int totalQuantity;
     private List<OrderDetailListItem> orderDetails;
 
     public OrderListListItem(GetOrderListResultSet resultSet){
         this.name = resultSet.getName();
+        this.point = resultSet.getPoint();
         this.status = resultSet.getStatus();
         this.office = resultSet.getOffice();
         this.orderId = resultSet.getOrderId();

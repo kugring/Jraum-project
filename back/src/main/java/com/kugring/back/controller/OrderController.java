@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kugring.back.dto.request.order.PatchOrderApproveRequestDto;
@@ -68,12 +69,14 @@ public class OrderController {
   }
  
 
-  @GetMapping("/manager/order-list")
-  public ResponseEntity<? super GetOrderListResponseDto> getOrderList(
-      @AuthenticationPrincipal String userId) {
-    ResponseEntity<? super GetOrderListResponseDto> resposne = orderService.getOrderList(userId);
-    return resposne;
-  }
+@GetMapping("/manager/order-list")
+public ResponseEntity<? super GetOrderListResponseDto> getOrderList(
+    @AuthenticationPrincipal String userId,
+    @RequestParam(defaultValue = "0") int page,
+    @RequestParam(defaultValue = "10") int size) {
+    ResponseEntity<? super GetOrderListResponseDto> response = orderService.getOrderList(userId, page, size);
+    return response;
+}
  
   @PatchMapping("/approve")
   public ResponseEntity<? super PatchOrderApproveResponseDto> patchOrder(

@@ -3,6 +3,7 @@ package com.kugring.back.repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -78,6 +79,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
   "o as order, " +
   "o.orderId as orderId, " +
   "o.user.name as name, " +
+  "o.user.point as point, " +
   "o.status as status, " +
   "o.user.office as office, " +
   "o.user.position as position, " +
@@ -96,7 +98,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
   "JOIN oi.menu m " +
   "GROUP BY o.orderId, o.user.name, o.status, o.user.office, o.user.position, " +
   "o.payMethod, o.createdAt, o.updatedAt, o.user.profileImage")
-  List<GetOrderListResultSet> findOrderList();
+  List<GetOrderListResultSet> findOrderList(Pageable pageable);
   
 
 

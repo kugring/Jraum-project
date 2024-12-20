@@ -3,6 +3,8 @@ package com.kugring.back.service.implement;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +34,8 @@ import com.kugring.back.repository.OrderRepository;
 import com.kugring.back.repository.UserRepository;
 import com.kugring.back.repository.resultSet.GetOrderListResultSet;
 import com.kugring.back.repository.resultSet.GetOrderManageMentResultSet;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import com.kugring.back.service.OrderService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -328,7 +332,7 @@ public class OrderServiceImplement implements OrderService {
     }
 
     @Override
-    public ResponseEntity<? super GetOrderListResponseDto> getOrderList(String userId) {
+    public ResponseEntity<? super GetOrderListResponseDto> getOrderList(String userId, int page, int size) {
 
         List<GetOrderListResultSet> list = null;
 
@@ -342,7 +346,10 @@ public class OrderServiceImplement implements OrderService {
                 return PinCheckResponseDto.pinCheckFail();
             }
 
-            list = orderRepository.findOrderList();
+            // 스크롤 이벤트로 인한 데이터 가져오게 도와주는것것
+            Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+            list = orderRepository.findOrderList(pageable);
 
             if (list != null) {
                 List<GetOrderListResultSet> resultList = list.stream().collect(Collectors.toList());

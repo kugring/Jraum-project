@@ -18,7 +18,7 @@ public interface OrderService {
   // ResponseEntity<? super FilterOrderListResponseDto> filterOrderList(FilterOrderListRequestDto dto);
 
   ResponseEntity<? super GetCashNameResponseDto> getCashName();
-  ResponseEntity<? super GetOrderListResponseDto> getOrderList(String userId);
+  ResponseEntity<? super GetOrderListResponseDto> getOrderList(String userId, int page, int size);
   ResponseEntity<? super PostOrderCashResponseDto> postCashOrderList(PostOrderCashRequestDto dto);
   ResponseEntity<? super PostPointOrderResponseDto> postPointOrderList(String user, PostPointOrderRequestDto dto);
   ResponseEntity<? super PatchOrderApproveResponseDto> patchOrderApprove(String userId, PatchOrderApproveRequestDto dto);
