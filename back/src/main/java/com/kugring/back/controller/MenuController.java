@@ -1,15 +1,23 @@
 package com.kugring.back.controller;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.kugring.back.dto.request.menu.PatchMenuSequenceRequestDto;
 import com.kugring.back.dto.response.menu.GetActiveMenuResponseDto;
 import com.kugring.back.dto.response.menu.GetMenuPageResponseDto;
+import com.kugring.back.dto.response.menu.PatchMenuSequenceResponseDto;
 import com.kugring.back.dto.response.option.GetMenuOptionResponseDto;
 import com.kugring.back.service.MenuService;
 import com.kugring.back.service.OptionService;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -37,6 +45,14 @@ public class MenuController {
       @AuthenticationPrincipal String userId,
       @PathVariable("category") String category) {
     ResponseEntity<? super GetMenuPageResponseDto> response = menuService.getMenuPage(userId, category);
+    return response;
+  }
+
+  @PatchMapping("/manager/menuPage/sequence")
+  public ResponseEntity<? super PatchMenuSequenceResponseDto> patchMenuSequence(
+      @AuthenticationPrincipal String userId,
+      @RequestBody @Valid PatchMenuSequenceRequestDto requestBody) {
+    ResponseEntity<? super PatchMenuSequenceResponseDto> response = menuService.patchMenuSequence(userId, requestBody);
     return response;
   }
 
