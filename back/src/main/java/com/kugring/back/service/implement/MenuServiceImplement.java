@@ -5,9 +5,14 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.kugring.back.dto.response.ResponseDto;
+import com.kugring.back.dto.response.auth.PinCheckResponseDto;
 import com.kugring.back.dto.response.menu.GetActiveMenuResponseDto;
+import com.kugring.back.dto.response.menu.GetMenuPageResponseDto;
+import com.kugring.back.entity.User;
 import com.kugring.back.repository.MenuRepository;
+import com.kugring.back.repository.UserRepository;
 import com.kugring.back.repository.resultSet.GetActiveMenuListResultSet;
+import com.kugring.back.repository.resultSet.GetMenuPageResultSet;
 import com.kugring.back.service.MenuService;
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class MenuServiceImplement implements MenuService {
 
     private final MenuRepository menuRepository;
+    private final UserRepository userRepository;
 
     @Override
     public ResponseEntity<? super GetActiveMenuResponseDto> getActiveMenu() {
@@ -23,15 +29,44 @@ public class MenuServiceImplement implements MenuService {
         List<GetActiveMenuListResultSet> menus;
 
         try {
-            
+
             // 모든 메뉴 정보를 담는다. (1인것이 정상이다)
             menus = menuRepository.findByStatus(1);
-            
+
         } catch (Exception exception) {
             exception.printStackTrace();
             return ResponseDto.databaseError();
         }
         return GetActiveMenuResponseDto.success(menus);
+    }
+
+    @Override
+    public ResponseEntity<? super GetMenuPageResponseDto> getMenuPage(String userId, String Category) {
+
+        List<GetMenuPageResultSet> menus;
+        
+        try {
+
+            // userId로 데이터 조회
+            User user = userRepository.findByUserId(userId);
+            // 정보가 없다면 예외처리
+            if (user == null)
+                return PinCheckResponseDto.pinCheckFail();
+            if (!user.getRole().trim().equals("ROLE_ADMIN")) {
+                return PinCheckResponseDto.pinCheckFail();
+            }
+
+            String category = "모두".equals(Category) ? null: Category;
+
+            menus = menuRepository.findMenuPageByCategory(category);
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            return ResponseDto.databaseError();
+        }
+
+        return GetMenuPageResponseDto.success(menus);
+
     }
 
     // @Override
@@ -50,7 +85,8 @@ public class MenuServiceImplement implements MenuService {
     // }
 
     // @Override @Transactional
-    // public ResponseEntity<? super PostMenuResponseDto> postMenu(PostMenuRequestDto dto) {
+    // public ResponseEntity<? super PostMenuResponseDto>
+    // postMenu(PostMenuRequestDto dto) {
     // try {
     // // 그대로 정보를 담고 저장
     // Menu Menu = new Menu(dto);
@@ -62,7 +98,8 @@ public class MenuServiceImplement implements MenuService {
     // for(MenuOptionListObject option : dto.getOptions()){
 
     // // 옵션엔터티 조회
-    // MenuOption optionEntity = optionRepository.findByOptionId(option.getOptionId());
+    // MenuOption optionEntity =
+    // optionRepository.findByOptionId(option.getOptionId());
 
     // // 옵션 코드가 아닌 경우 예외처리
     // if (optionEntity == null) return PostMenuResponseDto.menuCreateFail();
@@ -94,7 +131,8 @@ public class MenuServiceImplement implements MenuService {
     // }
 
     // @Override
-    // public ResponseEntity<? super PatchMenuResponseDto> patchMenu(int menuId, PatchMenuRequestDto
+    // public ResponseEntity<? super PatchMenuResponseDto> patchMenu(int menuId,
+    // PatchMenuRequestDto
     // dto) {
     // try {
 
@@ -114,7 +152,8 @@ public class MenuServiceImplement implements MenuService {
     // for(MenuOptionListObject option : dto.getOptions()){
 
     // // 옵션엔터티 조회
-    // MenuOption optionEntity = optionRepository.findByOptionId(option.getOptionId());
+    // MenuOption optionEntity =
+    // optionRepository.findByOptionId(option.getOptionId());
 
     // // 옵션 코드가 아닌 경우 예외처리
     // if (optionEntity == null) return PatchMenuResponseDto.menuPatchFail();

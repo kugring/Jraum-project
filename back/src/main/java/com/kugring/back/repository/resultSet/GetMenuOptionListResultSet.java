@@ -7,4 +7,5 @@ public interface GetMenuOptionListResultSet {
     String getCategory();
     Integer getSequence();
     Integer getPrice();
+    int getStatus();
 }

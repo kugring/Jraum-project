@@ -67,22 +67,23 @@ public class OrderController {
     ResponseEntity<? super GetOrderManagementResponseDto> resposne = orderService.getOrderManagement(userId);
     return resposne;
   }
- 
 
-@GetMapping("/manager/order-list")
-public ResponseEntity<? super GetOrderListResponseDto> getOrderList(
-    @AuthenticationPrincipal String userId,
-    @RequestParam(defaultValue = "0") int page,
-    @RequestParam(defaultValue = "10") int size) {
-    ResponseEntity<? super GetOrderListResponseDto> response = orderService.getOrderList(userId, page, size);
+  @GetMapping("/manager/order-list")
+  public ResponseEntity<? super GetOrderListResponseDto> getOrderList(
+      @AuthenticationPrincipal String userId,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size,
+      @RequestParam(required = false) String name,
+      @RequestParam(required = false) String status,
+      @RequestParam(required = false) String date) {
+    ResponseEntity<? super GetOrderListResponseDto> response = orderService.getOrderList(userId, page, size, name, status, date);
     return response;
-}
- 
+  }
+
   @PatchMapping("/approve")
   public ResponseEntity<? super PatchOrderApproveResponseDto> patchOrder(
       @AuthenticationPrincipal String userId,
       @RequestBody @Valid PatchOrderApproveRequestDto reqeustBody) {
-    System.out.println("userId: " + userId);
     ResponseEntity<? super PatchOrderApproveResponseDto> response = orderService.patchOrderApprove(userId, reqeustBody);
 
     return response;

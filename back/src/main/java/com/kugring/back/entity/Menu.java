@@ -37,17 +37,10 @@ public class Menu {
   private int sequence;
   private int espressoShot;
 
-
-    @ManyToMany
-    @JoinTable(
-        name = "menu_option_mapping", // 중간 테이블 이름
-        joinColumns = @JoinColumn(name = "menu_id"), // 메뉴를 참조하는 외래 키
-        inverseJoinColumns = @JoinColumn(name = "option_id") // 옵션을 참조하는 외래 키
-    )
-    private List<MenuOption> options; // 메뉴가 가지는 여러 옵션
-
-
-
-
+  @ManyToMany
+  @JoinTable(name = "menu_option_mapping", // 중간 테이블 이름
+      joinColumns = @JoinColumn(name = "menu_id"), // 메뉴를 참조하는 외래 키
+      inverseJoinColumns = @JoinColumn(name = "option_id") // 옵션을 참조하는 외래 키
+  )
+  private List<MenuOption> options; // 메뉴가 가지는 여러 옵션
 }
-

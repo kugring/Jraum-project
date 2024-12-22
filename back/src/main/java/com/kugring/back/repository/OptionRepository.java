@@ -26,7 +26,7 @@ public interface OptionRepository extends JpaRepository<MenuOption, Long> {
   boolean existsByDetail(String detail);
 
   // menu_id로 menu를 조회한 후, 해당 menu의 option_id들을 가져오고, 그 option들에 대한 정보를 조회하는 쿼리
-  @Query("SELECT o.optionId AS optionId, o.price AS price, o.category AS category, o.detail AS detail, o.sequence AS sequence, o.type AS type FROM Menu m JOIN m.options o WHERE m.menuId = :menuId AND o.status = 1 ORDER BY o.sequence ASC")
+  @Query("SELECT o.optionId AS optionId, o.price AS price, o.category AS category, o.status AS status, o.detail AS detail, o.sequence AS sequence, o.type AS type FROM Menu m JOIN m.options o WHERE m.menuId = :menuId AND o.status = 1 ORDER BY o.sequence ASC")
 List<GetMenuOptionListResultSet> findByMenuId(@Param("menuId") Long menuId);
 
 }

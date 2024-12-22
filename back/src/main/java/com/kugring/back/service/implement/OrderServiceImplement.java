@@ -1,7 +1,10 @@
 package com.kugring.back.service.implement;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
@@ -332,7 +335,8 @@ public class OrderServiceImplement implements OrderService {
     }
 
     @Override
-    public ResponseEntity<? super GetOrderListResponseDto> getOrderList(String userId, int page, int size) {
+    public ResponseEntity<? super GetOrderListResponseDto> getOrderList(
+            String userId, int page, int size, String nameD, String statusD, String dateD) {
 
         List<GetOrderListResultSet> list = null;
 
@@ -346,10 +350,26 @@ public class OrderServiceImplement implements OrderService {
                 return PinCheckResponseDto.pinCheckFail();
             }
 
-            // 스크롤 이벤트로 인한 데이터 가져오게 도와주는것것
+            // 스크롤 이벤트로 인한 데이터 가져오게 도와주는것
             Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
-            list = orderRepository.findOrderList(pageable);
+            // 회원이름 정의
+            String name = Objects.isNull(nameD) ? null : "".equals(nameD) ? null : nameD;
+            // String name = (Objects.isNull(nameD) || nameD.isEmpty()) ? null : "%" + nameD + "%";
+
+            // 상태에 정의
+            String status = Objects.isNull(statusD) ? null : "모두".equals(statusD) ? null : statusD;
+
+            // 자바스크립트 Date타입을 LocalDate로 변환
+            // 예외 처리를 추가한 경우
+
+            // dateD가 null이 아니면 LocalDateTime으로 변환하고, null일 경우 null을 반환
+            LocalDateTime startOfDay = Objects.isNull(dateD) ? null : LocalDate.parse(dateD).atStartOfDay();
+            LocalDateTime endOfDay = Objects.isNull(dateD) ? null : LocalDate.parse(dateD).atTime(LocalTime.MAX);
+
+            // 레파지토리에서 데이터 찾아옴
+            list = orderRepository.findOrderList(name, status, startOfDay, endOfDay, pageable);
+
 
             if (list != null) {
                 List<GetOrderListResultSet> resultList = list.stream().collect(Collectors.toList());
@@ -358,7 +378,6 @@ public class OrderServiceImplement implements OrderService {
                 System.out.println("resultSets is null");
             }
 
-            
         } catch (Exception exception) {
             exception.printStackTrace();
             ResponseDto.databaseError();
