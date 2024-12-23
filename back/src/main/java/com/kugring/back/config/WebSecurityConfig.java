@@ -52,7 +52,9 @@ public class WebSecurityConfig {
                         .requestMatchers(
                                 "/", "/api/v1/auth/**", "/oauth2/**", "/api/v1/board/**",
                                 "/api/v1/point/**", "/api/v1/menu/**", "/api/v1/user/**",
-                                "/api/v1/order/**", "/api/v1/option/**", "/api/v1/manager/**")
+                                "/api/v1/order/**", "/api/v1/option/**", "/api/v1/manager/**",
+                                "/file/**" // /file 경로와 하위 모든 경로 허용
+                        )
                         .permitAll()
 
                         // 권한이 필요한 요청 설정

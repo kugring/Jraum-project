@@ -19,9 +19,9 @@ public class PostMenuResponseDto extends ResponseDto {
     return ResponseEntity.status(HttpStatus.OK).body(result);
   }
 
-    // 실패 응답 (Menu create Fail)
-    public static ResponseEntity<ResponseDto> menuCreateFail() {
-        ResponseDto responseBody = new ResponseDto(ResponseCode.MENU_CREATE_FAIL, ResponseMessage.MENU_CREATE_FAIL);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
-    }
+  // 실패 응답 (Menu create Fail)
+  public static ResponseEntity<ResponseDto> menuCreateFail() {
+      ResponseDto responseBody = new ResponseDto(ResponseCode.MENU_CREATE_FAIL, ResponseMessage.MENU_CREATE_FAIL);
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
+  }
 }

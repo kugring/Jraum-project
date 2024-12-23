@@ -6,11 +6,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.kugring.back.dto.request.menu.PatchMenuSequenceRequestDto;
+import com.kugring.back.dto.request.menu.PostMenuRequestDto;
 import com.kugring.back.dto.response.ResponseDto;
 import com.kugring.back.dto.response.auth.PinCheckResponseDto;
 import com.kugring.back.dto.response.menu.GetActiveMenuResponseDto;
 import com.kugring.back.dto.response.menu.GetMenuPageResponseDto;
 import com.kugring.back.dto.response.menu.PatchMenuSequenceResponseDto;
+import com.kugring.back.dto.response.menu.PostMenuResponseDto;
 import com.kugring.back.entity.Menu;
 import com.kugring.back.entity.User;
 import com.kugring.back.repository.MenuRepository;
@@ -46,11 +48,8 @@ public class MenuServiceImplement implements MenuService {
 
     @Override
     public ResponseEntity<? super GetMenuPageResponseDto> getMenuPage(String userId, String Category) {
-
         List<GetMenuPageResultSet> menus;
-
         try {
-            System.out.println("userId: "+ userId );
             // userId로 데이터 조회
             User user = userRepository.findByUserId(userId);
             // 정보가 없다면 예외처리
@@ -59,11 +58,8 @@ public class MenuServiceImplement implements MenuService {
             if (!user.getRole().trim().equals("ROLE_ADMIN")) {
                 return PinCheckResponseDto.pinCheckFail();
             }
-
             String category = "모두".equals(Category) ? null : Category;
-
             menus = menuRepository.findMenuPageByCategory(category);
-
         } catch (Exception exception) {
             exception.printStackTrace();
             return ResponseDto.databaseError();
@@ -72,13 +68,38 @@ public class MenuServiceImplement implements MenuService {
     }
 
     @Override
-    public ResponseEntity<? super PatchMenuSequenceResponseDto> patchMenuSequence(String userId, PatchMenuSequenceRequestDto dto) {
+    public ResponseEntity<? super PatchMenuSequenceResponseDto> patchMenuSequence(String userId,
+            PatchMenuSequenceRequestDto dto) {
         try {
-            System.out.println("userId: "+ userId);
             // userId로 데이터 조회
             User user = userRepository.findByUserId(userId);
+            // 정보가 없다면 예외처리
+            if (user == null)
+                return PinCheckResponseDto.pinCheckFail();
+            if (!user.getRole().trim().equals("ROLE_ADMIN")) {
+                return PatchMenuSequenceResponseDto.notExistedManager();
+            }
+            // 메뉴Id로 조회 이후 null 인 경우 예외처리리
+            Menu menu = menuRepository.findByMenuId(dto.getMenuId());
+            if (menu == null) {
+                return PatchMenuSequenceResponseDto.notExistedMenu();
+            }
+            // 메뉴의 순서 수정정
+            menu.setSequence(dto.getSequence());
+            // 수정된 메뉴 저장
+            menuRepository.save(menu);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            return ResponseDto.databaseError();
+        }
+        return PatchMenuSequenceResponseDto.success();
+    }
 
-
+    @Override
+    public ResponseEntity<? super PostMenuResponseDto> postMenu(String userId, PostMenuRequestDto dto) {
+        try {
+            // userId로 데이터 조회
+            User user = userRepository.findByUserId(userId);
             // 정보가 없다면 예외처리
             if (user == null)
                 return PinCheckResponseDto.pinCheckFail();
@@ -86,23 +107,12 @@ public class MenuServiceImplement implements MenuService {
                 return PatchMenuSequenceResponseDto.notExistedManager();
             }
 
-            // 메뉴Id로 조회 이후 null 인 경우 예외처리리
-            Menu menu = menuRepository.findByMenuId(dto.getMenuId());
-            if (menu == null) {
-                return PatchMenuSequenceResponseDto.notExistedMenu();
-            }
-
-            // 메뉴의 순서 수정정
-            menu.setSequence(dto.getSequence());
-            // 수정된 메뉴 저장
-            menuRepository.save(menu);
-
+            
         } catch (Exception exception) {
             exception.printStackTrace();
             return ResponseDto.databaseError();
         }
-
-        return PatchMenuSequenceResponseDto.success();
+        return PostMenuResponseDto.success();
     }
 
     // @Override
