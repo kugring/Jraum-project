@@ -1,6 +1,8 @@
 package com.kugring.back.entity;
 
 import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,10 +39,12 @@ public class Menu {
   private int sequence;
   private int espressoShot;
 
-  @ManyToMany
-  @JoinTable(name = "menu_option_mapping", // 중간 테이블 이름
-      joinColumns = @JoinColumn(name = "menu_id"), // 메뉴를 참조하는 외래 키
-      inverseJoinColumns = @JoinColumn(name = "option_id") // 옵션을 참조하는 외래 키
+  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+  @JoinTable(
+      name = "menu_option_mapping",
+      joinColumns = @JoinColumn(name = "menu_id"),
+      inverseJoinColumns = @JoinColumn(name = "option_id")
   )
-  private List<MenuOption> options; // 메뉴가 가지는 여러 옵션
+  private List<MenuOption> options;
+  
 }

@@ -1,21 +1,27 @@
 package com.kugring.back.service.implement;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.kugring.back.dto.request.menu.PatchMenuRequestDto;
 import com.kugring.back.dto.request.menu.PatchMenuSequenceRequestDto;
 import com.kugring.back.dto.request.menu.PostMenuRequestDto;
 import com.kugring.back.dto.response.ResponseDto;
 import com.kugring.back.dto.response.auth.PinCheckResponseDto;
 import com.kugring.back.dto.response.menu.GetActiveMenuResponseDto;
 import com.kugring.back.dto.response.menu.GetMenuPageResponseDto;
+import com.kugring.back.dto.response.menu.PatchMenuResponseDto;
 import com.kugring.back.dto.response.menu.PatchMenuSequenceResponseDto;
 import com.kugring.back.dto.response.menu.PostMenuResponseDto;
 import com.kugring.back.entity.Menu;
+import com.kugring.back.entity.MenuOption;
 import com.kugring.back.entity.User;
 import com.kugring.back.repository.MenuRepository;
+import com.kugring.back.repository.OptionRepository;
 import com.kugring.back.repository.UserRepository;
 import com.kugring.back.repository.resultSet.GetActiveMenuListResultSet;
 import com.kugring.back.repository.resultSet.GetMenuPageResultSet;
@@ -28,6 +34,7 @@ public class MenuServiceImplement implements MenuService {
 
     private final MenuRepository menuRepository;
     private final UserRepository userRepository;
+    private final OptionRepository optionRepository;
 
     @Override
     public ResponseEntity<? super GetActiveMenuResponseDto> getActiveMenu() {
@@ -107,12 +114,91 @@ public class MenuServiceImplement implements MenuService {
                 return PatchMenuSequenceResponseDto.notExistedManager();
             }
 
-            
+            List<MenuOption> options = new ArrayList<>();
+            for (String category : dto.getOptions()) {
+                String syrup = "시럽";
+                // "시럽"이라는 단어가 들어가 있다면 제거
+                if (category.contains(syrup)) {
+                    category = category.replace(syrup, "");
+                }
+                List<MenuOption> item = optionRepository.findByCategory(category);
+                options.addAll(item);
+            }
+            Menu menu = new Menu();
+            menu.setName(dto.getName());
+            menu.setImage(dto.getImage());
+            menu.setPrice(dto.getPrice());
+            menu.setStatus(dto.getStatus());
+            menu.setCategory(dto.getCategory());
+            menu.setTemperature(dto.getTemperature());
+            menu.setEspressoShot(dto.getEspressoShot());
+            menu.setOptions(options);
+            menuRepository.save(menu);
         } catch (Exception exception) {
             exception.printStackTrace();
             return ResponseDto.databaseError();
         }
         return PostMenuResponseDto.success();
+    }
+
+    @Override
+    public ResponseEntity<? super PatchMenuResponseDto> patchMenu(String userId, PatchMenuRequestDto dto) {
+        try {
+            // 유저 권한 확인
+            User user = userRepository.findByUserId(userId);
+            if (user == null || !user.getRole().trim().equals("ROLE_ADMIN")) {
+                return PatchMenuSequenceResponseDto.notExistedManager();
+            }
+
+            // 메뉴 조회
+            Menu menu = menuRepository.findByMenuId(dto.getMenuId());
+            if (menu == null) {
+                return PatchMenuSequenceResponseDto.notExistedMenu();
+            }
+
+            // options만 제거
+            menu.setOptions(null);
+
+            // 변경된 상태 저장
+            menu = menuRepository.save(menu);
+
+            // 옵션 처리
+            List<MenuOption> options = dto.getOptions().stream()
+                    .flatMap(category -> {
+                        String syrup = "시럽";
+                        if (category.contains(syrup)) {
+                            // "시럽"이 포함되어 있으면 시럽을 제거한 detail로 옵션 찾기
+                            String detail = category.replace(syrup, "");
+                            return optionRepository.findByDetail(detail).stream();
+                        } else {
+                            // 시럽이 포함되지 않으면 카테고리로 옵션 찾기
+                            return optionRepository.findByCategory(category).stream();
+                        }
+                    })
+                    .collect(Collectors.toList());
+
+            // 메뉴 속성 업데이트
+            menu.setName(dto.getName());
+            menu.setImage(dto.getImage());
+            menu.setPrice(dto.getPrice());
+            menu.setStatus(dto.getStatus());
+            menu.setCategory(dto.getCategory());
+            menu.setTemperature(dto.getTemperature());
+            menu.setEspressoShot(dto.getEspressoShot());
+            menu.setOptions(options);
+
+            System.out.println("추가되는 옵션 이름: "+options.get(0).getCategory());
+            System.out.println("추가되는 옵션의 갯수: "+options.size());
+
+
+            // 메뉴 저장 (속성 업데이트)
+            menuRepository.save(menu);
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            return ResponseDto.databaseError();
+        }
+        return PatchMenuResponseDto.success();
     }
 
     // @Override

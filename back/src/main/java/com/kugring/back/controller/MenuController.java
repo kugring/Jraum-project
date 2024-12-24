@@ -10,10 +10,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.kugring.back.dto.request.menu.PatchMenuRequestDto;
 import com.kugring.back.dto.request.menu.PatchMenuSequenceRequestDto;
 import com.kugring.back.dto.request.menu.PostMenuRequestDto;
 import com.kugring.back.dto.response.menu.GetActiveMenuResponseDto;
 import com.kugring.back.dto.response.menu.GetMenuPageResponseDto;
+import com.kugring.back.dto.response.menu.PatchMenuResponseDto;
 import com.kugring.back.dto.response.menu.PatchMenuSequenceResponseDto;
 import com.kugring.back.dto.response.menu.PostMenuResponseDto;
 import com.kugring.back.dto.response.option.GetMenuOptionResponseDto;
@@ -64,6 +66,14 @@ public class MenuController {
       @AuthenticationPrincipal String userId,
       @RequestBody @Valid PostMenuRequestDto requestBody) {
     ResponseEntity<? super PostMenuResponseDto> response = menuService.postMenu(userId, requestBody);
+    return response;
+  }
+
+  @PatchMapping("")
+  public ResponseEntity<? super PatchMenuResponseDto> patchMenu(
+      @AuthenticationPrincipal String userId,
+      @RequestBody @Valid PatchMenuRequestDto requestBody) {
+    ResponseEntity<? super PatchMenuResponseDto> response = menuService.patchMenu(userId, requestBody);
     return response;
   }
 
