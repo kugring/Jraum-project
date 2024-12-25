@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.kugring.back.common.BiblePeople;
 import com.kugring.back.dto.request.order.PatchOrderApproveRequestDto;
+import com.kugring.back.dto.request.order.PatchOrderRefundRequestDto;
 import com.kugring.back.dto.request.order.PostOrderCashRequestDto;
 import com.kugring.back.dto.request.order.PostOrderDetailOptionRequestDto;
 import com.kugring.back.dto.request.order.PostOrderDetailRequestDto;
@@ -23,6 +24,7 @@ import com.kugring.back.dto.response.order.GetCashNameResponseDto;
 import com.kugring.back.dto.response.order.GetOrderListResponseDto;
 import com.kugring.back.dto.response.order.GetOrderManagementResponseDto;
 import com.kugring.back.dto.response.order.PatchOrderApproveResponseDto;
+import com.kugring.back.dto.response.order.PatchOrderRefundResponseDto;
 import com.kugring.back.dto.response.order.PostOrderCashResponseDto;
 import com.kugring.back.dto.response.order.PostPointOrderResponseDto;
 import com.kugring.back.entity.Menu;
@@ -355,7 +357,8 @@ public class OrderServiceImplement implements OrderService {
 
             // 회원이름 정의
             String name = Objects.isNull(nameD) ? null : "".equals(nameD) ? null : nameD;
-            // String name = (Objects.isNull(nameD) || nameD.isEmpty()) ? null : "%" + nameD + "%";
+            // String name = (Objects.isNull(nameD) || nameD.isEmpty()) ? null : "%" + nameD
+            // + "%";
 
             // 상태에 정의
             String status = Objects.isNull(statusD) ? null : "모두".equals(statusD) ? null : statusD;
@@ -370,7 +373,6 @@ public class OrderServiceImplement implements OrderService {
             // 레파지토리에서 데이터 찾아옴
             list = orderRepository.findOrderList(name, status, startOfDay, endOfDay, pageable);
 
-
             if (list != null) {
                 List<GetOrderListResultSet> resultList = list.stream().collect(Collectors.toList());
                 System.out.println(resultList);
@@ -384,6 +386,33 @@ public class OrderServiceImplement implements OrderService {
         }
 
         return GetOrderListResponseDto.success(list);
+    }
+
+    @Override
+    public ResponseEntity<? super PatchOrderRefundResponseDto> patchOrderRefund(String userId,
+            PatchOrderRefundRequestDto dto) {
+        try {
+            // userId로 데이터 조회
+            User manager = userRepository.findByUserId(userId);
+            // 정보가 없다면 예외처리
+            if (manager == null)
+                return PinCheckResponseDto.pinCheckFail();
+            if (!manager.getRole().trim().equals("ROLE_ADMIN")) {
+                return PinCheckResponseDto.pinCheckFail();
+            }
+            int refundPrice = orderRepository.findTotalPriceByOrderId(dto.getOrderId());
+            Order order = orderRepository.findByOrderId(dto.getOrderId());
+            order.setStatus("환불");
+            User user = order.getUser();
+            int finalPrice = user.getPoint() + refundPrice;
+            user.setPoint(finalPrice);
+            orderRepository.save(order);
+            userRepository.save(user);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            ResponseDto.databaseError();
+        }
+        return PatchOrderRefundResponseDto.success();
     }
 
     // @Override

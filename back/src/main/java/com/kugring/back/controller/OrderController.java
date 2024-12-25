@@ -11,12 +11,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kugring.back.dto.request.order.PatchOrderApproveRequestDto;
+import com.kugring.back.dto.request.order.PatchOrderRefundRequestDto;
 import com.kugring.back.dto.request.order.PostOrderCashRequestDto;
 import com.kugring.back.dto.request.order.PostPointOrderRequestDto;
 import com.kugring.back.dto.response.order.GetCashNameResponseDto;
 import com.kugring.back.dto.response.order.GetOrderListResponseDto;
 import com.kugring.back.dto.response.order.GetOrderManagementResponseDto;
 import com.kugring.back.dto.response.order.PatchOrderApproveResponseDto;
+import com.kugring.back.dto.response.order.PatchOrderRefundResponseDto;
 import com.kugring.back.dto.response.order.PostOrderCashResponseDto;
 import com.kugring.back.dto.response.order.PostPointOrderResponseDto;
 import com.kugring.back.service.OrderService;
@@ -88,6 +90,16 @@ public class OrderController {
 
     return response;
   }
+
+
+  @PatchMapping("/refund")
+public ResponseEntity<? super PatchOrderRefundResponseDto> patchOrderRefund(
+    @AuthenticationPrincipal String userId,
+    @RequestBody @Valid PatchOrderRefundRequestDto requestBody) {
+  ResponseEntity<? super PatchOrderRefundResponseDto> response = orderService.patchOrderRefund(userId, requestBody);
+
+  return response;
+}
 
   // @PutMapping("/{orderListId}")
   // public ResponseEntity<? super PutOrderListResponseDto>

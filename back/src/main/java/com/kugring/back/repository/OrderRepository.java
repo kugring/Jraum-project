@@ -136,4 +136,14 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
                         @Param("endOfDay") LocalDateTime endOfDay,
                         Pageable pageable);
 
+        @Query("SELECT SUM(oi.quantity * m.price + " +
+                        "    COALESCE((SELECT SUM(odOpt.quantity * mo.price) " +
+                        "              FROM OrderDetailOption odOpt " +
+                        "              JOIN odOpt.menuOption mo " +
+                        "              WHERE odOpt.orderDetail = oi), 0)) " +
+                        "FROM Order o " +
+                        "JOIN o.orderDetails oi " +
+                        "JOIN oi.menu m " +
+                        "WHERE o.orderId = :orderId")
+        int findTotalPriceByOrderId(@Param("orderId") Long orderId);
 }
