@@ -13,6 +13,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -52,6 +54,21 @@ public class Order {
     this.user = user;
     this.createdAt = LocalDateTime.now();
     this.status = "대기";
+  }
+
+
+    // 엔티티가 저장되기 전에 호출되어 createdAt을 설정
+  @PrePersist
+  public void prePersist() {
+    LocalDateTime now = LocalDateTime.now();
+    this.createdAt = now;
+    this.updatedAt = now;
+  }
+
+  // 엔티티가 업데이트되기 전에 호출되어 updatedAt을 설정
+  @PreUpdate
+  public void preUpdate() {
+    this.updatedAt = LocalDateTime.now();
   }
 
 }

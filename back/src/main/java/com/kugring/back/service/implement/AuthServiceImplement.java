@@ -5,9 +5,15 @@ import org.springframework.http.ResponseEntity;
 // import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.kugring.back.dto.request.auth.JraumSignUpRequestDto;
+import com.kugring.back.dto.request.auth.NicknameDpCheckRequestDto;
 import com.kugring.back.dto.request.auth.PinCheckRequestDto;
+import com.kugring.back.dto.request.auth.PinDpCheckRequestDto;
 import com.kugring.back.dto.response.ResponseDto;
+import com.kugring.back.dto.response.auth.JraumSignUpResponseDto;
+import com.kugring.back.dto.response.auth.NicknameDpCheckResponseDto;
 import com.kugring.back.dto.response.auth.PinCheckResponseDto;
+import com.kugring.back.dto.response.auth.PinDpCheckResponseDto;
 import com.kugring.back.dto.response.manager.PinCheckManagerResponseDto;
 import com.kugring.back.entity.User;
 // import com.kugring.back.provider.EmailProvider;
@@ -212,16 +218,95 @@ public class AuthServiceImplement implements AuthService {
       // pin으로 데이터 조회
       user = userRepository.findByPin(pin);
       // 정보가 없다면 예외처리
-      if (user == null) return PinCheckResponseDto.pinCheckFail();
-      if (!user.getRole().trim().equals("ROLE_ADMIN")){return PinCheckResponseDto.pinCheckFail();}
+      if (user == null)
+        return PinCheckResponseDto.pinCheckFail();
+      if (!user.getRole().trim().equals("ROLE_ADMIN")) {
+        return PinCheckResponseDto.pinCheckFail();
+      }
 
       token = jwtProvider.create(user.getUserId());
-      
 
     } catch (Exception exception) {
       exception.printStackTrace();
       return ResponseDto.databaseError();
     }
     return PinCheckManagerResponseDto.success(user, token);
+  }
+
+  @Override
+  public ResponseEntity<? super JraumSignUpResponseDto> jraumSignUp(String userId, JraumSignUpRequestDto dto) {
+    try {
+      // userId로 데이터 조회
+      User manager = userRepository.findByUserId(userId);
+      // 정보가 없다면 예외처리
+      if (manager == null)
+        return PinCheckResponseDto.pinCheckFail();
+      if (!manager.getRole().trim().equals("ROLE_ADMIN")) {
+        return PinCheckResponseDto.pinCheckFail();
+      }
+
+      boolean existsPin = userRepository.existsByPin(dto.getPin());
+      if (existsPin) {
+        return JraumSignUpResponseDto.duplicatePin();
+      }
+      boolean existsNickname = userRepository.existsByNickname(dto.getNickname());
+      if (existsNickname) {
+        return JraumSignUpResponseDto.duplicateNickname();
+      }
+      User user = new User(dto);
+      userRepository.save(user);
+    } catch (Exception exception) {
+      exception.printStackTrace();
+      return ResponseDto.databaseError();
+    }
+    return JraumSignUpResponseDto.success();
+  }
+
+  @Override
+  public ResponseEntity<? super PinDpCheckResponseDto> pinDpCheck(String userId, PinDpCheckRequestDto dto) {
+    try {
+      // userId로 데이터 조회
+      User manager = userRepository.findByUserId(userId);
+      // 정보가 없다면 예외처리
+      if (manager == null)
+        return PinCheckResponseDto.pinCheckFail();
+      if (!manager.getRole().trim().equals("ROLE_ADMIN")) {
+        return PinCheckResponseDto.pinCheckFail();
+      }
+      
+      boolean existsPin = userRepository.existsByPin(dto.getPin());
+      if (existsPin) {
+        return JraumSignUpResponseDto.duplicatePin();
+      }
+
+    } catch (Exception exception) {
+      exception.printStackTrace();
+      return ResponseDto.databaseError();
+    }
+    return PinDpCheckResponseDto.success();
+  }
+
+  @Override
+  public ResponseEntity<? super NicknameDpCheckResponseDto> nicknameDpCheck(String userId, NicknameDpCheckRequestDto dto) {
+    try {
+      // userId로 데이터 조회
+      User manager = userRepository.findByUserId(userId);
+      // 정보가 없다면 예외처리
+      if (manager == null)
+        return PinCheckResponseDto.pinCheckFail();
+      if (!manager.getRole().trim().equals("ROLE_ADMIN")) {
+        return PinCheckResponseDto.pinCheckFail();
+      }
+
+      boolean existsNickname = userRepository.existsByNickname(dto.getNickname());
+      if (existsNickname) {
+        return JraumSignUpResponseDto.duplicateNickname();
+      }
+
+    } catch (Exception exception) {
+      exception.printStackTrace();
+      return ResponseDto.databaseError();
+    }
+    return NicknameDpCheckResponseDto.success();
   }
 }

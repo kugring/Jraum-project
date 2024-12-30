@@ -373,13 +373,6 @@ public class OrderServiceImplement implements OrderService {
             // 레파지토리에서 데이터 찾아옴
             list = orderRepository.findOrderList(name, status, startOfDay, endOfDay, pageable);
 
-            if (list != null) {
-                List<GetOrderListResultSet> resultList = list.stream().collect(Collectors.toList());
-                System.out.println(resultList);
-            } else {
-                System.out.println("resultSets is null");
-            }
-
         } catch (Exception exception) {
             exception.printStackTrace();
             ResponseDto.databaseError();

@@ -18,6 +18,7 @@ public interface ResponseCode {
   String ORDER_FAIL = "OF";
   String REFUND_FAIL = "RF";
   String DUPLICATE_ID = "DI";
+  String DUPLICATE_PIN = "DP";
   String SIGN_IN_FAIL = "SF";
   String ALREADY_OPTION = "AO";
   String PIN_CHECK_FAIL = "PF";
@@ -29,6 +30,7 @@ public interface ResponseCode {
   String POINT_CHARGE_FAIL = "PCF";
   String CERTIFICATION_FAIL = "CF";
   String OPTION_CREATE_FAIL = "OCF";
+  String DUPLICATE_NICKNAME = "DN";
   String INSUFFICIENT_BALANCE = "IB";
   String ALREADY_POINT_CHARGE = "APC";
   String CANCEL_POINT_CHARGE_FAIL = "CPF";

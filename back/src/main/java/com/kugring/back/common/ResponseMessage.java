@@ -30,9 +30,12 @@ public interface ResponseMessage {
 
 
   String DUPLICATE_ID = "Duplicate Id.";
+  String DUPLICATE_PIN = "Duplicate Pin";
   String ALREADY_OPTION = "Already option.";
   String DATABASE_ERROR = "Database error.";
+  String DUPLICATE_NICKNAME = "Duplicate Nickname";
   String ALREADY_POINT_CHARGE = "Already charge point.";
+  
 
   String INSUFFICIENT_BALANCE = "Insufficient balance. Please recharge your account.";
 

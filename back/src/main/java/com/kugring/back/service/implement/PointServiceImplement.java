@@ -1,13 +1,32 @@
 package com.kugring.back.service.implement;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.kugring.back.dto.request.point.PointChargeApprovalRequestDto;
+import com.kugring.back.dto.request.point.PointChargeDeclineRequestDto;
+import com.kugring.back.dto.request.point.PointDirectChargeReuqestDto;
 import com.kugring.back.dto.request.point.PostPointChargeRequestDto;
 import com.kugring.back.dto.response.ResponseDto;
+import com.kugring.back.dto.response.auth.PinCheckResponseDto;
 import com.kugring.back.dto.response.point.DeletePointChargeResponseDto;
+import com.kugring.back.dto.response.point.GetChargeListResponseDto;
+import com.kugring.back.dto.response.point.GetPointChargePendingResponseDto;
 import com.kugring.back.dto.response.point.GetPointChargependingCountResponseDto;
+import com.kugring.back.dto.response.point.PointChargeApprovalResponseDto;
+import com.kugring.back.dto.response.point.PointChargeDeclineResponseDto;
+import com.kugring.back.dto.response.point.PointDirectChargeResponseDto;
 import com.kugring.back.dto.response.point.PostPointChargeResponseDto;
+import com.kugring.back.dto.response.user.PatchUserEditResponseDto;
 import com.kugring.back.entity.PointCharge;
 import com.kugring.back.entity.User;
 import com.kugring.back.repository.PointChargeRepositoy;
@@ -62,7 +81,8 @@ public class PointServiceImplement implements PointService {
 
   // todo: 이놈들 메소드 명이랑 다 바꿔야함
   @Override
-  public ResponseEntity<? super GetPointChargependingCountResponseDto> getPointChargependingCount(Long pointChargeId, String userId) {
+  public ResponseEntity<? super GetPointChargependingCountResponseDto> getPointChargependingCount(Long pointChargeId,
+      String userId) {
 
     // 미승인 갯수를 담을 객체
     boolean approve;
@@ -76,7 +96,8 @@ public class PointServiceImplement implements PointService {
     return GetPointChargependingCountResponseDto.success(approve);
   }
 
-  @Override @Transactional
+  @Override
+  @Transactional
   public ResponseEntity<? super DeletePointChargeResponseDto> deletePointCharge(Long pointChargeId, String userId) {
 
     try {
@@ -86,7 +107,186 @@ public class PointServiceImplement implements PointService {
       return ResponseDto.databaseError();
     }
     return DeletePointChargeResponseDto.success();
-    
+
+  }
+
+  @Override
+  public ResponseEntity<? super GetPointChargePendingResponseDto> getPointChargePending(String userId) {
+
+    List<PointCharge> pointChargeList = null;
+
+    try {
+      // userId로 관리자 계정 조회
+      User manager = userRepository.findByUserId(userId);
+      // 정보가 없거나 관리자가 아니라면 실패 응답 반환
+      if (manager == null || !manager.getRole().trim().equals("ROLE_ADMIN")) {
+        return PatchUserEditResponseDto.notExistedManager();
+      }
+      pointChargeList = pointChargeRepositoy.findByStatus("미승인");
+      System.out.println("pointChargeList: " + pointChargeList);
+
+    } catch (Exception exception) {
+      exception.printStackTrace();
+      return ResponseDto.databaseError();
+    }
+    return GetPointChargePendingResponseDto.success(pointChargeList);
+  }
+
+  @Override
+  public ResponseEntity<? super PointChargeApprovalResponseDto> pointChargeApproval(String userId,
+      PointChargeApprovalRequestDto dto) {
+
+    try {
+      // userId로 관리자 계정 조회
+      User manager = userRepository.findByUserId(userId);
+      // 정보가 없거나 관리자가 아니라면 실패 응답 반환
+      if (manager == null || !manager.getRole().trim().equals("ROLE_ADMIN")) {
+        return PatchUserEditResponseDto.notExistedManager();
+      }
+
+      // 포인트 충전 내역 가져오기
+      PointCharge pointCharge = pointChargeRepositoy.findByPointChargeId(dto.getPointChargeId());
+      // 포인트 충전 상태를 승인으로 변경
+      pointCharge.setStatus("승인");
+      // 포인트를 요청한 회원을 추출
+      User user = pointCharge.getUser();
+      // 회원의 포인트를 추가해줌
+      user.pointCharge(pointCharge.getChargePoint());
+
+      // 포인트 충전내역과 회원정보를 저장함
+      pointChargeRepositoy.save(pointCharge);
+      userRepository.save(user);
+
+    } catch (Exception exception) {
+      exception.printStackTrace();
+      return ResponseDto.databaseError();
+    }
+
+    return PointChargeApprovalResponseDto.success();
+  }
+
+  @Override
+  public ResponseEntity<? super PointChargeDeclineResponseDto> pointChargeDecline(String userId,
+      PointChargeDeclineRequestDto dto) {
+    try {
+      // userId로 관리자 계정 조회
+      User manager = userRepository.findByUserId(userId);
+      // 정보가 없거나 관리자가 아니라면 실패 응답 반환
+      if (manager == null || !manager.getRole().trim().equals("ROLE_ADMIN")) {
+        return PatchUserEditResponseDto.notExistedManager();
+      }
+
+      // 포인트 충전 내역 가져오기
+      PointCharge pointCharge = pointChargeRepositoy.findByPointChargeId(dto.getPointChargeId());
+      // 포인트 충전 상태를 승인으로 변경
+      pointCharge.setStatus("거절");
+      // 포인트 충전내역 저장
+      pointChargeRepositoy.save(pointCharge);
+
+    } catch (Exception exception) {
+      exception.printStackTrace();
+      return ResponseDto.databaseError();
+    }
+    return PointChargeDeclineResponseDto.success();
+  }
+
+  @Override
+  public ResponseEntity<? super GetChargeListResponseDto> getChargeList(String userId, int page, int size, String Name,
+      String Status, String Date) {
+
+    List<PointCharge> pointCharges;
+
+    try {
+      // userId로 데이터 조회
+      User user = userRepository.findByUserId(userId);
+      // 정보가 없다면 예외처리
+      if (user == null)
+        return GetChargeListResponseDto.managerNotExisted();
+      if (!user.getRole().trim().equals("ROLE_ADMIN")) {
+        return GetChargeListResponseDto.managerNotExisted();
+      }
+
+      // 스크롤 이벤트로 인한 데이터 가져오게 도와주는것
+      Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+      // 회원이름 정의
+      String name = Objects.isNull(Name) ? null : "".equals(Name) ? null : Name;
+
+      // 상태에 정의
+      String status = Objects.isNull(Status) ? null : "모두".equals(Status) ? null : Status;
+
+      // 자바스크립트 Date타입을 LocalDate로 변환
+      // 예외 처리를 추가한 경우
+
+      // dateD가 null이 아니면 LocalDateTime으로 변환하고, null일 경우 null을 반환
+      LocalDateTime startOfDay = Objects.isNull(Date) ? null : LocalDate.parse(Date).atStartOfDay();
+      LocalDateTime endOfDay = Objects.isNull(Date) ? null : LocalDate.parse(Date).atTime(LocalTime.MAX);
+
+      // 레파지토리에서 데이터 찾아옴
+      pointCharges = pointChargeRepositoy.findChargeList(name, status, startOfDay, endOfDay, pageable);
+
+    } catch (Exception exception) {
+      exception.printStackTrace();
+      return ResponseDto.databaseError();
+    }
+
+    return GetChargeListResponseDto.success(pointCharges);
+  }
+
+  @Override
+  public ResponseEntity<? super PointDirectChargeResponseDto> pointDirectCharge(String managerId,
+      PointDirectChargeReuqestDto dto) {
+    try {
+
+      // userId로 데이터 조회
+      User manager = userRepository.findByUserId(managerId);
+      // 정보가 없다면 예외처리
+      if (manager == null)
+        return PinCheckResponseDto.pinCheckFail();
+      if (!manager.getRole().trim().equals("ROLE_ADMIN")) {
+        return PinCheckResponseDto.pinCheckFail();
+      }
+
+      String userId =  dto.getUserId().equals("") ? null : dto.getUserId();
+
+      // Dto에서 필요한 정보 가져오기
+      int chargePoint = dto.getChargePoint();
+
+      // 회원 조회
+      User user = userRepository.findByUserId(userId);
+      // 등록된 회원이 아닌 경우 예외처리
+      if (user == null)
+        return PointDirectChargeResponseDto.noExistUser();
+
+      // 회원 포인트 충전
+      user.pointCharge(chargePoint);
+
+      // 회원 현재_포인트 + 포인트 관련 예외처리
+      int currentPoint = user.getPoint();
+      if (chargePoint < 0)
+        return PostPointChargeResponseDto.pointChargeFail();
+      if (currentPoint < 0)
+        return PostPointChargeResponseDto.pointChargeFail();
+
+      // 포인트 엔터티 생성
+      PointCharge pointCharge = new PointCharge();
+      pointCharge.setChargePoint(chargePoint);
+      pointCharge.setCreatedAt(LocalDateTime.now());
+      pointCharge.setUpdatedAt(LocalDateTime.now());
+      pointCharge.setCurrentPoint(user.getPoint());
+      pointCharge.setManager(manager);
+      pointCharge.setStatus("승인");
+      pointCharge.setUser(user);
+
+      // 포인트 내역 생성하고 포인트가 추가된 회원 정보 저장
+      pointChargeRepositoy.save(pointCharge);
+      userRepository.save(user);
+
+    } catch (Exception exception) {
+      exception.printStackTrace();
+      return ResponseDto.databaseError();
+    }
+    return PointDirectChargeResponseDto.success();
   }
 
   // @Override

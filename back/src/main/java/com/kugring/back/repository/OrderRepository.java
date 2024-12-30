@@ -93,42 +93,20 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
                         "    COALESCE((SELECT SUM(odOpt.quantity * mo.price) " +
                         "              FROM OrderDetailOption odOpt " +
                         "              JOIN odOpt.menuOption mo " +
-                        "              WHERE odOpt.orderDetail = oi), 0)) as totalPrice " + // `o.orderDetails` 제거
+                        "              WHERE odOpt.orderDetail = oi " +
+                        "              GROUP BY odOpt.orderDetail), 0)) as totalPrice " +
                         "FROM Order o " +
                         "JOIN o.orderDetails oi " +
                         "JOIN oi.menu m " +
-                        "GROUP BY o.orderId, o.user.name, o.status, o.user.office, o.user.position, " +
-                        "o.payMethod, o.createdAt, o.updatedAt, o.user.profileImage")
-        List<GetOrderListResultSet> findOrderList(Pageable pageable);
-
-        @Query("SELECT " +
-                        "o as order, " +
-                        "o.orderId as orderId, " +
-                        "o.user.name as name, " +
-                        "o.user.point as point, " +
-                        "o.status as status, " +
-                        "o.user.office as office, " +
-                        "o.user.position as position, " +
-                        "o.payMethod as payMethod, " +
-                        "o.createdAt as createdAt, " +
-                        "o.updatedAt as updatedAt, " +
-                        "o.user.profileImage as profileImage, " +
-                        "SUM(oi.quantity) as totalQuantity, " +
-                        "SUM(oi.quantity * m.price + " +
-                        "    COALESCE((SELECT SUM(odOpt.quantity * mo.price) " +
-                        "              FROM OrderDetailOption odOpt " +
-                        "              JOIN odOpt.menuOption mo " +
-                        "              WHERE odOpt.orderDetail = oi), 0)) as totalPrice " +
-                        "FROM Order o " +
-                        "JOIN o.orderDetails oi " +
-                        "JOIN oi.menu m " +
-                        "WHERE (:name IS NULL OR TRIM(REPLACE(o.user.name, ' ', '')) = TRIM(REPLACE(:name, ' ', ''))) "
+                        "WHERE (:name IS NULL OR " +
+                        "       TRIM(REPLACE(o.user.name, ' ', '')) LIKE CONCAT('%', TRIM(REPLACE(:name, ' ', '')), '%')) "
                         +
                         "AND (:status IS NULL OR o.status = :status) " +
-                        "AND (:startOfDay IS NULL OR (o.createdAt >= :startOfDay AND o.createdAt <= :endOfDay))" +
+                        "AND (:startOfDay IS NULL OR " +
+                        "     (o.createdAt >= :startOfDay AND o.createdAt <= :endOfDay)) " +
                         "GROUP BY o.orderId, o.user.name, o.status, o.user.office, o.user.position, " +
-                        "o.payMethod, o.createdAt, o.updatedAt, o.user.profileImage " + // 공백 확인
-                        "ORDER BY o.createdAt DESC") // ORDER BY 구문 수정
+                        "         o.payMethod, o.createdAt, o.updatedAt, o.user.profileImage " +
+                        "ORDER BY o.createdAt DESC")
         List<GetOrderListResultSet> findOrderList(
                         @Param("name") String name,
                         @Param("status") String status,

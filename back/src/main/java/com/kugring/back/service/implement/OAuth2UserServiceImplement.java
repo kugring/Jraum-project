@@ -43,7 +43,7 @@ public class OAuth2UserServiceImplement extends DefaultOAuth2UserService {
 
     if (oauthClientName.equals("kakao")) {
       userId = "kakao_" + oAuth2User.getAttributes().get("id");
-      User = new User(userId, email, "kakao");
+      User = new User(userId, email, 5);  // 카카오는 5번
 
     }
     if (oauthClientName.equals("naver")) {
@@ -51,7 +51,7 @@ public class OAuth2UserServiceImplement extends DefaultOAuth2UserService {
       userId = "naver_" + responseMap.get("id").substring(0, 14); // 네이버에서 가져오는 id값이 너무 길기 때문에 15글자만
                                                                   // 가져온다.
       email = responseMap.get("email");
-      User = new User(userId, email, "naver");
+      User = new User(userId, email, 4); // 네이버는 4번
     }
 
     UserRepository.save(User);
