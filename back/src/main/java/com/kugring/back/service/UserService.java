@@ -9,7 +9,7 @@ import com.kugring.back.dto.response.user.PatchUserEditResponseDto;
 
 public interface UserService {
 
-  ResponseEntity<? super GetSortedUserResponseDto> getSortedUser(String userId, String sort, String name);
+  ResponseEntity<? super GetSortedUserResponseDto> getSortedUser(String userId, int page, int size, String name, String sort);
   ResponseEntity<? super PatchUserEditResponseDto> patchUserEdit(String userId, PatchUserEditRequestDto dto);
 
 

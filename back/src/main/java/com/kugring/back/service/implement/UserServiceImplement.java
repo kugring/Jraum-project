@@ -1,7 +1,10 @@
 package com.kugring.back.service.implement;
 
 import java.util.List;
+import java.util.Objects;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -23,10 +26,20 @@ public class UserServiceImplement implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public ResponseEntity<? super GetSortedUserResponseDto> getSortedUser(String userId, String sort, String Name) {
+    public ResponseEntity<? super GetSortedUserResponseDto> getSortedUser(String userId, int page, int size,
+            String Name, String Sort) {
         // 정렬 기준에 따른 데이터 조회
         List<GetSortedUserResultSet> sortedUsers;
+
         try {
+
+            System.out.println("페이지: " + page);
+            System.out.println("리미트: " + size);
+            System.out.println("이름: " + Name);
+            System.out.println("정렬: " + Sort);
+
+
+
             // userId로 관리자 계정 조회
             User manager = userRepository.findByUserId(userId);
             // 정보가 없거나 관리자가 아니라면 실패 응답 반환
@@ -34,19 +47,25 @@ public class UserServiceImplement implements UserService {
                 return PinCheckResponseDto.pinCheckFail();
             }
 
+            // 스크롤 이벤트로 인한 데이터 가져오게 도와주는것
+            Pageable pageable = PageRequest.of(page, size);
+
+            // 상태에 정의
+            String sort = Objects.isNull(Sort) ? null : "모두".equals(Sort) ? null : Sort;
+
             String pin = null;
-            String name = "all".equals(Name) ? null : Name;
+
+            String name = Name;
 
             // Name이 숫자로 된 4자리인지 확인
             if (name != null && name.matches("\\d+")) {
                 pin = name; // 숫자로 된 4자리라면 pin에 저장
                 name = null; // name은 null로 설정
             }
-            System.out.println("이름: " + name);
-            System.out.println("핀번호: " + pin);
+
 
             // 정렬 기준에 맞게 사용자 목록과 지출 합계를 가져옴
-            sortedUsers = userRepository.findSortedUser(sort, name, pin);
+            sortedUsers = userRepository.findSortedUser(sort, name, pin, pageable);
 
         } catch (Exception exception) {
             exception.printStackTrace();
