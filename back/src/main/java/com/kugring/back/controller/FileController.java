@@ -16,8 +16,8 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/file")
-@RequiredArgsConstructor
-public class FileController {
+    @RequiredArgsConstructor
+    public class FileController {
     
     private final FileService fileService;
 

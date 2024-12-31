@@ -43,10 +43,20 @@ public interface UserRepository extends JpaRepository<User, Long> {
                   "AND u.pin IS NOT NULL " +
                   "GROUP BY u.id, u.name, u.pin, u.createdAt " +
                   "ORDER BY " +
-                  "CASE WHEN :sort = 'name' THEN u.name " +
-                  "     WHEN :sort = 'pin' THEN u.pin " +
-                  "     WHEN :sort = 'createdAt' THEN u.createdAt " +
-                  "     ELSE u.name END")
+                  "CASE " +
+                  "    WHEN :sort = 'name' THEN u.name " +
+                  "    WHEN :sort = 'pin' THEN u.pin " +
+                  "    ELSE NULL " +
+                  "END ASC, " +
+                  "CASE " +
+                  "    WHEN :sort = 'createdAt' THEN u.createdAt " +
+                  "    ELSE NULL " +
+                  "END DESC, " +
+                  "CASE " +
+                  "    WHEN :sort = 'updatedAt' THEN u.updatedAt " +
+                  "    ELSE NULL " +
+                  "END DESC, " +
+                  "u.name ASC")
       List<GetSortedUserResultSet> findSortedUser(
                   @Param("sort") String sort,
                   @Param("name") String name,
