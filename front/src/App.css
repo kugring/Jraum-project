@@ -1,0 +1,177 @@
+:root {
+  --redOrange: #FF4E28;
+  --brughtOrange: #FF7928;
+  --orange: #FC8D08; /* 변수 이름과 기본값 설정 */
+  --goldenPeach: #ffa450;
+  --goldenOrange: #FFB13D;
+  --goldenSun: #FFC346;
+  --sunsetPeach: #FFD07A;
+  --creamyYellow: #FFE2B7;
+  --lightCream: #FCF3E4;
+  --cream: #fffaec;
+  --seashell: #fff5ee;
+  --coralPink: #FF7070;
+  --coralSunset: #FF9371;
+  --coralOrange: #fa9a7d;
+  --peachPink: #F7C2BC;
+  --creamPink: #F4E2E0;
+  --copperOrange: #CD7352;
+  --copperRed: #CD6552;
+  --brickRed: #541602;
+  --brickOrange: #6A3500;
+  --amberBrown: #85460F;
+  --copperBrown: #A75E2A;
+  --caramelBrown: #e9a05b;
+  --copperGlow: #CB7618;
+  --lightBrown: #CA9067;
+  --mochaBrown: #B4875D;
+  --antiqueCream: #ceb297;
+  --pinkBeige: #E4B6A6;
+  --darkTeal: #1b3c35;
+  --deepTeal: #007067;
+  --tealGrean: #317873;
+  --lightPastelGrean: #6fcf97;
+  --forestGrean: #2e8b57;
+  --mintCreen: #4caf50;
+  --fernGrean: #80a878;
+  --sageGrean: #9caf88;
+  --darkOliveGreen: #556b2f;
+  --font-size-large: 18px;
+  --hot: #E7727A;
+  --cold: #5C76D1;
+  letter-spacing: 1px;
+  -webkit-user-select: none;
+  user-select: none;
+
+}
+#EFB866
+#FFC4AE
+#FFBEAA
+#FFD07A
+#9CAF88
+#6689A6
+#F8F4E3
+#D8BBA2
+#F4C95D
+#4B4B4B
+#2F4F4F
+#2C3E50
+
+#4E3629
+#3B2924
+#46332B
+#5C4033
+#6E4B3A
+
+#800020
+#CB4154
+#A33E36
+#560319
+#B04A5B
+#9A2A2A
+
+#DC143C
+#FF2400
+#960018
+#FF9500
+#FF7300
+#FF7F50
+#FFC300
+#FFBF00
+#FFD700
+
+
+
+
+.primary-button-lg {
+  border-radius: 6px;
+  padding: 8px 24px;
+
+  box-sizing: border-box;
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: rgba(58, 87, 232, 1);
+
+  color: rgba(255,255,255, 1);
+
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 175%;
+
+  cursor: pointer;
+}
+
+.disable-button-lg {
+  border-radius: 6px;
+  padding: 8px 24px;
+
+  box-sizing: border-box;
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: rgba(138, 146, 166, 1);
+
+  color: rgba(255,255,255, 1);
+
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 175%;
+
+  cursor: default;
+}
+
+.primary-button-lg:hover {
+  opacity: 0.95;
+}
+
+.text-link-lg{
+  box-sizing: border-box;
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  color: rgba(113,113,113, 1);
+
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 175%;
+
+  cursor: pointer;
+}
+
+.text-link-lg:hover{
+color: rgba(40,40,40,1);
+}
+
+.full-width{
+  width: 100%;
+}
+
+.kakao-sign-in-button{
+  width: 56px;
+  height: 56px;
+
+  background-position: 50% 50%;
+  background-size: 100% 100%;
+  background-image: url(assets/image/kakao-sign-in.png);
+
+  cursor: pointer;
+}
+
+.naver-sign-in-button{
+  width: 56px;
+  height: 56px;
+
+  background-position: 50% 50%;
+  background-size: 100% 100%;
+  background-image: url(assets/image/naver-sign-in.png);
+
+  cursor: pointer;
+}
+
