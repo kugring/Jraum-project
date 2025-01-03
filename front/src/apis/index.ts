@@ -35,7 +35,7 @@ const authorization = (accessToken: string) => {
 };
 
 
-const DOMAIN = 'http://' + TEST_DOMAIN + ':4000';
+const DOMAIN = 'https://' + TEST_DOMAIN + ':4000';
 
 
 
