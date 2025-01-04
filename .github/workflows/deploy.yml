@@ -56,7 +56,7 @@ jobs:
         # 5. EC2로 JAR 파일 전송
       - name: Send JAR to EC2
         run: |
-          scp -i ${{ secrets.EC2_PRIVATE_KEY }} -P 22 ./back/build/libs/jraum-0.0.1-SNAPSHOT.jar ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/Jraum-project/build/libs/jraum-0.0.1-SNAPSHOT.jar
+          scp -i ${{ secrets.EC2_PRIVATE_KEY }} -P 443 ./back/build/libs/jraum-0.0.1-SNAPSHOT.jar ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/Jraum-project/build/libs/jraum-0.0.1-SNAPSHOT.jar
 
       # 6. EC2에서 JAR 파일 실행
       - name: Run JAR on EC2
