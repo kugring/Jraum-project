@@ -59,7 +59,7 @@ jobs:
       
       - name: Send JAR to EC2
         run: |
-          scp -i private-key.pem -P 443 ./back/build/libs/jraum-0.0.1-SNAPSHOT.jar ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/Jraum-project/build/libs/
+          scp -i private-key.pem -P 22 ./back/build/libs/jraum-0.0.1-SNAPSHOT.jar ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/Jraum-project/build/libs/
       
       - name: Remove the private key file after usage
         run: rm -f private-key.pem
