@@ -49,8 +49,8 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-task bootJar(type: BootJar) {
-    baseName = 'jraum'
-    version = '0.0.1-SNAPSHOT'
-    destinationDir = file("$buildDir/libs")
+// bootJar 태스크 수정
+bootJar {
+    archiveFileName = 'jraum-0.0.1-SNAPSHOT.jar'
+    destinationDirectory = file("$buildDir/libs")  // 빌드된 JAR 파일 경로
 }
