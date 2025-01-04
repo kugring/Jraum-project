@@ -38,7 +38,7 @@ jobs:
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2.6.0
         with:
-          gradle-version: '7.4.2'
+          gradle-version: '8.3'  # Gradle 버전 8.x로 변경
           build-root-directory: ./back  # back 디렉토리로 설정
           arguments: build
 
