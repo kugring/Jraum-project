@@ -52,7 +52,7 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-task buildJar(type: BootJar) {
-    dependsOn bootJar
+task buildJar(type: Jar) {
+    dependsOn bootJar  // 'bootJar'가 자동으로 생성됨
     archiveFileName = 'jraum-0.0.1-SNAPSHOT.jar'
 }
