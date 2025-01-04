@@ -51,3 +51,8 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+task buildJar(type: BootJar) {
+    dependsOn bootJar
+    archiveFileName = 'jraum-0.0.1-SNAPSHOT.jar'
+}
