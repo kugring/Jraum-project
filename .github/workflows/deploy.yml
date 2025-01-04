@@ -25,19 +25,20 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x back/gradlew
 
-      # Gradle 빌드 엑션을 이용해서 프로젝트 빌드 (back 폴더로 경로 수정)
+      # Gradle 빌드 실행 (back 폴더로 이동 후 실행)
+      # back 폴더에서 gradlew를 실행해 빌드
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@v2.6.0
-        with:
-          arguments: build
-          working-directory: back  # back 폴더에서 빌드 실행
+        run: |
+          cd back
+          ./gradlew build  
+          
   
       # 빌드해서 생긴 JAR 파일을 깃허브 아티팩트로 업로드!!
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
           name: jraumServer
-          path: build/libs/jraum-0.0.1-SNAPSHOT.jar
+          path: back/build/libs/jraum-0.0.1-SNAPSHOT.jar
 
       # 2. SSH를 사용하여 EC2에 JAR 파일만 전달
       - name: Deploy JAR to EC2
