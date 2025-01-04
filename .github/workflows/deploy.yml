@@ -14,9 +14,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Check current directory
-        run: pwd
-
       # 2. AWS 자격 증명 설정 (IAM 역할을 통해 접근)
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -36,15 +33,21 @@ jobs:
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2.6.0
         with:
-          gradle-version: '8.3'  # Gradle 버전 8.x로 변경
-          build-root-directory: ./back  # back 디렉토리로 설정
+          gradle-version: '8.3'
+          build-root-directory: ./back
           arguments: build
 
-      # 빌드 후 디렉토리 확인: Gradle 빌드 후 build 디렉토리 내용 확인
+      # 빌드 후 디렉토리 확인: build 디렉토리 존재 여부
       - name: Check build directory contents
-        run: ls -la ./build/
+        run: |
+          if [ -d "./build" ]; then
+            echo "Build directory exists"
+            ls -la ./build/
+          else
+            echo "Build directory does not exist"
+          fi
 
-      # 5. 빌드한 JAR 파일을 GitHub 아티팩트로 업로드
+      # 5. 빌드된 JAR 파일을 GitHub 아티팩트로 업로드
       - name: Upload JAR to artifact storage
         uses: actions/upload-artifact@v3
         with:
