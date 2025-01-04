@@ -57,9 +57,9 @@ jobs:
           include-hidden-files: false
 
       # 6. EC2에 SSH 연결하여 배포
+      # EC2에 아티팩트 다운로드 및 JAR 파일 배포
       - name: Deploy JAR to EC2
         run: |
-          # EC2에 아티팩트 다운로드 및 JAR 파일 배포
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
