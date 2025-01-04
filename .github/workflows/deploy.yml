@@ -47,7 +47,13 @@ jobs:
             echo "Build directory does not exist"
           fi
 
-       # 5. EC2로 JAR 파일 전송
+        # 테스트용 출력 코드
+      - name: Test secrets output
+        run: |
+          echo "EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}"
+          echo "EC2_IP: ${{ secrets.EC2_IP }}"
+
+        # 5. EC2로 JAR 파일 전송
       - name: Send JAR to EC2
         run: |
           scp -i ${{ secrets.EC2_PRIVATE_KEY }} ./back/build/libs/jraum-0.0.1-SNAPSHOT.jar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/Jraum-project/build/libs/jraum-0.0.1-SNAPSHOT.jar
