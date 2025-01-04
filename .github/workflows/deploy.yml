@@ -2,7 +2,7 @@ name: Deploy to EC2 and S3
 
 on:
   push:
-    branches:      
+    branches:
       - main
 
 jobs:
@@ -34,15 +34,15 @@ jobs:
         uses: gradle/gradle-build-action@v2.6.0
         with:
           gradle-version: '8.3'
-          build-root-directory: ./back
+          build-root-directory: ./back  # 백엔드 프로젝트 디렉토리
           arguments: build
 
       # 빌드 후 디렉토리 확인: build 디렉토리 존재 여부
       - name: Check build directory contents
         run: |
-          if [ -d "./build" ]; then
+          if [ -d "./back/build" ]; then
             echo "Build directory exists"
-            ls -la ./build/
+            ls -la ./back/build/
           else
             echo "Build directory does not exist"
           fi
@@ -52,7 +52,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: jraumServer
-          path: ./back/build/libs/jraum-0.0.1-SNAPSHOT.jar  # 경로 수정
+          path: ./back/build/libs/jraum-0.0.1-SNAPSHOT.jar  # 경로 수정 (back 디렉토리 안에 있는 JAR 파일)
           if-no-files-found: warn
           include-hidden-files: false
 
