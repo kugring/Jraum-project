@@ -67,7 +67,7 @@ jobs:
       # 6. EC2에서 JAR 파일 실행
       - name: Run JAR on EC2
         run: |
-          ssh -i private-key.pem -p 443 ubuntu@${{ secrets.EC2_HOST }} "sudo nohup java -jar /home/ubuntu/Jraum-project/build/libs/jraum-0.0.1-SNAPSHOT.jar > /home/ubuntu/Jraum-project/application.log 2>&1 &"
+          ssh -i private-key.pem -p 22 ubuntu@${{ secrets.EC2_HOST }} "sudo nohup java -jar /home/ubuntu/Jraum-project/build/libs/jraum-0.0.1-SNAPSHOT.jar > /home/ubuntu/Jraum-project/application.log 2>&1 &"
 
 
 
