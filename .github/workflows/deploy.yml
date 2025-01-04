@@ -38,8 +38,8 @@ jobs:
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2.6.0
         with:
-          working-directory: ./back  # back 디렉토리 내의 Gradle 설정 파일이 있어야 합니다.
-          gradle-version: '7.4.2'    # Gradle 버전 명시
+          gradle-version: '7.4.2'
+          build-root-directory: ./back  # back 디렉토리로 설정
           arguments: build
 
       # 5. 빌드한 JAR 파일을 GitHub 아티팩트로 업로드
