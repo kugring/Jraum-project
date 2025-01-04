@@ -38,14 +38,14 @@ jobs:
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2.6.0
         with:
-          arguments: build
+          working-directory: ./Jraum-project/back # 'back' 폴더로 작업 디렉토리를 변경
 
       # 5. 빌드한 JAR 파일을 GitHub 아티팩트로 업로드
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
           name: jraumServer
-          path: build/libs/jraum-0.0.1-SNAPSHOT.jar
+          path: ./Jraum-project/back/build/libs/jraum-0.0.1-SNAPSHOT.jar # 경로 수정
 
       # 6. EC2에 SSH 연결하여 배포
       - name: Deploy JAR to EC2
