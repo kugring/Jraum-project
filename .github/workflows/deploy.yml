@@ -31,10 +31,9 @@ jobs:
 
       # 4. Gradle 빌드 실행
       - name: Build with Gradle
-        run: |
-          cd back
-          chmod +x gradlew
-          ./gradlew build  
+        uses: gradle/gradle-build-action@v2.6.0
+        with:
+          arguments: build
 
       # 5. 빌드한 JAR 파일을 GitHub 아티팩트로 업로드
       - name: Upload build artifact
