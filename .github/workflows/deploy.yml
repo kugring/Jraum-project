@@ -51,12 +51,12 @@ jobs:
       - name: Upload JAR to EC2
         run: |
           # EC2로 JAR 파일 전송
-          scp -i ${{ secrets.EC2_SSH_PRIVATE_KEY }} ./back/build/libs/jraum-0.0.1-SNAPSHOT.jar ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/Jraum-project/build/libs/jraum-0.0.1-SNAPSHOT.jar
+          scp -i ${{ secrets.EC2_PRIVATE_KEY }} ./back/build/libs/jraum-0.0.1-SNAPSHOT.jar ubuntu@${{ secrets.EC2_INSTANCE_ID }}:/home/ubuntu/Jraum-project/build/libs/jraum-0.0.1-SNAPSHOT.jar
 
       # 6. EC2에 SSH 연결하여 JAR 파일 실행
       - name: Deploy JAR to EC2
         run: |
-          ssh -i ${{ secrets.EC2_SSH_PRIVATE_KEY }} ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+          ssh -i ${{ secrets.EC2_PRIVATE_KEY }} ubuntu@${{ secrets.EC2_INSTANCE_ID }} << 'EOF'
             # EC2에서 기존 JAR 파일 삭제
             sudo rm -f /home/ubuntu/Jraum-project/build/libs/*.jar
 
