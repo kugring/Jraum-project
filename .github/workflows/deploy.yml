@@ -14,10 +14,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      
       - name: Check current directory
         run: pwd
-        
 
       # 2. AWS 자격 증명 설정 (IAM 역할을 통해 접근)
       - name: Configure AWS credentials
@@ -41,6 +39,10 @@ jobs:
           gradle-version: '8.3'  # Gradle 버전 8.x로 변경
           build-root-directory: ./back  # back 디렉토리로 설정
           arguments: build
+
+      # 디버깅: 빌드된 파일이 있는지 확인
+      - name: List build directory contents
+        run: ls -la ./build/libs/
 
       # 5. 빌드한 JAR 파일을 GitHub 아티팩트로 업로드
       - name: Upload JAR to artifact storage
