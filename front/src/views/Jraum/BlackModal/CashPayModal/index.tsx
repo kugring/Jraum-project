@@ -80,7 +80,7 @@ const PayButton = () => {
 
         // 웹소켓 연결 및 데이터 전송
         // const socket = new SockJS('httplocalhost:4000/ws');
-        const socket = new SockJS('https://'+ TEST_DOMAIN +':4000/ws');
+        const socket = new SockJS('https://'+ TEST_DOMAIN +'/ws');
         const client = new Client({
             webSocketFactory: () => socket,
             onConnect: () => {
@@ -171,7 +171,7 @@ const PayButton = () => {
     //          effect: 웹소켓 연결하는 이펙트              //
     useEffect(() => {
         // const socket = new SockJS('httplocalhost:4000/ws');
-        const socket = new SockJS('https://'+ TEST_DOMAIN +':4000/ws');
+        const socket = new SockJS('https://'+ TEST_DOMAIN +'/ws');
 
         const client = new Client({
             webSocketFactory: () => socket,

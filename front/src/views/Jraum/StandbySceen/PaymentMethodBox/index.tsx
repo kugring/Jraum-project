@@ -29,7 +29,7 @@ const PaymentMethodBox = () => {
             <Title>결제 방식</Title>
             <Divider />
             <Buttons>
-                <CashButton onClick={cashPayment}>현금 결제</CashButton>
+                <CashButton onClick={cashPayment}>현금 결제일껄?</CashButton>
                 <PointButton onClick={pinModalOpen}>포인트 결제</PointButton>
             </Buttons>
         </PaymentMethodBoxE>

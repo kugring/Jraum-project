@@ -47,9 +47,7 @@ const Header = () => {
     //          effect: 웹소켓 연결하는 이펙트              //
     useEffect(() => {
         // 웹소켓 엔드포인트에 연결
-        // const socket = new SockJS('httplocalhost:4000/ws');
-        const socket = new SockJS('https://'+ TEST_DOMAIN +':4000/ws');
-
+        const socket = new SockJS('https://'+ TEST_DOMAIN +'/ws');
         client.current = new Client({
             webSocketFactory: () => socket,
             onConnect: () => {

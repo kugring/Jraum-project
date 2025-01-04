@@ -15,7 +15,7 @@ const WebSocketComponent = () => {
     //            effect: 웹소켓 연결 이펙트          //
     useEffect(() => {
         // 웹소켓 엔드포인트에 연결
-        const socket = new SockJS('http172.30.1.52:4000/ws');
+        const socket = new SockJS('http172.30.1.5/ws');
 
         const client = new Client({
             webSocketFactory: () => socket,
