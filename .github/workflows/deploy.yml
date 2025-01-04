@@ -65,11 +65,11 @@ jobs:
             --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
             --comment "Deploying JAR file" \
             --parameters '{
-              "commands": [
-                "sudo rm -f /home/ubuntu/Jraum-project/build/libs/*.jar",  # 기존 JAR 파일 삭제
-                "aws s3 cp s3://$AWS_S3_BUCKET/jraum-0.0.1-SNAPSHOT.jar /home/ubuntu/Jraum-project/build/libs/jraum-0.0.1-SNAPSHOT.jar",  # S3에서 JAR 파일 다운로드
-                "sudo nohup java -jar /home/ubuntu/Jraum-project/build/libs/jraum-0.0.1-SNAPSHOT.jar > /home/ubuntu/Jraum-project/application.log 2>&1 &"  # JAR 파일 실행
-              ]
+            "commands": [
+              "sudo rm -f /home/ubuntu/Jraum-project/build/libs/*.jar",
+              "aws s3 cp s3://$AWS_S3_BUCKET/jraum-0.0.1-SNAPSHOT.jar /home/ubuntu/Jraum-project/build/libs/jraum-0.0.1-SNAPSHOT.jar",
+              "sudo nohup java -jar /home/ubuntu/Jraum-project/build/libs/jraum-0.0.1-SNAPSHOT.jar > /home/ubuntu/Jraum-project/application.log 2>&1 &"
+            ]
             }' \
             --timeout-seconds 600 \
             --region ${{ secrets.AWS_REGION }}
