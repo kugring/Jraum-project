@@ -51,6 +51,7 @@ const Header = () => {
         client.current = new Client({
             webSocketFactory: () => socket,
             onConnect: () => {
+                console.log('Connected to WebSocket');
                 // setConnected(true); // 연결 성공시 상태 업데이트
                 // 메시지 구독
                 client.current!.subscribe('/topic/order', (msg: Message) => {
