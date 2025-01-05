@@ -16,12 +16,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(@NonNull StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("https://api.hyunam.site", "https://hyunam.site", "*")
-                .withSockJS();
-        
-        // /ws/info 경로 처리
-        registry.addEndpoint("/ws/info")
-                .setAllowedOrigins("https://api.hyunam.site", "https://hyunam.site", "*")
+                .setAllowedOrigins("https://api.hyunam.site", "https://hyunam.site", "*") // 백엔드와 프론트엔드 도메인 모두 허용
                 .withSockJS();
     }
 
