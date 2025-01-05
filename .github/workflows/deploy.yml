@@ -98,7 +98,8 @@ jobs:
       - name: Deploy to S3
         uses: jakejarvis/s3-sync-action@v0.5.1
         with:
-          args: --acl public-read --delete  # 업로드 시 퍼블릭 권한 설정, 불필요한 파일 삭제
+          args: --acl public-read --delete
+          source: front/build/
         env:
           AWS_S3_BUCKET: ${{ secrets.S3_BUCKET }}  # S3 버킷 이름
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # AWS Access Key ID
