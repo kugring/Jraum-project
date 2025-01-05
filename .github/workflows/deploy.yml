@@ -53,22 +53,26 @@ jobs:
           echo "EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}"
           echo "EC2_HOST: ${{ secrets.EC2_HOST }}"
 
-      # 5. EC2로 JAR 파일 전송
-      - name: Save EC2 Private Key
-        run: echo "${{ secrets.EC2_PRIVATE_KEY }}" > private-key.pem && chmod 600 private-key.pem
-      
-      - name: Send JAR to EC2
+ # 5. SSH 설정 (비밀키를 사용하여 연결)
+      - name: Setup SSH
         run: |
-          scp -i private-key.pem -P 22 ./back/build/libs/jraum-0.0.1-SNAPSHOT.jar ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/Jraum-project/build/libs/
-      
-      - name: Remove the private key file after usage
-        run: rm -f private-key.pem
-      
-      # 6. EC2에서 JAR 파일 실행
-      - name: Run JAR on EC2
-        run: |
-          ssh -i private-key.pem -p 22 ubuntu@${{ secrets.EC2_HOST }} "sudo nohup java -jar /home/ubuntu/Jraum-project/build/libs/jraum-0.0.1-SNAPSHOT.jar > /home/ubuntu/Jraum-project/application.log 2>&1 &"
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
+      # 6. EC2로 파일 전송
+      - name: Copy build folder to EC2
+        run: |
+          scp -r ./back/build/ ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/build/
+
+      # 7. EC2에서 JAR 파일 실행 (예: Spring Boot)
+      - name: Run backend on EC2
+        run: |
+          ssh ubuntu@${{ secrets.EC2_HOST }} << EOF
+          pkill -f 'java -jar' || true
+          nohup java -jar /home/ubuntu/build/libs/*.jar > app.log 2>&1 &
+          EOF
 
 
   deploy-frontend:
