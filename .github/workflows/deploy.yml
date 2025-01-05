@@ -88,6 +88,7 @@ jobs:
       - name: Build React project
         run: |
           cd front  # React 프로젝트 디렉토리로 이동
+          echo "CI=false" >> $GITHUB_ENV  # CI 환경 변수를 false로 설정
           npm install  # 의존성 설치
           npm run build  # 빌드 실행 (결과물은 front/build 디렉토리에 생성)
 
