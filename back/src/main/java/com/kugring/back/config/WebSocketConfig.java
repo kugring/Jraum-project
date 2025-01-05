@@ -1,29 +1,33 @@
 package com.kugring.back.config;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.lang.NonNull;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
+import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
+import com.kugring.back.handler.MyWebSocketHandler;
 
 @Configuration
-@EnableWebSocketMessageBroker
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+@EnableWebSocket
+public class WebSocketConfig implements WebSocketConfigurer  {
 
+    // @Override
+    // public void configureMessageBroker(MessageBrokerRegistry config) {
+    //     config.enableSimpleBroker("/topic", "/order", "/pointCharge", "/user", "/manager", "/cashPay");  // /topic 경로 추가
+    //     config.setApplicationDestinationPrefixes("/app");
+    // }
+
+    @SuppressWarnings("null")
     @Override
-    public void registerStompEndpoints(@NonNull StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws")
-                .setAllowedOrigins("https://api.hyunam.site", "https://hyunam.site", "*") // 백엔드와 프론트엔드 도메인 모두 허용
-                .withSockJS();
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        registry.addHandler(myHandler(), "/ws").setAllowedOrigins("*");
     }
 
-    @Override
-    public void configureMessageBroker(@NonNull MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic", "/order", "/pointCharge", "/user", "/manager", "/cashPay");  
-        config.setApplicationDestinationPrefixes("/app");
+    public WebSocketHandler myHandler() {
+        return new MyWebSocketHandler();
     }
+
+
 }
-
