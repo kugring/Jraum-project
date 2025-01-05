@@ -27,7 +27,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer  {
 
     @Override
     public void registerStompEndpoints(@SuppressWarnings("null") StompEndpointRegistry registry) {
-    registry.addEndpoint("/greeting").setAllowedOrigins("*");
+    registry.addEndpoint("/ws").setAllowedOrigins("*");
     }
 
 
