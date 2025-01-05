@@ -71,7 +71,7 @@ jobs:
         run: |
           ssh ubuntu@${{ secrets.EC2_HOST }} << EOF
           pkill -f 'java -jar' || true
-          nohup java -jar /home/ubuntu/build/libs/*.jar > app.log 2>&1 &
+          nohup java -jar /home/ubuntu/build/libs/jraum-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
           EOF
 
 
