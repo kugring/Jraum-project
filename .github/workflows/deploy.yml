@@ -80,28 +80,28 @@ jobs:
     needs: deploy-backend  # 백엔드 배포가 완료된 후 실행
 
     steps:
-      # 1. GitHub 레포지토리의 코드를 체크아웃
-      - name: Checkout code
-        uses: actions/checkout@v3
+    
+    # 1. GitHub 레포지토리의 코드를 체크아웃
+    - name: Checkout code
+      uses: actions/checkout@v3
+  
+    # 2. React 프로젝트 빌드
+    - name: Disable CI
+      run: echo "CI=false" >> $GITHUB_ENV
+    
+    - name: Build React project
+      run: |
+        cd front
+        npm install
+        npm run build
+  
+    # 3. 빌드된 정적 파일을 S3에 업로드
+    - name: Deploy to S3
+      run: |
+        aws s3 sync ${{ github.workspace }}/front/build/ s3://${{ secrets.S3_BUCKET }} \
+          --acl public-read --delete
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
 
-      # 2. React 프로젝트 빌드
-      - name: Disable CI
-        run: echo "CI=false" >> $GITHUB_ENV
-      
-      - name: Build React project
-        run: |
-          cd front
-          npm install
-          npm run build
-
-      # 3. 빌드된 정적 파일을 S3에 업로드
-      - name: Deploy to S3
-        uses: jakejarvis/s3-sync-action@v0.5.1
-        with:
-          args: --acl public-read --delete
-          source: front/build/
-        env:
-          AWS_S3_BUCKET: ${{ secrets.S3_BUCKET }}  # S3 버킷 이름
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # AWS Access Key ID
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # AWS Secret Access Key
-          AWS_REGION: ${{ secrets.AWS_REGION }}  # S3 버킷이 위치한 AWS 리전 (예: ap-northeast-2)
