@@ -1,17 +1,16 @@
 package com.kugring.back.config;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
-import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 import com.kugring.back.handler.MyWebSocketHandler;
 
 @Configuration
 @EnableWebSocket
-public class WebSocketConfig implements WebSocketConfigurer  {
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer  {
 
     // @Override
     // public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -19,11 +18,18 @@ public class WebSocketConfig implements WebSocketConfigurer  {
     //     config.setApplicationDestinationPrefixes("/app");
     // }
 
-    @SuppressWarnings("null")
+    // @SuppressWarnings("null")
+    // @Override
+    // public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+    //     registry.addHandler(myHandler(), "/ws").setAllowedOrigins("*");
+    // }
+
+
     @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(myHandler(), "/ws").setAllowedOrigins("*");
+    public void registerStompEndpoints(@SuppressWarnings("null") StompEndpointRegistry registry) {
+    registry.addEndpoint("/greeting").setAllowedOrigins("*");
     }
+
 
     public WebSocketHandler myHandler() {
         return new MyWebSocketHandler();
