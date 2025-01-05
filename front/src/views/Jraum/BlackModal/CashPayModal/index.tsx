@@ -3,7 +3,7 @@ import { postCashOrderRequest } from 'apis';
 import { PostCashOrderRequestDto } from 'apis/request/order';
 import { ResponseDto } from 'apis/response';
 import { PostCashOrderResponseDto } from 'apis/response/order';
-import { formattedPoint, TEST_DOMAIN } from 'constant';
+import { formattedPoint } from 'constant';
 import { memo, useEffect, useState } from 'react';
 import { HashLoader } from 'react-spinners';
 import SockJS from 'sockjs-client';
@@ -80,7 +80,7 @@ const PayButton = () => {
 
         // 웹소켓 연결 및 데이터 전송
         // const socket = new SockJS('httplocalhost:4000/ws');
-        const socket = new SockJS('https://' + TEST_DOMAIN + '/ws');
+        const socket = new SockJS('https://api.hyunam.site/ws');
         const client = new Client({
             webSocketFactory: () => socket,
             onConnect: () => {
@@ -171,7 +171,7 @@ const PayButton = () => {
     //          effect: 웹소켓 연결하는 이펙트              //
     useEffect(() => {
         // const socket = new SockJS('httplocalhost:4000/ws');
-        const socket = new SockJS('https://' + TEST_DOMAIN + '/ws');
+        const socket = new SockJS('https://api.hyunam.site/ws');
 
         const client = new Client({
             webSocketFactory: () => socket,
