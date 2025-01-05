@@ -47,13 +47,7 @@ jobs:
             echo "Build directory does not exist"
           fi
 
-        # 테스트용 출력 코드
-      - name: Test secrets output
-        run: |
-          echo "EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}"
-          echo "EC2_HOST: ${{ secrets.EC2_HOST }}"
-
- # 5. SSH 설정 (비밀키를 사용하여 연결)
+      # 5. SSH 설정 (비밀키를 사용하여 연결)
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
@@ -61,12 +55,19 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
-      # 6. EC2로 파일 전송
+      # 6. EC2에서 기존 build 폴더 삭제
+      - name: Remove existing build folder on EC2
+        run: |
+          ssh ubuntu@${{ secrets.EC2_HOST }} << EOF
+          rm -rf /home/ubuntu/build
+          EOF
+
+      # 7. EC2로 새로 빌드된 파일 전송
       - name: Copy build folder to EC2
         run: |
           scp -r ./back/build/ ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/build/
 
-      # 7. EC2에서 JAR 파일 실행 (예: Spring Boot)
+      # 8. EC2에서 JAR 파일 실행 (예: Spring Boot)
       - name: Run backend on EC2
         run: |
           ssh ubuntu@${{ secrets.EC2_HOST }} << EOF
