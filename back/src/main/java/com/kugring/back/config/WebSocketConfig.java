@@ -1,39 +1,36 @@
 package com.kugring.back.config;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.socket.WebSocketHandler;
-import org.springframework.web.socket.config.annotation.EnableWebSocket;
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
-import com.kugring.back.handler.MyWebSocketHandler;
+import org.springframework.beans.factory.annotation.Value;
+
+import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.lang.NonNull;
+
+
 
 @Configuration
-@EnableWebSocket
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer  {
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    // @Override
-    // public void configureMessageBroker(MessageBrokerRegistry config) {
-    //     config.enableSimpleBroker("/topic", "/order", "/pointCharge", "/user", "/manager", "/cashPay");  // /topic 경로 추가
-    //     config.setApplicationDestinationPrefixes("/app");
-    // }
-
-    // @SuppressWarnings("null")
-    // @Override
-    // public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-    //     registry.addHandler(myHandler(), "/ws").setAllowedOrigins("*");
-    // }
-
+    @Value("${tdomain}")
+    private String tdomain;
 
     @Override
-    public void registerStompEndpoints(@SuppressWarnings("null") StompEndpointRegistry registry) {
-    registry.addEndpoint("/ws").setAllowedOrigins("*");
+    public void registerStompEndpoints(@NonNull StompEndpointRegistry registry) {
+        registry.addEndpoint("/ws")
+                .setAllowedOrigins("https://"+ tdomain)
+                // .setAllowedOriginPatterns("http://localhost:*") // 허용할 출처 패턴 지정
+                .withSockJS();
     }
 
-
-    public WebSocketHandler myHandler() {
-        return new MyWebSocketHandler();
+    @Override
+    public void configureMessageBroker(@NonNull MessageBrokerRegistry config) {
+        config.enableSimpleBroker("/topic", "/order", "/pointCharge", "/user", "/manager", "/cashPay");  // /topic 경로 추가
+        config.setApplicationDestinationPrefixes("/app");
     }
-
-
+    
 }
