@@ -60,6 +60,7 @@ jobs:
         run: |
           ssh ubuntu@${{ secrets.EC2_HOST }} << EOF
           rm -rf /home/ubuntu/build
+          mkdir -p /home/ubuntu/build
           EOF
 
       # 7. EC2로 새로 빌드된 파일 전송
