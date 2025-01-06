@@ -34,9 +34,9 @@ const authorization = (accessToken: string) => {
     return { headers: { Authorization: `Bearer ${accessToken}` } }
 };
 
-
-// const DOMAIN = 'https://' + TEST_DOMAIN + ':4000'; 기존에는 포트를 적어줘야 했지는 https 통신으로 443으로 고정됨됨
-const DOMAIN = 'https://' + TEST_DOMAIN; 
+//  기존에는 포트를 적어줘야 했지는 https 통신으로 443으로 고정됨됨
+const DOMAIN = 'http://' + TEST_DOMAIN + ':4000';
+// const DOMAIN = 'https://' + TEST_DOMAIN; 
 
 
 

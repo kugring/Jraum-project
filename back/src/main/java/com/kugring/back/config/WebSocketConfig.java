@@ -22,8 +22,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(@NonNull StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("*")
-                // .setAllowedOriginPatterns("http://localhost:*") // 허용할 출처 패턴 지정
+                // .setAllowedOrigins("*")
+                .setAllowedOriginPatterns("http://api.hyunam.site:*") // 허용할 출처 패턴 지정
                 .withSockJS();
     }
 

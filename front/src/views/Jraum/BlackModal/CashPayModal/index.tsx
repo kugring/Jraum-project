@@ -173,7 +173,6 @@ const PayButton = () => {
         // const socket = new SockJS('httplocalhost:4000/ws');
         const socket = new SockJS('https://api.hyunam.site/ws');
 
-
         const client = new Client({
             webSocketFactory: () => socket,
             onConnect: () => {
