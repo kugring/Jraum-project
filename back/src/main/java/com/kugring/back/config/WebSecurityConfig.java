@@ -85,30 +85,21 @@ public class WebSecurityConfig {
 
     @Bean
     protected CorsConfigurationSource corsConfigurationSource() {
+
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        
-        // 특정 Origin만 허용 (hyunam.site)
-        corsConfiguration.addAllowedOriginPattern("https://hyunam.site");
-        
-        // WebSocket 요청에 대한 허용 메소드 추가 (OPTIONS, GET, POST 등)
-        corsConfiguration.addAllowedMethod("GET");
-        corsConfiguration.addAllowedMethod("POST");
-        corsConfiguration.addAllowedMethod("OPTIONS"); // WebSocket의 경우 Preflight 요청이 발생할 수 있음
-        
-        // 허용할 헤더
-        corsConfiguration.addAllowedHeader("Origin");
-        corsConfiguration.addAllowedHeader("Content-Type");
-        corsConfiguration.addAllowedHeader("Accept");
-        corsConfiguration.addAllowedHeader("Authorization");
-        corsConfiguration.addAllowedHeader("X-Requested-With");
-        
-        corsConfiguration.setAllowCredentials(true);  // 쿠키와 자격 증명을 허용
-        corsConfiguration.setMaxAge(3600L);  // 1시간 동안 CORS preflight 캐시
-    
+        // 반환할 configurationSource이다. UrlBased가 뭘까? 인스턴트 생성이라고 하네?
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // 모든 경로에 대해 CORS 설정을 적용
+
+        // 모든 ip에 응답 허용
+        corsConfiguration.addAllowedOriginPattern("*");
+        corsConfiguration.addAllowedMethod("*");
+        corsConfiguration.addAllowedHeader("*");
+        // 내 서버의 응답 json 을 javascript에서 처리할수 있게 하는것(axios 등)
+        corsConfiguration.setAllowCredentials(true);
+        corsConfiguration.setMaxAge(3600L);
+
         source.registerCorsConfiguration("/**", corsConfiguration);
-    
+
         return source;
     }
 }
