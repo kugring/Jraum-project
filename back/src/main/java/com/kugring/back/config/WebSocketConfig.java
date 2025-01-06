@@ -23,7 +23,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(@NonNull StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
                 // .setAllowedOrigins("*")
-                .setAllowedOriginPatterns("https://api.hyunam.site:*") // 허용할 출처 패턴 지정
+                .setAllowedOriginPatterns("https://hyunam.site:*") // 허용할 출처 패턴 지정
                 .withSockJS();
     }
 
