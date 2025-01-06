@@ -60,13 +60,12 @@ jobs:
         run: |
           ssh ubuntu@${{ secrets.EC2_HOST }} << EOF
           rm -rf /home/ubuntu/build
-          mkdir -p /home/ubuntu/build
           EOF
 
       # 7. EC2로 새로 빌드된 파일 전송
       - name: Copy build folder to EC2
         run: |
-          scp -r ./back/build/ ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/build/
+          scp -r ./back/build/ ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/build
 
       # 8. EC2에서 JAR 파일 실행 (예: Spring Boot)
       - name: Run backend on EC2
