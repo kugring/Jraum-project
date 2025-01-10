@@ -1,5 +1,6 @@
 package com.kugring.back.controller;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,8 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+// import org.springframework.http.HttpHeaders;
 
 import com.kugring.back.dto.request.order.PatchOrderApproveRequestDto;
 import com.kugring.back.dto.request.order.PatchOrderRefundRequestDto;
@@ -114,28 +114,14 @@ public class OrderController {
     // MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @GetMapping(value = "/{orderId}/audio", produces = "audio/wav") // WAV MIME 타입 지정
     public ResponseEntity<byte[]> getOrderAudio(@PathVariable("orderId") Long orderId) {
-        System.out.println("Request received for orderId: " + orderId);
-
         // TTS를 통해 음성 생성
         byte[] audioData = fileService.generateSsmlOrderAudio(orderId);
 
-        if (audioData == null || audioData.length == 0) {
-            System.out.println("Error: Audio data is empty or null for orderId: " + orderId);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Error 응답
-        }
-
-        System.out.println("Audio data generated successfully for orderId: " + orderId);
-
         // CORS 헤더 추가 및 MIME 타입 설정
         HttpHeaders headers = new HttpHeaders();
-        // 여러 도메인에서 접근을 허용
-        headers.add("Access-Control-Allow-Origin", "https://hyunam.site, https://www.hyunam.site");
-        headers.add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS"); // 허용된 HTTP 메소드
-        headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization"); // 허용된 헤더
+        headers.add("Access-Control-Allow-Origin", "https://hyunam.site"); // 모든 도메인에서 접근 허용
         headers.add("Content-Type", "audio/wav"); // WAV 형식으로 MIME 타입 설정
         headers.add("Content-Disposition", "inline; filename=\"order-audio.wav\""); // 파일 이름 설정
-
-        System.out.println("Headers set: " + headers);
 
         return ResponseEntity.ok()
                 .headers(headers) // CORS와 Content-Type 헤더를 포함하여 응답
