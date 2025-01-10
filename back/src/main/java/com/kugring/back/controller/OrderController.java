@@ -119,7 +119,12 @@ public class OrderController {
 
         // CORS 헤더 추가 및 MIME 타입 설정
         HttpHeaders headers = new HttpHeaders();
+
+        
+        // 이 부분은 Spring Security의 CORS 설정에 포함되므로, 제거해도 동일하게 동작해야 합니다. Spring Security가 헤더를 관리하도록 맡기는 것이 더 좋습니다.
         // headers.add("Access-Control-Allow-Origin", "https://hyunam.site"); // 모든 도메인에서 접근 허용
+
+
         headers.add("Content-Type", "audio/wav"); // WAV 형식으로 MIME 타입 설정
         headers.add("Content-Disposition", "inline; filename=\"order-audio.wav\""); // 파일 이름 설정
 
