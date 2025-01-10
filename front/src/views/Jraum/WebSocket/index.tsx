@@ -38,15 +38,26 @@ const WebSocket = () => {
     //          function: 주문 음성 듣기 함수               //
     const actionTTS = (orderId: number) => {
         fetch(`${TEST_DOMAIN}/api/v1/order/${orderId}/audio`)
-            .then((response) => response.blob())  // 오디오 데이터를 blob 형태로 받음
-            .then((audioBlob) => {
-                const audioUrl = URL.createObjectURL(audioBlob);
-                const audio = new Audio(audioUrl);
+        .then((response) => response.blob())  // 오디오 데이터를 blob 형태로 받음
+        .then((audioBlob) => {
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(audioUrl);
+            
+            // 로그 추가: 오디오가 로드된 후
+            audio.oncanplaythrough = () => {
+                console.log("Audio loaded successfully");
                 audio.play();
-            })
-            .catch((error) => {
-                console.error("Error fetching audio:", error);
-            });
+            };
+
+            audio.onerror = (error) => {
+                console.error("Audio playback error:", error);
+            };
+            
+            audio.play();
+        })
+        .catch((error) => {
+            console.error("Error fetching audio:", error);
+        });
     }
 
     //              function: 사용자 주문 웹소켓 구독 핸들러               // 

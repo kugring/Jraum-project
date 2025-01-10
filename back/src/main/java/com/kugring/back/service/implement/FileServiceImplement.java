@@ -142,7 +142,8 @@ public class FileServiceImplement implements FileService {
                     .build();
 
             AudioConfig audioConfig = AudioConfig.newBuilder()
-                    .setAudioEncoding(AudioEncoding.MP3) // MP3 포맷
+                    // .setAudioEncoding(AudioEncoding.MP3) // MP3 포맷
+                    .setAudioEncoding(AudioEncoding.LINEAR16) // WAV 형식으로 설정
                     .build();
 
             // Google TTS 호출
@@ -155,6 +156,8 @@ public class FileServiceImplement implements FileService {
             throw new RuntimeException("TTS 처리 중 오류 발생", e);
         }
     }
+
+    
 
 
         // SSML 텍스트 생성
