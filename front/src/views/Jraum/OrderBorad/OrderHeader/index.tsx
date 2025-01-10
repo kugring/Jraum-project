@@ -39,9 +39,7 @@ const OrderHeader = () => {
             .catch((error) => {
                 console.error("Error fetching audio:", error);
             });
-
             console.log("누름");
-            
     }
 
     //              render: 주문 헤더 렌더링               //
