@@ -18,7 +18,7 @@ function App() {
     return (
         <Routes>
             {/* 아직 메인이 준비되지 않아서 일단 제이라움으로 리다이렉트 */}
-            <Route path='' element={<Navigate to='jraum' replace />} />
+            <Route path='/' element={<Navigate to='jraum' replace />} />
             <Route element={<Container />}>
                 <Route path='/auth'>
                     <Route path='sign-up' element={<SignUp />} />

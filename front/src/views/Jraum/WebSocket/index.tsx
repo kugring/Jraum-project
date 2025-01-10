@@ -35,44 +35,44 @@ const WebSocket = () => {
         });
     };
 
-    // //          function: 주문 음성 듣기 함수               //
-    // const actionTTS = (orderId: number) => {
-    //     fetch(`${TEST_DOMAIN}/api/v1/order/${orderId}/audio`, {
-    //         method: 'GET',
-    //         headers: {
-    //             'Content-Type': 'audio/wav'
-    //         },
-    //         mode: 'cors',  // CORS 모드 설정
-    //     })
-    //     .then((response) => response.blob())
-    //     .then((audioBlob) => {
-    //         const audioUrl = URL.createObjectURL(audioBlob);
-    //         const audio = new Audio(audioUrl);
+    //          function: 주문 음성 듣기 함수               //
+    const actionTTS = (orderId: number) => {
+        fetch(`${TEST_DOMAIN}/api/v1/order/${orderId}/audio`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'audio/wav'
+            },
+            mode: 'cors',  // CORS 모드 설정
+        })
+        .then((response) => response.blob())
+        .then((audioBlob) => {
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(audioUrl);
             
-    //         // 로그 추가: 오디오가 로드된 후
-    //         audio.oncanplaythrough = () => {
-    //             console.log("Audio loaded successfully");
-    //             audio.play();
-    //         };
+            // 로그 추가: 오디오가 로드된 후
+            audio.oncanplaythrough = () => {
+                console.log("Audio loaded successfully");
+                audio.play();
+            };
         
-    //         audio.onerror = (error) => {
-    //             console.error("Audio playback error:", error);
-    //         };
+            audio.onerror = (error) => {
+                console.error("Audio playback error:", error);
+            };
         
-    //         audio.play();
-    //     })
-    //     .catch((error) => {
-    //         console.error("Error fetching audio:", error);
-    //     });
-    // }
+            audio.play();
+        })
+        .catch((error) => {
+            console.error("Error fetching audio:", error);
+        });
+    }
 
-    // //              function: 사용자 주문 웹소켓 구독 핸들러               // 
-    // const OrderTTSSubscribe = () => {
-    //     manager?.subscribe('/receive/user/orderTTS', (orderId) => {
-    //         console.log(orderId);
-    //         actionTTS(orderId);
-    //     });
-    // };
+    //              function: 사용자 주문 웹소켓 구독 핸들러               // 
+    const OrderTTSSubscribe = () => {
+        manager?.subscribe('/receive/user/orderTTS', (orderId) => {
+            console.log(orderId);
+            actionTTS(orderId);
+        });
+    };
 
 
 
@@ -90,7 +90,7 @@ const WebSocket = () => {
     useEffect(() => {
         if (connected) {
             PointChargeRequestSubscribe();
-            // OrderTTSSubscribe();
+            OrderTTSSubscribe();
         }
     }, [connected])
 
