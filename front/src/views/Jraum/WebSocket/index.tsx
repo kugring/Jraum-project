@@ -37,8 +37,14 @@ const WebSocket = () => {
 
     //          function: 주문 음성 듣기 함수               //
     const actionTTS = (orderId: number) => {
-        fetch(`${TEST_DOMAIN}/api/v1/order/${orderId}/audio`)
-        .then((response) => response.blob())  // 오디오 데이터를 blob 형태로 받음
+        fetch(`${TEST_DOMAIN}/api/v1/order/${orderId}/audio`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'audio/wav'
+            },
+            mode: 'cors',  // CORS 모드 설정
+        })
+        .then((response) => response.blob())
         .then((audioBlob) => {
             const audioUrl = URL.createObjectURL(audioBlob);
             const audio = new Audio(audioUrl);
@@ -48,11 +54,11 @@ const WebSocket = () => {
                 console.log("Audio loaded successfully");
                 audio.play();
             };
-
+        
             audio.onerror = (error) => {
                 console.error("Audio playback error:", error);
             };
-            
+        
             audio.play();
         })
         .catch((error) => {
