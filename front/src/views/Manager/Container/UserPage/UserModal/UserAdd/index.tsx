@@ -9,6 +9,7 @@ import { useCookies } from 'react-cookie';
 import { JraumSignUpRequestDto, NicknameDpCheckRequestDto, PinDpCheckRequestDto } from 'apis/request/auth';
 import { JraumSignUpResponseDto, NicknameDpcheckResponseDto, PinDpcheckResponseDto } from 'apis/response/auth';
 import { ResponseDto } from 'apis/response';
+import { toast } from 'react-toastify';
 
 
 //              component: 회원 등록 모달 컴포넌트                  //
@@ -63,7 +64,7 @@ const UserAdd = () => {
             pinDpCheckRequest(requestBody, cookies.managerToken).then(pinDpCheckResponse)
         }
     };
-    //          function: 주문 완료 처리 이후 함수          //
+    //          function: 핀 중복 체크 완료 처리 이후 함수          //
     const pinDpCheckResponse = (responseBody: PinDpcheckResponseDto | ResponseDto | null) => {
         if (!responseBody) return;
         const { code } = responseBody;
@@ -224,7 +225,11 @@ const UserAdd = () => {
         if (code === 'DN') alert('닉네임이 중복되었습니다.');
         if (code === 'DP') alert('회원번호가 중복되었습니다.');
         if (code !== 'SU') return;
-        alert('회원 등록되었습니다!')
+        toast.success('정상적으로 회원이 등록되었습니다.', {
+            autoClose: 1500,
+            position: "top-center",
+            closeOnClick: true, // 클릭 시 바로 사라짐
+          });
         closeModal();
     }
 

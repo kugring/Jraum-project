@@ -12,6 +12,8 @@ import usePointChargeStore from 'store/modal/point-charge-modal.store'
 import { postPointChargeRequest } from 'apis'
 import { PostPointChargeRequestDto } from 'apis/request/pointCharge'
 import { PostPointChargeResponseDto } from 'apis/response/pointCharge'
+import useWebSocketStore from 'store/web-socket.store'
+import { log } from 'console'
 
 //          component: 포인트 충전 모달 텀포넌트            //
 const PointChargeModal = () => {
@@ -133,15 +135,17 @@ const ChargeButton = () => {
     const active = usePointChargeStore(state => state.chargePoint > 0)
     //          state: 충전 포인트 상태             //
     const chargePoint = usePointChargeStore.getState().chargePoint;
-    //          state: 충전 포인트 상태             //
-    const setPointChargeId = usePointChargeStore(state => state.setPointChargeId);
     //          state: cookie 상태              //
     const [cookies,] = useCookies();
 
     //          function: 블랙 모달 종료 함수           //
     const closeModal = useBlackModalStore.getState().closeModal;
-    //          function: 블랙 모달 종료 함수           //
+    //          function: 화이트 모달 설정 함수           //
     const setWhiteModal = useBlackModalStore.getState().setWhiteModal;
+    //          function: 충전 포인트 아이디 설정 함수             //
+    const setPointChargeId = usePointChargeStore.getState().setPointChargeId;
+    //          function: 충전 포인트 진행 설정 함수             //
+    const setCharging = usePointChargeStore.getState().setCharging;
     //          function: 충전 포인트 변경하는 함수             //
     const setChargePoint = usePointChargeStore.getState().setChargePoint;
     //          function: 포인트 충전을 요청하는 함수           //
@@ -162,15 +166,25 @@ const ChargeButton = () => {
         const { code } = responseBody;
         if (code === 'DBE') alert('데이터베이스 오류입니다.');
         if (code !== 'SU') return;
-        const { pointChargeId } = responseBody as PostPointChargeResponseDto;
+        const { pointChargeRequest } = responseBody as PostPointChargeResponseDto;
+
         // 블랙 모달을 종료한다.
         closeModal();
         // pointChardId로 인한 충전버튼의 의존성이 나중에 발동될 수 있게 먼저 결제로 화이트 모달을 설정하고 
         setWhiteModal('포인트결제');
         // 이후에 pointChargeId값을 설정하여 렌더링의 문제가 없도록 한다. 
-        setTimeout(() => { setChargePoint(0); setPointChargeId(pointChargeId) }, 510) // 블랙 모달 종료 500뒤에 종료되도록 10추가
+        setChargePoint(0);
+        // 충전 요청의 ID 설정
+        setPointChargeId(pointChargeRequest.pointChargeId)
+        // 충전 요청의 ID 설정
+        setCharging(true)
+        console.log("pointChargeRequest: " + pointChargeRequest);
 
+        const { manager } = useWebSocketStore.getState();
+        manager?.sendMessage('/send/pointCharge/request', pointChargeRequest); // 메시지 전송
     }
+
+
 
 
     //          render: 충전 포인트 렌더링         //

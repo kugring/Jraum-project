@@ -1,19 +1,17 @@
-import { Client, Message } from '@stomp/stompjs';
+import styled from 'styled-components'
+import useOrderStore from 'store/modal/order-list.store';
+import useWebSocketStore from 'store/web-socket.store';
+import useBlackModalStore from 'store/modal/black-modal.store';
+import { HashLoader } from 'react-spinners';
+import { ResponseDto } from 'apis/response';
+import { formattedPoint } from 'constant';
 import { postCashOrderRequest } from 'apis';
 import { PostCashOrderRequestDto } from 'apis/request/order';
-import { ResponseDto } from 'apis/response';
 import { PostCashOrderResponseDto } from 'apis/response/order';
-import { formattedPoint } from 'constant';
 import { memo, useEffect, useState } from 'react';
-import { HashLoader } from 'react-spinners';
-import SockJS from 'sockjs-client';
-import useBlackModalStore from 'store/modal/black-modal.store';
-import useOrderStore from 'store/modal/order-list.store';
-import styled from 'styled-components'
 
 //          component: 현금 결제 모달 컴포넌트            //
 const CashPayModal = () => {
-
 
 
     //          state: 주문의 최종 결제 금액 상태            //
@@ -51,6 +49,11 @@ export default memo(CashPayModal);
 //          component: 결제 대기하는 컴포넌트               //
 const PayButton = () => {
 
+    //              state: 웹소켓 연결 상태                 //
+    const connected = useWebSocketStore(state => state.connected);
+    //              state: 웹소켓 매니저 상태               //
+    const { manager } = useWebSocketStore.getState();
+
     //          state: 주문 버튼 상태           //
     const [action, setAction] = useState<boolean>(false);
     //          state: 주문의 최종 결제 금액 상태            //
@@ -78,34 +81,10 @@ const PayButton = () => {
         // 데이터 가져온것을 분할
         const { order, cashName, waitingNum } = responseBody as PostCashOrderResponseDto;
 
-        // 웹소켓 연결 및 데이터 전송
-        // const socket = new SockJS('httplocalhost:4000/ws');
-        const socket = new SockJS('https://api.hyunam.site/ws');
-        const client = new Client({
-            webSocketFactory: () => socket,
-            onConnect: () => {
-                console.log('Connected to WebSocket');
-
-                // 웹소켓으로 데이터 보내기
-                if (client) {
-                    client.publish({
-                        destination: '/app/sendOrder',
-                        body: JSON.stringify(order),  // order 객체를 JSON 문자열로 변환
-                    });
-                } else {
-                    console.error('WebSocket not connected');
-                }
-
-                // 연결 후 바로 종료
-                client.deactivate(); // 데이터 전송 후 연결 종료
-            },
-            onDisconnect: () => {
-                console.log('Disconnected from WebSocket');
-            }
-        });
-
-        // 웹소켓 연결 활성화
-        client.activate();
+        console.log("order: "+ order);
+        
+        // 웹소켓으로 Order 데이터 보내기
+        manager?.sendMessage('/send/order', order);
 
         // 상태 업데이트
         setWaitingNum(waitingNum);
@@ -125,76 +104,38 @@ const PayButton = () => {
     }
 
 
-    //          function: 웹소켓 연결시 관리자에게 현금결제 여부를 확인할 소켓 전달     //
-    const handleConnect = (client: Client, totalPrice: number): void => {
-        // 메시지 구독
-        client.subscribe('/topic/cashPay/user', handleCashPayResponse);
 
-        // 서버로 데이터 전송
-        client.publish({
-            destination: '/app/sendCashPay',
-            body: JSON.stringify({
-                totalPrice: totalPrice,
-                waiting: true
-            })
-        });
-
-        console.log("보내짐: " + totalPrice);
-
-    };
-
-    //          function: 컴포넌트가 언마운트 된다면 현금결제 여부 확인 취소함          //
-    const handleDisconnect = (client: Client, totalPrice: number): void => {
-        // 서버로 데이터 전송 (연결 끊김 시)
-        client.publish({
-            destination: '/app/sendCashPay',
-            body: JSON.stringify({
-                totalPrice: totalPrice,
-                waiting: false
-            })
-        });
-    };
-
-    //          function: 관리자가 현금을 결제에 대한 승인, 거절에 대한 처리 함수           //
-    const handleCashPayResponse = (msg: Message): void => {
-        if (msg.body) {
-            const cashPayOk: boolean = JSON.parse(msg.body);
+    //              function: 현금결제 Ok 웹소켓 구독 핸들러               // 
+    const cashPayOkSubWS = () => {
+        manager?.subscribe('/receive/user/cashPay', (data) => {
+            const { cashPayOk } = data;
             if (cashPayOk) {
                 setAction(true)
                 paymentActive();
             } else {
                 closeModal();
             }
-        }
+        });
     };
 
-    //          effect: 웹소켓 연결하는 이펙트              //
-    useEffect(() => {
-        // const socket = new SockJS('httplocalhost:4000/ws');
-        const socket = new SockJS('https://api.hyunam.site/ws');
-
-
-        const client = new Client({
-            webSocketFactory: () => socket,
-            onConnect: () => {
-                console.log('Connected to WebSocket');
-                handleConnect(client, totalPrice)
-            }
-
+    //              function: 현금 결제 승인 요청 웹소켓 전송 함수               // 
+    const cashPayInfoSendWS = (waiting: boolean) => {
+        manager?.sendMessage('/send/cashPay/info', {
+            totalPrice: totalPrice,
+            waiting: waiting
         });
+    };
 
-        client.activate();
-
+    //              effect: 웹소켓이 연결되면 이후에 구독하는 이펙트                //
+    useEffect(() => {
+        if (connected) {
+            cashPayOkSubWS();
+            cashPayInfoSendWS(true);
+        }
         return () => {
-            // 소켓 연결 해제 전에 메시지 전송
-            handleDisconnect(client, totalPrice);
-            // 약간의 지연 후 클라이언트 비활성화
-            client.deactivate();
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-
+            cashPayInfoSendWS(false);
+        }
+    }, [connected])
 
     //          render: 결제 대기 상태의 버튼 렌더링             //
     return (

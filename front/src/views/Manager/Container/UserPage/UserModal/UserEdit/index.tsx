@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { toast } from 'react-toastify'
 import { CiEdit } from 'react-icons/ci'
 import { useCookies } from 'react-cookie'
 import { FaCaretDown } from 'react-icons/fa'
@@ -227,7 +228,11 @@ const UserEdit = () => {
         if (code === 'DN') alert('닉네임이 중복되었습니다.');
         if (code === 'DP') alert('회원번호가 중복되었습니다.');
         if (code !== 'SU') return;
-        alert('회원 정보가 수정되었습니다!')
+        toast.success('회원정보가 수정되었습니다.', {
+            autoClose: 1500,
+            position: "top-center",
+            closeOnClick: true, // 클릭 시 바로 사라짐
+          });
         closeModal();
     }
 

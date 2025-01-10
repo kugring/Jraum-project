@@ -1,6 +1,5 @@
 import Card from './Card';
 import styled from 'styled-components';
-import MenuModal from './MenuModal';
 import { useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 import { ResponseDto } from 'apis/response';
@@ -112,7 +111,6 @@ const MenuPage = () => {
                         </CategoryGroup>))}
                 </CardBox>
             </DragDropContext>
-            <MenuModal />
         </MenuPageE>
     );
 };

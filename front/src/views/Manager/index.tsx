@@ -4,27 +4,34 @@ import PinCheck from './PinCheck'
 import { useCookies } from 'react-cookie'
 import { Outlet } from 'react-router-dom'
 import Header from './Header'
+import WebSocket from './WebSocket'
+import BlackModal from './BlackModal'
+import { ToastContainer } from 'react-toastify'
 
 //          component: 관리자 컴포넌트              //
 const Manager = () => {
 
-
     //          state: 쿠키 상태            //
     const [cookies,] = useCookies(['managerToken']);
-
 
     //          render: 관리자 렌더링              //
     return (
         <ManagerE>
             {cookies.managerToken === undefined ?
-                <PinCheck />
+                <>
+                    <PinCheck />
+                    {/* <TTSComponent /> 25/01/10 아직은 안쓸꺼임 */}
+                </>
                 :
                 <>
+                    <WebSocket />
                     <Header />
                     <Container>
+                        <ToastContainer style={{ fontSize: "18px" }}/>
                         <Outlet />
                     </Container>
                     <Footer />
+                    <BlackModal />
                 </>
             }
         </ManagerE>

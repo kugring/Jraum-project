@@ -18,7 +18,6 @@ import com.kugring.back.dto.response.order.PostPointOrderResponseDto;
 public interface OrderService {
 
   // ResponseEntity<? super FilterOrderListResponseDto> filterOrderList(FilterOrderListRequestDto dto);
-
   ResponseEntity<? super GetCashNameResponseDto> getCashName();
   ResponseEntity<? super GetOrderListResponseDto> getOrderList(String userId, int page, int size, String name, String status, String date);
   ResponseEntity<? super PostOrderCashResponseDto> postCashOrderList(PostOrderCashRequestDto dto);

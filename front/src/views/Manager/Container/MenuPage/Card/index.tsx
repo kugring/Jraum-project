@@ -5,6 +5,7 @@ import { PatchMenuSequenceResponseDto } from 'apis/response/menu';
 import { formattedPoint } from 'constant';
 import { useEffect, useState } from 'react'
 import { useCookies } from 'react-cookie';
+import { toast } from 'react-toastify';
 import useMenuPageStore from 'store/manager/menu-page.store';
 import useBlackModalStore from 'store/modal/black-modal.store';
 import styled from 'styled-components';
@@ -48,6 +49,11 @@ const Card = ({ index }: { menu: MenuPageItem, index: number }) => {
         console.log(menu.name + ": " + menu.sequence + " -> " + index);
         //  순서값이 변동 되었을때 menu.sequence값을 DB에서 가져오지 않고 수정된 index값을 상태로 지닌다.
         setSequence(index);
+        toast.success('메뉴의 순서가 수정되었습니다.', {
+          autoClose: 1500,
+          position: "top-center",
+          closeOnClick: true, // 클릭 시 바로 사라짐
+      });
     }
 
     //          effect: 달라진 순서를 확인하는 이펙트               //

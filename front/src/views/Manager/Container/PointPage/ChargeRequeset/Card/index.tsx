@@ -1,63 +1,80 @@
 import styled from 'styled-components'
-import { defaultUserImage, formattedPoint } from 'constant'
-import ChargeRequestListItem from 'types/interface/charge-request-list-item.interface'
-import { PatchPointChargeApprovalRequestDto, PatchPointChargeDeclineRequestDto } from 'apis/request/pointCharge'
-import { useCookies } from 'react-cookie'
-import { patchPointChargeApprovalRequest, patchPointChargeDeclineRequest } from 'apis'
-import { PatchPointChargeApprovalResponseDto, PatchPointChargeDeclineResponseDto } from 'apis/response/pointCharge'
-import { ResponseDto } from 'apis/response'
-import { useState } from 'react'
 import { fromNow } from 'helpers/dayjs'
+import { useCookies } from 'react-cookie'
+import { ResponseDto } from 'apis/response'
+import { useWebSocketStore } from 'store';
+import { ToastContainer, toast } from 'react-toastify';
+import { ChargeRequestListItem } from 'types/interface'
+import { usePointChargeRequestStore } from 'store/manager';
+import { defaultUserImage, formattedPoint } from 'constant'
+import { patchPointChargeApprovalRequest, patchPointChargeDeclineRequest } from 'apis'
+import { PatchPointChargeApprovalRequestDto, PatchPointChargeDeclineRequestDto } from 'apis/request/pointCharge'
+import { PatchPointChargeApprovalResponseDto, PatchPointChargeDeclineResponseDto } from 'apis/response/pointCharge'
+import 'react-toastify/dist/ReactToastify.css';
 
 //              component: 포인트 충전 요청 컴포넌트                    //
 const Card = ({ request }: { request: ChargeRequestListItem }) => {
 
     //          state: 쿠키 상태              //
     const [cookies] = useCookies();
-    //          state: 보여짐 상태              //
-    const [show, setShow] = useState<boolean>(true);
+    //          state: 웹소켓 상태            //
+    const { manager } = useWebSocketStore.getState();
+    //            state: 포인트 요청 목록             //
+    const removeChargeRequest = usePointChargeRequestStore.getState().removeChargeRequest;
 
     //          function: 포인트 충전 승인하는 함수             //
     const pointChargeApproval = () => {
-      const requestBody: PatchPointChargeApprovalRequestDto = {
-          pointChargeId: request.pointChargeId
-      }
-      patchPointChargeApprovalRequest(requestBody, cookies.managerToken).then(patchPointChargeApprovalResponse)
-  }
+        const requestBody: PatchPointChargeApprovalRequestDto = {
+            pointChargeId: request.pointChargeId
+        }
+        patchPointChargeApprovalRequest(requestBody, cookies.managerToken).then(patchPointChargeApprovalResponse)
+    }
 
-  //          function: 포인트 충전 요청 승인 데이터 처리 함수            //
-  const patchPointChargeApprovalResponse = (responseBody: PatchPointChargeApprovalResponseDto | ResponseDto | null) => {
-      if (!responseBody) return;
-      const { code } = responseBody;
-      if (code === 'DBE') alert('데이터베이스 오류입니다.');
-      if (code === 'NMG') alert('유효하지 않은 관리자입니다.');
-      if (code !== 'SU') return;
-      alert("승인되었습니다.")
-      setShow(false);
-  }
-  //          function: 포인트 충전 거절하는 함수             //
-  const pointChargeDecline = () => {
-      const requestBody: PatchPointChargeDeclineRequestDto = {
-          pointChargeId: request.pointChargeId
-      }
-      patchPointChargeDeclineRequest(requestBody, cookies.managerToken).then(patchPointChargeDeclineResponse)
-  }
+    //          function: 포인트 충전 요청 승인 데이터 처리 함수            //
+    const patchPointChargeApprovalResponse = (responseBody: PatchPointChargeApprovalResponseDto | ResponseDto | null) => {
+        if (!responseBody) return;
+        const { code } = responseBody;
+        if (code === 'DBE') alert('데이터베이스 오류입니다.');
+        if (code === 'NMG') alert('유효하지 않은 관리자입니다.');
+        if (code !== 'SU') return;
 
-  //          function: 포인트 충전 요청 거절 데이터 처리 함수            //
-  const patchPointChargeDeclineResponse = (responseBody: PatchPointChargeDeclineResponseDto | ResponseDto | null) => {
-      if (!responseBody) return;
-      const { code } = responseBody;
-      if (code === 'DBE') alert('데이터베이스 오류입니다.');
-      if (code === 'NMG') alert('유효하지 않은 관리자입니다.');
-      if (code !== 'SU') return;
-      alert("거절되었습니다.")
-      setShow(false);
-  }
+        manager?.sendMessage('/send/pointCharge/requestOk', { pointChargeId: request.pointChargeId, status: "승인" }); // 메시지 전송
+        toast.success('충전이 승인되었습니다.', {
+            autoClose: 1500,
+            position: "top-center",
+            closeOnClick: true, // 클릭 시 바로 사라짐
+          });
+        removeChargeRequest(request);
+    }
+    //          function: 포인트 충전 거절하는 함수             //
+    const pointChargeDecline = () => {
+        const requestBody: PatchPointChargeDeclineRequestDto = {
+            pointChargeId: request.pointChargeId
+        }
+        patchPointChargeDeclineRequest(requestBody, cookies.managerToken).then(patchPointChargeDeclineResponse)
+    }
+
+    //          function: 포인트 충전 요청 거절 데이터 처리 함수            //
+    const patchPointChargeDeclineResponse = (responseBody: PatchPointChargeDeclineResponseDto | ResponseDto | null) => {
+        if (!responseBody) return;
+        const { code } = responseBody;
+        if (code === 'DBE') alert('데이터베이스 오류입니다.');
+        if (code === 'NMG') alert('유효하지 않은 관리자입니다.');
+        if (code !== 'SU') return;
+
+        manager?.sendMessage('/send/pointCharge/requestOk', { pointChargeId: request.pointChargeId, status: "거절" }); // 메시지 전송
+        toast.warn('충전이 거절되었습니다.', {
+            autoClose: 1500,
+            position: "top-center",
+            closeOnClick: true, // 클릭 시 바로 사라짐
+          });
+        removeChargeRequest(request);
+    }
 
 
     //              render: 포인트 충전 요청 렌더링                 //
     return (
-        <CardE $show={show}>
+        <CardE>
             <CardContent>
                 <UserInfo>
                     <ProfileImage src={defaultUserImage ? defaultUserImage : request.profileImage}></ProfileImage>
@@ -79,13 +96,14 @@ const Card = ({ request }: { request: ChargeRequestListItem }) => {
                 <Approve onClick={pointChargeApproval}>승인</Approve>
             </Buttons>
         </CardE>
+
     )
 }
 
 export default Card
 
-const CardE = styled.div<{$show: boolean}>`
-  display: ${({$show}) => $show ? "flex" : "none"};
+const CardE = styled.div`
+  display: flex;
   flex-direction: column;
   justify-content: center;
   width: 100%;

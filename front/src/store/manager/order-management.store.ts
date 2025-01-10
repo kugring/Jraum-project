@@ -4,22 +4,26 @@ import { devtools } from 'zustand/middleware';
 
 interface OrderManagementStore {
     orders?: OrderManagement[];
+    openTTS: boolean;
     showOrder: OrderManagement | null;
+    addOrder: (order: OrderManagement) => void;
     setOrders: (orders: OrderManagement[]) => void;
+    setOpenTTS: (boolean: boolean) => void;
     setShowOrder: (order: OrderManagement) => void;
     removeOrderById: (orderId: number) => void;
-    addOrder: (order: OrderManagement) => void; // addOrder 함수 추가
 }
 
 // Zustand 상태 생성
 const useOrderManagementStore = create<OrderManagementStore>()(
     devtools((set) => ({
         orders: [],
+        openTTS: true,
         showOrder: null,
+        addOrder: (order) => set((state) => ({ orders: [...state.orders!, order] })),
         setOrders: (orders) => set({ orders: orders }),
+        setOpenTTS: (boolean) => set({ openTTS: boolean}),
         setShowOrder: (order) => set({ showOrder: order }),
         removeOrderById: (orderId: number) => set((state) => ({ orders: state.orders!.filter(order => order.orderId !== orderId) })),
-        addOrder: (order) => set((state) => ({ orders: [...state.orders!, order] })),
     }))
 );
 export default useOrderManagementStore;

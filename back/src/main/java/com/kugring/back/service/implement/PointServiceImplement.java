@@ -21,7 +21,7 @@ import com.kugring.back.dto.response.auth.PinCheckResponseDto;
 import com.kugring.back.dto.response.point.DeletePointChargeResponseDto;
 import com.kugring.back.dto.response.point.GetChargeListResponseDto;
 import com.kugring.back.dto.response.point.GetPointChargePendingResponseDto;
-import com.kugring.back.dto.response.point.GetPointChargependingCountResponseDto;
+import com.kugring.back.dto.response.point.GetPointChargeStatusResponseDto;
 import com.kugring.back.dto.response.point.PointChargeApprovalResponseDto;
 import com.kugring.back.dto.response.point.PointChargeDeclineResponseDto;
 import com.kugring.back.dto.response.point.PointDirectChargeResponseDto;
@@ -47,8 +47,7 @@ public class PointServiceImplement implements PointService {
   public ResponseEntity<? super PostPointChargeResponseDto> postPointCharge(PostPointChargeRequestDto dto,
       String userId) {
 
-    Long pointChargeId = null;
-
+    PointCharge PointCharge = null;
     try {
       // Dto에서 필요한 정보 가져오기
       int chargePoint = dto.getChargePoint();
@@ -67,33 +66,36 @@ public class PointServiceImplement implements PointService {
         return PostPointChargeResponseDto.pointChargeFail();
 
       // 포인트 엔터티 생성
-      PointCharge PointCharge = new PointCharge(User, currentPoint, chargePoint);
+      PointCharge = new PointCharge(User, currentPoint, chargePoint);
       PointCharge savedPointCharge = pointChargeRepositoy.save(PointCharge);
-      pointChargeId = savedPointCharge.getPointChargeId();
+      PointCharge = savedPointCharge;
 
     } catch (Exception exception) {
       exception.printStackTrace();
       return ResponseDto.databaseError();
     }
 
-    return PostPointChargeResponseDto.success(pointChargeId);
+    return PostPointChargeResponseDto.success(PointCharge);
   }
 
   // todo: 이놈들 메소드 명이랑 다 바꿔야함
   @Override
-  public ResponseEntity<? super GetPointChargependingCountResponseDto> getPointChargependingCount(Long pointChargeId,
-      String userId) {
+  public ResponseEntity<? super GetPointChargeStatusResponseDto> getPointChargeStatus(String userId) {
 
-    // 미승인 갯수를 담을 객체
-    boolean approve;
+    String status;
+    Long pointChargeId;
 
     try {
-      approve = pointChargeRepositoy.existsByUser_UserIdAndPointChargeIdAndStatus(userId, pointChargeId, "승인");
+      PointCharge pointCharge = pointChargeRepositoy.findFirstByUser_UserIdOrderByCreatedAtDesc(userId);
+      if(pointCharge == null){return GetPointChargeStatusResponseDto.noExistPointCharge();}
+      status = pointCharge.getStatus();
+      pointChargeId = pointCharge.getPointChargeId();
+
     } catch (Exception exception) {
       exception.printStackTrace();
       return ResponseDto.databaseError();
     }
-    return GetPointChargependingCountResponseDto.success(approve);
+    return GetPointChargeStatusResponseDto.success(status, pointChargeId);
   }
 
   @Override

@@ -41,7 +41,7 @@ const SubPageBox = styled.div`
 
 const SubPage = styled.div<{$select: boolean}>`
     position: relative;
-    font-size: 20px;
+    font-size: 18px;
     padding: 4px 12px;
     ${({$select}) => $select ?
     `

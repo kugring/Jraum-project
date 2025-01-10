@@ -3,6 +3,7 @@ import ChargeRequest from './ChargeRequeset';
 import ChargeList from './ChargeList';
 import DirectCharge from './DirectCharge';
 import { useEffect } from 'react';
+import { ToastContainer } from 'react-toastify';
 
 //              component: 포인트 페이지 컴포넌트                   //
 const PointPage = () => {

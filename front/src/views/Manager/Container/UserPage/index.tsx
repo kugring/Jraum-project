@@ -1,6 +1,5 @@
 import styled from 'styled-components'
 import { HiUserAdd } from "react-icons/hi";
-import UserModal from './UserModal';
 import useBlackModalStore from 'store/modal/black-modal.store';
 import Card from './Card';
 import { useEffect } from 'react';
@@ -149,7 +148,6 @@ const UserPage = () => {
                 {!end && isLoading && <div>Loading...</div>}
                 {end && <div>끝</div>}
             </CardBox>
-            <UserModal />
         </UserPageE>
     )
 }

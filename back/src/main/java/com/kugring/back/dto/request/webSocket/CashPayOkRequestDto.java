@@ -11,5 +11,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CashPayOkRequestDto {
     
-    private boolean chashPayOk;
+    private boolean cashPayOk;
 }

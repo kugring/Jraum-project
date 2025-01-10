@@ -9,6 +9,7 @@ import { CiEdit } from "react-icons/ci";
 import { FaCaretDown } from "react-icons/fa";
 import { IoCheckbox } from "react-icons/io5";
 import { MdOutlineCheckBoxOutlineBlank } from "react-icons/md";
+import { toast } from "react-toastify";
 import useMenuPageStore from "store/manager/menu-page.store";
 import useBlackModalStore from "store/modal/black-modal.store";
 import styled from "styled-components";
@@ -168,9 +169,12 @@ const MenuEdit = () => {
         if (code !== 'SU') return;
         
         closeModal();
-        setTimeout(() => {setEditMenu(null); console.log("이거 수행함?");
-        },500)
-        console.log("메뉴를 수정되었습니다.");
+        setTimeout(() => setEditMenu(null),500)
+        toast.success('메뉴가 수정되었습니다.', {
+            autoClose: 1500,
+            position: "top-center",
+            closeOnClick: true, // 클릭 시 바로 사라짐
+        });
     }
 
     //            effect: 드롭다운 외부 클릭 이벤트 이펙터                //

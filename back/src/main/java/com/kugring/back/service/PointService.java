@@ -9,7 +9,7 @@ import com.kugring.back.dto.response.point.PostPointChargeResponseDto;
 import com.kugring.back.dto.response.point.DeletePointChargeResponseDto;
 import com.kugring.back.dto.response.point.GetChargeListResponseDto;
 import com.kugring.back.dto.response.point.GetPointChargePendingResponseDto;
-import com.kugring.back.dto.response.point.GetPointChargependingCountResponseDto;
+import com.kugring.back.dto.response.point.GetPointChargeStatusResponseDto;
 import com.kugring.back.dto.response.point.PointChargeApprovalResponseDto;
 import com.kugring.back.dto.response.point.PointChargeDeclineResponseDto;
 import com.kugring.back.dto.response.point.PointDirectChargeResponseDto;
@@ -23,8 +23,8 @@ public interface PointService {
   ResponseEntity<? super DeletePointChargeResponseDto> deletePointCharge(Long pointChargeId, String userId);
   ResponseEntity<? super PointChargeDeclineResponseDto> pointChargeDecline(String userId, PointChargeDeclineRequestDto dto);
   ResponseEntity<? super PointChargeApprovalResponseDto> pointChargeApproval(String userId, PointChargeApprovalRequestDto dto);
+  ResponseEntity<? super GetPointChargeStatusResponseDto> getPointChargeStatus(String userId);
   ResponseEntity<? super GetPointChargePendingResponseDto> getPointChargePending(String userId);
-  ResponseEntity<? super GetPointChargependingCountResponseDto> getPointChargependingCount(Long pointChargeId, String userId);
 
   
   

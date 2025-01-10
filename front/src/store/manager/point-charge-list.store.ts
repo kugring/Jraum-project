@@ -14,10 +14,6 @@ interface PointChargeListStore {
     setStatus: (status: string) => void;
     setChargeList: (chargeList: PointChargeDetail[]) => void;
 
-
-
-
-
     setIsLoading: (isLoading: boolean) => void;
     setLimited: (limited: number) => void;
     resetChargeList: () => void;

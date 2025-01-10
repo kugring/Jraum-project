@@ -13,7 +13,8 @@ export const MANAGER_PATH = () => '/jraum/manager';
 // export const TEST_DOMAIN = 'localhost'; // 로컬
 // export const TEST_DOMAIN = '172.30.1.74'; // 이건 내 컴퓨터
 // export const TEST_DOMAIN = '54.221.169.225'; // 이건 ec2 ip임
-export const TEST_DOMAIN = 'api.hyunam.site'; // 도메인으로 접근!
+export const TEST_DOMAIN = 'https://api.hyunam.site'; // 도메인으로 접근!
+// export const TEST_DOMAIN = 'http://localhost:4000'; // 도메인으로 접근!
 
 
 

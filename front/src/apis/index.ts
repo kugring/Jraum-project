@@ -2,7 +2,7 @@ import { ResponseDto } from './response';
 import axios, { AxiosResponse } from 'axios';
 import { PatchPointChargeApprovalRequestDto, PatchPointChargeDeclineRequestDto, PostPointChargeRequestDto, PostPointDirectChargeRequestDto } from './request/pointCharge';
 import { GetActiveMenuListResponseDto, GetMenuPageResponseDto, PatchMenuResponseDto, PatchMenuSequenceResponseDto, PostMenuResponseDto } from './response/menu';
-import { DeletePointChargeResponseDto, GetPointChargeListResponseDto, GetPointChargePendingCountResponseDto, GetPointChargePendingResponseDto, PatchPointChargeApprovalResponseDto, PatchPointChargeDeclineResponseDto, PostPointChargeResponseDto } from './response/pointCharge';
+import { DeletePointChargeResponseDto, GetPointChargeListResponseDto, GetPointChargeStatusResponseDto, GetPointChargePendingResponseDto, PatchPointChargeApprovalResponseDto, PatchPointChargeDeclineResponseDto, PostPointChargeResponseDto } from './response/pointCharge';
 import { CheckCertificationRequestDto, EmailCertificationRequestDto, IdCheckRequestDto, JraumSignUpRequestDto, NicknameDpCheckRequestDto, PinDpCheckRequestDto, PostPinCheckRequestDto, SignInRequestDto, SignUpRequestDto } from './request/auth';
 import { CheckCertificationResponseDto, EmailCertificationResponseDto, IdcheckResponseDto, JraumSignUpResponseDto, NicknameDpcheckResponseDto, PinDpcheckResponseDto, PostPinCheckResponseDto, SignInResponseDto, SignUpResponseDto } from './response/auth';
 import { GetOrderListResponseDto, GetOrderManagementResponseDto, PatchOrderApproveResponseDto, PatchOrderRefundResponseDto, PostCashOrderResponseDto, PostPointOrderResponseDto } from './response/order';
@@ -36,7 +36,7 @@ const authorization = (accessToken: string) => {
 
 //  기존에는 포트를 적어줘야 했지는 https 통신으로 443으로 고정됨됨
 // const DOMAIN = 'https://' + TEST_DOMAIN + ':4000';
-const DOMAIN = 'https://' + TEST_DOMAIN; 
+const DOMAIN = TEST_DOMAIN; 
 
 
 
@@ -277,7 +277,7 @@ const POST_POINT_DIRECT_CHARGE_URL = () => `${API_DOMAIN}/point/manager/charge/d
 const PATCH_POINT_CHARGE_APPROVAL_URL = () => `${API_DOMAIN}/point/approve`;
 const PATCH_POINT_CHARGE_DECLINE_URL = () => `${API_DOMAIN}/point/decline`;
 const GET_POINT_CHARGE_PENDING_URL = () => `${API_DOMAIN}/point/manager/charge/pending`;
-const GET_POINT_CHARGE_PENDING_COUNT_URL = (pointChargeId: number | string) => `${API_DOMAIN}/point/${pointChargeId}/charge/pending/count`;
+const GET_POINT_CHARGE_STATUS_URL = () => `${API_DOMAIN}/point/charge/status`;
 const DELETE_POINT_CHARGE_URL = (pointChargeId: number | string) => `${API_DOMAIN}/point/${pointChargeId}`;
 const GET_POINT_CHARGE_List_URL = (page: number, size: number, name?: string, status?: string, date?: string) => {
     let url = `${API_DOMAIN}/point/manager/charge/list?page=${page}&size=${size}`;
@@ -331,9 +331,9 @@ export const getPointChargePendingRequest = async (accessToken: string) => {
     return result;
 }
 
-export const getPointChargePendingCountRequest = async (pointChargeId: number, accessToken: string) => {
-    const result = await axios.get(GET_POINT_CHARGE_PENDING_COUNT_URL(pointChargeId), authorization(accessToken))
-        .then(responseHandler<GetPointChargePendingCountResponseDto>)
+export const getPointChargeStatusRequest = async (accessToken: string) => {
+    const result = await axios.get(GET_POINT_CHARGE_STATUS_URL(), authorization(accessToken))
+        .then(responseHandler<GetPointChargeStatusResponseDto>)
         .catch(errorHandler)
     return result;
 }

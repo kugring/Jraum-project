@@ -17,26 +17,25 @@ function App() {
 
     return (
         <Routes>
+            {/* 아직 메인이 준비되지 않아서 일단 제이라움으로 리다이렉트 */}
+            <Route path='' element={<Navigate to='jraum' replace />} />
             <Route element={<Container />}>
                 <Route path='/auth'>
                     <Route path='sign-up' element={<SignUp />} />
                     <Route path='sign-in' element={<SignIn />} />
                     <Route path='oauth-response/:token/:expirationTime' element={<OAuth />} />
                 </Route>
-
-
                 {/* 메인 페이지 라우트 */}
                 <Route path='main' element={<Main />} />
-
 
                 {/* Jraum 라우트 */}
                 <Route path='/jraum'>
                     <Route path='' element={<Jraum />} />
                     <Route path='manager' element={<Manager />}>
                         {/* 리다이렉트 처리 */}
-                        <Route path='' element={<Navigate to='order' replace />}/>
-                        <Route path='order' element={<OrderPage />}/>
-                        <Route path='point' element={<PointPage />}/>
+                        <Route path='' element={<Navigate to='order' replace />} />
+                        <Route path='order' element={<OrderPage />} />
+                        <Route path='point' element={<PointPage />} />
                         <Route path='user' element={<UserPage />} />
                         <Route path='menu' element={<MenuPage />} />
                     </Route>

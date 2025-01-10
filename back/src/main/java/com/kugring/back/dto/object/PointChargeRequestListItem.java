@@ -23,7 +23,6 @@ public class PointChargeRequestListItem {
     private String profileImage;
     private LocalDateTime createdAt;
 
-    
     public PointChargeRequestListItem(PointCharge reusltSet) {
         this.name = reusltSet.getUser().getName();
         this.office = reusltSet.getUser().getOffice();

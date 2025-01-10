@@ -11,6 +11,7 @@ import { PostMenuResponseDto } from 'apis/response/menu';
 import { MdOutlineCheckBoxOutlineBlank } from "react-icons/md";
 import { fileUploadRequest, postMenuRequest } from 'apis';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 
 //          component: 메뉴 추가 컴포넌트               //
 const MenuAdd = () => {
@@ -56,18 +57,18 @@ const MenuAdd = () => {
 
     //          function: 이름 입력시 중간에 form처리 하는 함수         //
     const handleNameChange = (inputValue: string) => {
-        if(inputValue.length > 15) return;
+        if (inputValue.length > 15) return;
         setName(inputValue); // 상태에 숫자 값 저장
     };
     //          function: 가격 입력시 중간에 form처리 하는 함수         //
     const handlePriceChange = (inputValue: string) => {
-        if(inputValue.length > 7) return;
+        if (inputValue.length > 7) return;
         const numericValue = inputValue.replace(/[^0-9]/g, ""); // 숫자 외 제거
         setPrice(numericValue); // 상태에 숫자 값 저장
     };
     //          function: 샷 입력시 중간에 form처리 하는 함수         //
     const handleShotChange = (inputValue: string) => {
-        if(inputValue.length >= 2) return;
+        if (inputValue.length >= 2) return;
         const numericValue = inputValue.replace(/[^0-9]/g, ""); // 숫자 외 제거
         setShot(numericValue); // 상태에 숫자 값 저장
     };
@@ -159,9 +160,12 @@ const MenuAdd = () => {
         if (code === 'DBE') alert("데이터베이스 오류입니다.");
         if (code === 'NMN') alert("존재하지 않는 메뉴 입니다.");
         if (code !== 'SU') return;
-
         closeModal();
-        alert("메뉴를 저장하였습니다.");
+        toast.success('정상적으로 메뉴가 추가되었습니다.', {
+            autoClose: 1500,
+            position: "top-center",
+            closeOnClick: true, // 클릭 시 바로 사라짐
+        });
     }
 
     //            effect: 드롭다운 외부 클릭 이벤트 이펙터                //
@@ -191,7 +195,7 @@ const MenuAdd = () => {
                             <Value>{selectedValues.temperature}</Value>
                             <FaCaretDown />
                         </DropDown>
-                        <OptionBox isOpen={openDropdowns.temperature}>
+                        <OptionBox $isOpen={openDropdowns.temperature}>
                             <Option $action={selectedValues.temperature === "HOT"} onClick={() => handleOptionClick("temperature", "HOT")}>HOT</Option>
                             <Option $action={selectedValues.temperature === "COLD"} onClick={() => handleOptionClick("temperature", "COLD")}>COLD</Option>
                         </OptionBox>
@@ -202,7 +206,7 @@ const MenuAdd = () => {
                             <Value>{selectedValues.category}</Value>
                             <FaCaretDown />
                         </DropDown>
-                        <OptionBox isOpen={openDropdowns.category}>
+                        <OptionBox $isOpen={openDropdowns.category}>
                             <Option $action={selectedValues.category === "커피"} onClick={() => handleOptionClick("category", "커피")}>커피</Option>
                             <Option $action={selectedValues.category === "논커피"} onClick={() => handleOptionClick("category", "논커피")}>논커피</Option>
                             <Option $action={selectedValues.category === "차"} onClick={() => handleOptionClick("category", "차")}>차</Option>
@@ -228,7 +232,7 @@ const MenuAdd = () => {
                         {optionSelectList.map((badge) => (
                             <OptionBadge
                                 key={badge}
-                                isActive={options.includes(badge)}  // 상태에 따라 활성화/비활성화
+                                $isActive={options.includes(badge)}  // 상태에 따라 활성화/비활성화
                                 onClick={() => toggleBadge(badge)}  // 클릭 시 상태 변경
                             >
                                 {badge}
@@ -356,12 +360,12 @@ const OptionBadgeBox = styled.div`
   background: var(--lightCream, #fcf3e4);
 `;
 
-const OptionBadge = styled.div<{ isActive: boolean }>`
+const OptionBadge = styled.div<{ $isActive: boolean }>`
   padding: 6px 8px;
   border-radius: 10000px;
   border: 1px solid #d9d9d9;
-  background: ${(props) => (props.isActive ? 'var(--goldenPeach)' : '#FFF')};  // 활성화 시 배경색 변경
-  color: ${(props) => (props.isActive ? '#FFF' : '#D9D9D9')};  // 활성화 시 글자색 변경
+  background: ${(props) => (props.$isActive ? 'var(--goldenPeach)' : '#FFF')};  // 활성화 시 배경색 변경
+  color: ${(props) => (props.$isActive ? '#FFF' : '#D9D9D9')};  // 활성화 시 글자색 변경
   font-size: 12px;
   cursor: pointer;
   transition: background 0.3s, color 0.3s;
@@ -389,7 +393,7 @@ const Value = styled.div`
     color: var(--amberBrown);
 `
 
-const OptionBox = styled.div<{ isOpen: boolean }>`
+const OptionBox = styled.div<{ $isOpen: boolean }>`
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
@@ -398,7 +402,7 @@ const OptionBox = styled.div<{ isOpen: boolean }>`
   border-radius: 4px;
   overflow: hidden;
   background-color: white;
-  display: ${({ isOpen }) => (isOpen ? "block" : "none")};
+  display: ${({ $isOpen }) => ($isOpen ? "block" : "none")};
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 10;
 `;

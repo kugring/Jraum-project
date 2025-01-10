@@ -8,6 +8,9 @@ import { defaultUserImage, formattedDate, formattedPoint } from 'constant'
 import { patchOrderApproveRequest, patchOrderRefundRequest } from 'apis'
 import { PatchOrderApproveRequestDto, PatchOrderRefundRequestDto } from 'apis/request/order'
 import { PatchOrderApproveResponseDto, PatchOrderRefundResponseDto } from 'apis/response/order'
+import useBlackModalStore from 'store/modal/black-modal.store'
+import { BiSolidBellRing } from "react-icons/bi";
+import useWebSocketStore from 'store/web-socket.store'
 
 //          component: 주문 목록 카드 컴포넌트            //
 const Card = ({ order }: { order: OrderList }) => {
@@ -16,6 +19,13 @@ const Card = ({ order }: { order: OrderList }) => {
     const [cookies] = useCookies(['managerToken'])
     //          state: 주문 상태            //
     const [status, setStatus] = useState(order.status);
+
+
+    //          function: 블랙 모달과 알림창 모달을 위한 함수               //
+    const setWhiteModal = useBlackModalStore.getInitialState().setWhiteModal;
+    const setCallback = useBlackModalStore.getInitialState().setCallback;
+    const setMessage = useBlackModalStore.getInitialState().setMessage;
+    const openModal = useBlackModalStore.getState().openModal;
 
     //          function: 주문 완료 처리 이후 함수          //
     const patchOrderApproveResponse = (responseBody: PatchOrderApproveResponseDto | ResponseDto | null) => {
@@ -34,6 +44,14 @@ const Card = ({ order }: { order: OrderList }) => {
         patchOrderApproveRequest(requestBody, cookies.managerToken).then(patchOrderApproveResponse)
     }
 
+    //          function: 주문 완료 안내창 뜨우는 함수              //
+    const orderCompletedAlertModalOpen = () => {
+        openModal();
+        setWhiteModal("안내창");
+        setMessage("주문을 완료하시겠습니까?")
+        setCallback(orderCompleted);
+    }
+
     //          function: 주문 환불 처리 이후 함수          //
     const patchOrderRefundResponse = (responseBody: PatchOrderRefundResponseDto | ResponseDto | null) => {
         if (!responseBody) return;
@@ -44,11 +62,35 @@ const Card = ({ order }: { order: OrderList }) => {
         if (code !== 'SU') return;
         setStatus('환불')
     }
-    //          function: 주문 환불불 처리하는 함수           //
+    //          function: 주문 환불 처리하는 함수           //
     const orderRefund = () => {
         if (!cookies.managerToken) return;
         const requestBody: PatchOrderRefundRequestDto = { orderId: order.orderId }
         patchOrderRefundRequest(requestBody, cookies.managerToken).then(patchOrderRefundResponse)
+    }
+
+
+    //          function: 주문 완료 안내창 뜨우는 함수              //
+    const orderRefundAlertModalOpen = () => {
+        openModal();
+        setWhiteModal("안내창");
+        setMessage("주문을 환불하시겠습니까?")
+        setCallback(orderRefund);
+    }
+
+
+    //          function: 주문 알림 웹소켓 TTS 함수             //
+    const orderSendTTS = (orderId: number) => {
+        const { manager } = useWebSocketStore.getState();
+        manager?.sendMessage('/send/orderTTS', { orderId }); // 메시지 전송
+    }
+
+    //          function: 주문 완료 안내창 뜨우는 함수              //
+    const orderSendTTSAlertModalOpen = (orderId: number) => {
+        openModal();
+        setWhiteModal("안내창");
+        setMessage("주문 음성 알리기")
+        setCallback(() => orderSendTTS(orderId));
     }
 
     //          render: 주문 목록 카드 렌더링            //
@@ -97,13 +139,16 @@ const Card = ({ order }: { order: OrderList }) => {
                     switch (status) {
                         case '완료':
                             return (<>
-                                <Cancel onClick={orderRefund}>환불</Cancel>
-                                <Completed>완료됨</Completed>
+                                <Cancel onClick={orderRefundAlertModalOpen}>환불</Cancel>
+                                <Completed onClick={() => orderSendTTSAlertModalOpen(order.orderId)}>
+                                    완료됨 &nbsp;
+                                    <BiSolidBellRing color='var(--copperBrown)' size={16} />
+                                </Completed>
                             </>);
                         case '대기':
                             return (<>
-                                <Cancel onClick={orderRefund}>환불</Cancel>
-                                <Complete onClick={orderCompleted}>주문 완료</Complete>
+                                <Cancel onClick={orderRefundAlertModalOpen}>환불</Cancel>
+                                <Complete onClick={orderCompletedAlertModalOpen}>주문 완료</Complete>
                             </>)
                         case '환불':
                             return <Canceled>환불 처리됨</Canceled>

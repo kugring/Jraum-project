@@ -19,7 +19,7 @@ import com.kugring.back.dto.request.point.PostPointChargeRequestDto;
 import com.kugring.back.dto.response.point.DeletePointChargeResponseDto;
 import com.kugring.back.dto.response.point.GetChargeListResponseDto;
 import com.kugring.back.dto.response.point.GetPointChargePendingResponseDto;
-import com.kugring.back.dto.response.point.GetPointChargependingCountResponseDto;
+import com.kugring.back.dto.response.point.GetPointChargeStatusResponseDto;
 import com.kugring.back.dto.response.point.PointChargeApprovalResponseDto;
 import com.kugring.back.dto.response.point.PointChargeDeclineResponseDto;
 import com.kugring.back.dto.response.point.PointDirectChargeResponseDto;
@@ -52,12 +52,10 @@ public class PointController {
     return response;
   }
 
-  @GetMapping("/{pointChargeId}/charge/pending/count")
-  public ResponseEntity<? super GetPointChargependingCountResponseDto> getPointChargependingCount(
-      @PathVariable("pointChargeId") Long pointChargeId,
+  @GetMapping("/charge/status")
+  public ResponseEntity<? super GetPointChargeStatusResponseDto> getPointChargeStatus(
       @AuthenticationPrincipal String userId) {
-    ResponseEntity<? super GetPointChargependingCountResponseDto> response = pointService
-        .getPointChargependingCount(pointChargeId, userId);
+    ResponseEntity<? super GetPointChargeStatusResponseDto> response = pointService.getPointChargeStatus(userId);
     return response;
   }
 

@@ -65,6 +65,8 @@ const Price = () => {
     //      state: 핀 회원 정보         //
     const point = usePinUserStore(state => state.pinUser?.point!);
 
+
+    //          render: 회원 현재 포인트 렌더링            //
     return (
         <>
             {formattedPoint(point)}{" "}원

@@ -2,10 +2,12 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
 interface PointChargeStore {
+  message: string;
   charging: boolean;
   chargePoint: number;
   pointChargeId: number;
   badgeEdit: (value: number) => void;
+  setMessage: (message: string) => void;
   buttonEdit: (value: string) => void;
   setCharging: (boolean: boolean) => void;
   handleDelete: () => void;
@@ -17,10 +19,13 @@ interface PointChargeStore {
 const usePointChargeStore = create<PointChargeStore>()(
   devtools(
     (set) => ({
+      message: "포인트 충전",
       charging: false,
       chargePoint: 0,
       pointChargeId: 0,
 
+      // 포인트 충전 상태 버튼 메세지
+      setMessage: (message) => set({ message }),
 
       // 뱃지 버튼으로 충전 입력
       badgeEdit: (value) => set((state) => ({ chargePoint: state.chargePoint + value })),

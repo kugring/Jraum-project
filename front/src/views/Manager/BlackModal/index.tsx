@@ -1,12 +1,16 @@
 import styled from 'styled-components';
 import useBlackModalStore from 'store/modal/black-modal.store';
 import { memo, useEffect, useState } from 'react';
-import MenuAdd from './MenuAdd';
-import MenuEdit from './MenuEdit';
+import MenuAdd from '../Container/MenuPage/MenuModal/MenuAdd';
+import MenuEdit from '../Container/MenuPage/MenuModal/MenuEdit';
+import UserAdd from '../Container/UserPage/UserModal/UserAdd';
+import UserEdit from '../Container/UserPage/UserModal/UserEdit';
+import CashPayModal from './CashPayModal';
+import AlertModal from './AlertModal';
 
 
 //        component: 모달 모음 컴포넌트       //
-const MenuModal = () => {
+const BlackModal = () => {
 
     //    state: 블랙 모달 상태 (전역변수)      //
     const isModalOpen = useBlackModalStore(state => state.isModalOpen)
@@ -58,26 +62,34 @@ const MenuModal = () => {
     return (
         <>
             {show && ( // 절대 지우지말것! 렌더링 순서를 위해서!!!
-                <BlackModal $actionBlack={actionBlack} $actionWhite={actionWhite} onClick={handleModalClick}>
+                <BlackModalE $actionBlack={actionBlack} $actionWhite={actionWhite} onClick={handleModalClick}>
                     {(() => {
                         switch (white) {
                             case '메뉴추가':
                                 return <MenuAdd />;
                             case '메뉴수정':
                                 return <MenuEdit />;
+                            case '회원등록':
+                                return <UserAdd />;
+                            case '회원수정':
+                                return <UserEdit />;
+                            case '현금결제승인':
+                                return <CashPayModal />;
+                            case '안내창':
+                                return <AlertModal />;
                             default:
                                 return null; // 조건에 맞는 값이 없을 때는 아무것도 렌더링하지 않음
                         }
                     })()}
-                </BlackModal>
+                </BlackModalE>
             )}
         </>
     );
 };
 
-export default memo(MenuModal);
+export default memo(BlackModal);
 
-const BlackModal = styled.div<{ $actionBlack: boolean, $actionWhite: boolean }>`
+const BlackModalE = styled.div<{ $actionBlack: boolean, $actionWhite: boolean }>`
 
   position: fixed;
   top: 0;

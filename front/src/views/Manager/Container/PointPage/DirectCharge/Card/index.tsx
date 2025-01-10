@@ -1,25 +1,35 @@
-import { postPointDirectChargeRequest } from 'apis'
-import { PostPointDirectChargeRequestDto } from 'apis/request/pointCharge'
-import { ResponseDto } from 'apis/response'
-import PostPointDirectChargeResponseDto from 'apis/response/pointCharge/post-point-direct-charge.response.dto'
-import { defaultUserImage, formattedPoint } from 'constant'
-import React, { useState } from 'react'
+import styled from 'styled-components'
+import { useState } from 'react'
 import { useCookies } from 'react-cookie'
+import { SortedUser } from 'types/interface'
+import { ResponseDto } from 'apis/response'
+import useBlackModalStore from 'store/modal/black-modal.store'
 import { IoCaretDownOutline } from 'react-icons/io5'
 import usePointDirectChargeStore from 'store/manager/point-direct-charge.store'
-import styled from 'styled-components'
-import { SortedUser } from 'types/interface'
+import { postPointDirectChargeRequest } from 'apis'
+import { PostPointDirectChargeRequestDto } from 'apis/request/pointCharge'
+import { PostPointDirectChargeResponseDto } from 'apis/response/pointCharge'
+import { defaultUserImage, formattedPoint } from 'constant'
+import { toast } from 'react-toastify'
 
 //              component: 포인트 직접 충전 컴포넌트                  //
 const Card = ({ user }: { user: SortedUser }) => {
-    
+
     //              state: 쿠키 상태                //
     const [cookies] = useCookies();
     //              state: 하단 정보 공개 상태                  //
     const [show, setShow] = useState<boolean>(false);
+    //              state: 충전 금액 상태                  //
+    const [chargePoint, setChargePoint] = useState<number>(0);
     //              state: 원하는 충전 포인트트 상태                  //
     const directPoint = usePointDirectChargeStore(state => state.directPoint);
     const setDirectPoint = usePointDirectChargeStore(state => state.setDirectPoint);
+
+    //          function: 블랙 모달과 알림창 모달을 위한 함수               //
+    const setWhiteModal = useBlackModalStore.getInitialState().setWhiteModal;
+    const setCallback = useBlackModalStore.getInitialState().setCallback;
+    const setMessage = useBlackModalStore.getInitialState().setMessage;
+    const openModal = useBlackModalStore.getState().openModal;
 
     //          function: 가격 입력시 중간에 form처리 하는 함수         //
     const handlePointChange = (inputValue: string) => {
@@ -34,19 +44,34 @@ const Card = ({ user }: { user: SortedUser }) => {
         if (code === 'DBE') alert('데이터베이스 오류입니다.');
         if (code === 'NMG') alert('존재하지 않는 관리자입니다.');
         if (code !== 'SU') return;
-
-        alert("충전이 되었습니다!")
+        setDirectPoint("0")
+        setShow(false)
+        toast.success('정상적으로 충전되었습니다.', {
+            autoClose: 1500,
+            position: "top-center",
+            closeOnClick: true, // 클릭 시 바로 사라짐
+        });
     }
     //          event handler: 직접 충전을 진행하는 함수           //
-    const onDirectChargeClickHandler = () => {
+    const onDirectCharge = () => {
         const requestBody: PostPointDirectChargeRequestDto = {
             userId: user.userId,
             chargePoint: parseInt(directPoint, 10)
         }
+        //  두번 연속으로 충전을 하는 경우를 대비해서 기존것에서 더하기!
+        setChargePoint(chargePoint + parseInt(directPoint, 10));
         postPointDirectChargeRequest(requestBody, cookies.managerToken).then(postPointDirectChargeResponse)
     }
 
-    
+    //          function: 주문 완료 안내창 뜨우는 함수              //
+    const onDirectChargeAlertModalOpen = () => {
+        openModal();
+        setWhiteModal("안내창");
+        setMessage("직접 충전하시겠습니까?")
+        setCallback(onDirectCharge);
+        console.log(chargePoint);
+
+    }
 
     //              render: 포인트 직접 충전 렌더링                 //
     return (
@@ -61,16 +86,16 @@ const Card = ({ user }: { user: SortedUser }) => {
                 </CardLeft>
                 <PointInfo>
                     <Balance>잔액</Balance>
-                    <CurrentPoint>{formattedPoint(user.point)}원</CurrentPoint>
+                    <CurrentPoint>{formattedPoint(user.point + chargePoint)}원</CurrentPoint>
                 </PointInfo>
             </CardBody>
             <Direct $show={show}>
                 <IoCaretDownOutline color='gray' />
                 <DirectInputBox>
-                <InputBox>
-                    <DirectPoint value={`${directPoint === "" ? "" : formattedPoint(parseInt(directPoint, 10))}`} onChange={(e) => handlePointChange(e.target.value)} placeholder='포인트를 입력해주세요' />
-                    <DirectChargeButton onClick={onDirectChargeClickHandler}>충전</DirectChargeButton>
-                </InputBox>
+                    <InputBox>
+                        <DirectPoint value={`${directPoint === "" ? "" : formattedPoint(parseInt(directPoint, 10))}`} onChange={(e) => handlePointChange(e.target.value)} placeholder='포인트를 입력해주세요' />
+                        <DirectChargeButton onClick={onDirectChargeAlertModalOpen}>충전</DirectChargeButton>
+                    </InputBox>
                 </DirectInputBox>
             </Direct>
         </CardE>

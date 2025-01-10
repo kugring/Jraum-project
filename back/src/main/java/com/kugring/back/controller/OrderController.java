@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +22,9 @@ import com.kugring.back.dto.response.order.PatchOrderApproveResponseDto;
 import com.kugring.back.dto.response.order.PatchOrderRefundResponseDto;
 import com.kugring.back.dto.response.order.PostOrderCashResponseDto;
 import com.kugring.back.dto.response.order.PostPointOrderResponseDto;
+import com.kugring.back.service.FileService;
 import com.kugring.back.service.OrderService;
+import org.springframework.http.MediaType;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +35,8 @@ import lombok.RequiredArgsConstructor;
 public class OrderController {
 
   private final OrderService orderService;
-
+  private final FileService fileService;
+  
   // @PostMapping("/filter")
   // public ResponseEntity<? super FilterOrderListResponseDto>
   // getOrderList(@RequestBody @Valid FilterOrderListRequestDto reqeustBody) {
@@ -78,7 +82,8 @@ public class OrderController {
       @RequestParam(required = false) String name,
       @RequestParam(required = false) String status,
       @RequestParam(required = false) String date) {
-    ResponseEntity<? super GetOrderListResponseDto> response = orderService.getOrderList(userId, page, size, name, status, date);
+    ResponseEntity<? super GetOrderListResponseDto> response = orderService.getOrderList(userId, page, size, name,
+        status, date);
     return response;
   }
 
@@ -91,15 +96,24 @@ public class OrderController {
     return response;
   }
 
-
   @PatchMapping("/refund")
-public ResponseEntity<? super PatchOrderRefundResponseDto> patchOrderRefund(
-    @AuthenticationPrincipal String userId,
-    @RequestBody @Valid PatchOrderRefundRequestDto requestBody) {
-  ResponseEntity<? super PatchOrderRefundResponseDto> response = orderService.patchOrderRefund(userId, requestBody);
+  public ResponseEntity<? super PatchOrderRefundResponseDto> patchOrderRefund(
+      @AuthenticationPrincipal String userId,
+      @RequestBody @Valid PatchOrderRefundRequestDto requestBody) {
+    ResponseEntity<? super PatchOrderRefundResponseDto> response = orderService.patchOrderRefund(userId, requestBody);
 
-  return response;
-}
+    return response;
+  }
+  // orderId를 받아 음성을 생성하여 반환
+    @GetMapping(value = "/{orderId}/audio", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<byte[]> getOrderAudio(@PathVariable("orderId") Long orderId) {
+        // TTS를 통해 음성 생성
+        byte[] audioData = fileService.generateSsmlOrderAudio(orderId);
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "inline; filename=\"order-audio.mp3\"")
+                .body(audioData);
+    }
 
   // @PutMapping("/{orderListId}")
   // public ResponseEntity<? super PutOrderListResponseDto>

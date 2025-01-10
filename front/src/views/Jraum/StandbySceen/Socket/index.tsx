@@ -24,7 +24,7 @@ const WebSocketComponent = () => {
                 setConnected(true); // 연결 성공시 상태 업데이트
 
                 // 메시지 구독
-                client.subscribe('/topic/messages', (msg: Message) => {
+                client.subscribe('/receive/messages', (msg: Message) => {
                     if (msg.body) {
                         console.log('Received: ' + msg.body);
                         setMessage(msg.body);
@@ -53,7 +53,7 @@ const WebSocketComponent = () => {
     const sendMessage = () => {
         if (stompClient && connected) {
             stompClient.publish({
-                destination: '/app/sendMessage',
+                destination: '/send/message',
                 body: 'Hello from React',
             });
         } else {

@@ -1,15 +1,16 @@
 import styled from "styled-components";
-import { memo, useEffect, useState } from "react";
+import { isEqual } from "lodash";
 import { useCookies } from "react-cookie";
 import { ResponseDto } from "apis/response";
-import { getOrderManagementRequest, patchOrderApproveRequest } from "apis";
-import { GetOrderManagementResponseDto, PatchOrderApproveResponseDto } from "apis/response/order";
-import useOrderManagementStore from "store/manager/order-management.store";
+import { defaultUserImage } from "constant";
+import { useWebSocketStore } from "store";
+import { useBlackModalStore } from "store/modal";
+import { useOrderManagementStore } from "store/manager";
+import { memo, useEffect, useState } from "react";
 import { PatchOrderApproveRequestDto } from "apis/request/order";
 import { OrderDetail, OrderManagement } from "types/interface";
-import { isEqual } from "lodash";
-import { defaultUserImage } from "constant";
-
+import { getOrderManagementRequest, patchOrderApproveRequest } from "apis";
+import { GetOrderManagementResponseDto, PatchOrderApproveResponseDto } from "apis/response/order";
 
 //          component: 주문 페이지 컴포넌트             //
 const OrderManageMent = () => {
@@ -222,15 +223,15 @@ const OrderSummaryBox = () => {
     //          render: 주문 요약 박스 렌더링               //
     return (
         <OrderInfoBox>
-            {show &&
+            {show && order && (
                 <>
                     <SummaryLeft>
                         <ProfileImage src={profileImage!} />
                         <UserInfo>
                             <NameE>{order.name}</NameE>
-                            {order.position !== null &&
+                            {order.position !== null && (
                                 <Position>{position()}</Position>
-                            }
+                            )}
                         </UserInfo>
                     </SummaryLeft>
                     <SummaryRight>
@@ -238,9 +239,9 @@ const OrderSummaryBox = () => {
                         <CompletedButton />
                     </SummaryRight>
                 </>
-            }
+            )}
         </OrderInfoBox>
-    )
+    );
 }
 
 //          component: 주문 완료 버튼               //
@@ -253,6 +254,8 @@ const CompletedButton = () => {
     const orderId = useOrderManagementStore(state => state.showOrder?.orderId)
     //          state: 보여진 주문 Id 상태              //
     const orders = useOrderManagementStore.getState().orders
+    //          state: TTS 음성 듣기 상태         //
+    const openTTS = useOrderManagementStore(state => state.openTTS);
 
     //          function: 주문들 데이터 설정 상태         //
     const removeOrderById = useOrderManagementStore.getState().removeOrderById;
@@ -274,6 +277,13 @@ const CompletedButton = () => {
         } else {
             setShowOrder(orders![0])
         }
+
+        // openTTS가 열려있다면 음성출력을 보내고 닫혀있다면 안보냄
+        if (openTTS) {
+            const { manager } = useWebSocketStore.getState();
+            manager?.sendMessage('/send/orderTTS', { orderId }); // 메시지 전송
+        }
+
     }
 
 
@@ -284,9 +294,21 @@ const CompletedButton = () => {
         patchOrderApproveRequest(requestBody, cookies.managerToken).then(patchOrderApproveResponse)
     }
 
+    //          function: 주문 완료 안내창 뜨우는 함수              //
+    const alertModalOpen = () => {
+        const openModal = useBlackModalStore.getState().openModal;
+        const setWhiteModal = useBlackModalStore.getInitialState().setWhiteModal;
+        const setCallback = useBlackModalStore.getInitialState().setCallback;
+        const setMessage = useBlackModalStore.getInitialState().setMessage;
+        openModal();
+        setWhiteModal("안내창");
+        setMessage("주문을 완료하시겠습니끼?")
+        setCallback(orderCompleted);
+    }
+
     //          render: 주문 완료 버튼          //
     return (
-        <CompletedButtonE onClick={orderCompleted}>
+        <CompletedButtonE onClick={alertModalOpen}>
             완료
         </CompletedButtonE>
     )
@@ -552,6 +574,7 @@ const OrderInfoBox = styled.div`
     justify-content: space-between;
     align-items: center;
     width: calc(100% - 24px - 24px);
+    height: 36px;
     padding: 10px;
     margin-bottom: 8px;
     color: var(--amberBrown);

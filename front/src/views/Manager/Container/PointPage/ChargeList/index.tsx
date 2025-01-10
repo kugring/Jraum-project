@@ -160,16 +160,17 @@ const ChargeList = () => {
         </ChargeListE>
     );
 };
-
 export default ChargeList;
 
 const ChargeListE = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 320px;
-  padding-top: 18px;
-  margin: 0 auto;
-  gap: 8px;
+    display: flex;
+    flex-direction: column;
+    width: 320px;
+    height: 100%;
+    gap: 8px;
+    padding-top: 18px;
+    margin: 0 auto;
+    box-sizing: border-box;
 `;
 
 const SelectDate = styled.div`

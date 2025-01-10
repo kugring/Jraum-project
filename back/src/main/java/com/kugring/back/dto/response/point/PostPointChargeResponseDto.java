@@ -5,22 +5,24 @@ import org.springframework.http.ResponseEntity;
 
 import com.kugring.back.common.ResponseCode;
 import com.kugring.back.common.ResponseMessage;
+import com.kugring.back.dto.object.PointChargeRequestListItem;
 import com.kugring.back.dto.response.ResponseDto;
+import com.kugring.back.entity.PointCharge;
 
 import lombok.Getter;
 
 @Getter
 public class PostPointChargeResponseDto extends ResponseDto {
 
-  Long pointChargeId;
+  PointChargeRequestListItem pointChargeRequest = null;
 
-  private PostPointChargeResponseDto(Long pointChargeId) {
+  private PostPointChargeResponseDto(PointCharge PointCharge) {
     super();
-    this.pointChargeId = pointChargeId;
+    this.pointChargeRequest = new PointChargeRequestListItem(PointCharge);
   }
 
-  public static ResponseEntity<PostPointChargeResponseDto> success(Long pointChargeId) {
-    PostPointChargeResponseDto responseBody = new PostPointChargeResponseDto(pointChargeId);
+  public static ResponseEntity<PostPointChargeResponseDto> success(PointCharge PointCharge) {
+    PostPointChargeResponseDto responseBody = new PostPointChargeResponseDto(PointCharge);
     return ResponseEntity.status(HttpStatus.OK).body(responseBody);
   }
 

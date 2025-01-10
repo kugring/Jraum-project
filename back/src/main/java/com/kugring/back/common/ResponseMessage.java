@@ -25,6 +25,7 @@ public interface ResponseMessage {
   String NOT_EXISTED_OPTION = "This option does not exists.";
   String NOT_EXISTED_MANAGER = "This manager does not exists.";
   String NOT_EXISTED_ORDER_ITEM = "This order_item does not exists.";
+  String NOT_EXISTED_POINT_CHARGE = "This point_charge does not exists.";
   String NOT_EXISTED_ORDER_STATUS = "This order_status does not exists.";
   String NOT_EXISTED_ORDER_ITEM_OPTION = "This order_item_option does not exists.";
 

@@ -1,6 +1,7 @@
 import ResponseDto from '../response.dto';
 
-export default interface GetPointChargePendingCountResponseDto extends ResponseDto {
-    approve: boolean;
+export default interface GetPointChargeStatusResponseDto extends ResponseDto {
+    pointChargeId: number;
+    status: string;
 }
 

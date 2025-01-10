@@ -67,7 +67,7 @@ const PointPayModal = () => {
                 // 웹소켓으로 데이터 보내기
                 if (client) {
                     client.publish({
-                        destination: '/app/sendOrder',
+                        destination: '/send/order',
                         body: JSON.stringify(order),  // order 객체를 JSON 문자열로 변환
                     });
                 } else {

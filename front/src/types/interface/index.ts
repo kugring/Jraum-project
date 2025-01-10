@@ -10,6 +10,7 @@ import OrderListItem from './order-list-item.interface'
 import OptionListItem from './menu-option-list-item.interface';
 import OrderManagement from './order-management.interface'
 import orderDetailOption from './order-detail-option.interface'
+import ChargeRequestListItem from './charge-request-list-item.interface'
 
 export type {
     User,
@@ -24,4 +25,5 @@ export type {
     OptionListItem,
     OrderManagement,
     orderDetailOption,
+    ChargeRequestListItem,
 }

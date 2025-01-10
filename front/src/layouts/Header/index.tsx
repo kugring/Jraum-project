@@ -12,7 +12,7 @@ const Header = () => {
         <HeaderEL>
             <LinkGroup>
                 <StyledLink title={"제이라움"} to={"/jraum"}></StyledLink>
-                <StyledLink title={"주문내역"} to={"/jraum/orderDetail"}></StyledLink>
+                <StyledLink title={"주문내역"} to={"/jraum/manager/order"}></StyledLink>
             </LinkGroup>
             <UserInfoBox/>
         </HeaderEL>

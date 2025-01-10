@@ -94,7 +94,7 @@ public class WebSecurityConfig {
         corsConfiguration.addAllowedOriginPattern("*");
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.addAllowedHeader("*");
-        // 내 서버의 응답 json 을 javascript에서 처리할수 있게 하는것(axios 등)
+        // setAllowCredentials를 true로 설정시 * (아스타)로 설정이 불가능하고 반드시 명시적으로 직접 기입해야함
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.setMaxAge(3600L);
 

@@ -10,6 +10,7 @@ public interface ResponseCode {
   String NOT_EXISTED_OPTION = "NOP";
   String NOT_EXISTED_MANAGER = "NMG";
   String NOT_EXISTED_ORDER_ITEM = "NOI";
+  String NOT_EXISTED_POINT_CHARGE = "NPC";
   String NOT_EXISTED_ORDER_STATUS = "NOS";
   String NOT_EXISTED_ORDER_ITEM_OPTION = "NOIO";
 

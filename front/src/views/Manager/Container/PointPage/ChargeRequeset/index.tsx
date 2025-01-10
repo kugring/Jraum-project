@@ -1,11 +1,11 @@
 import { getPointChargePendingRequest } from 'apis'
 import { ResponseDto } from 'apis/response'
 import { GetPointChargePendingResponseDto } from 'apis/response/pointCharge'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useCookies } from 'react-cookie'
 import styled from 'styled-components'
-import ChargeRequestListItem from 'types/interface/charge-request-list-item.interface'
 import Card from './Card'
+import usePointChargeRequestStore from 'store/manager/point-charge-request.store'
 
 //              component: 충전 요청 컴포넌트                   //
 const ChargeRequest = () => {
@@ -13,8 +13,8 @@ const ChargeRequest = () => {
     //          state: 쿠키 상태              //
     const [cookies] = useCookies();
     //            state: 포인트 요청 목록             //
-    const [chargeRequests, setChargeRequests] = useState<ChargeRequestListItem[]>([]);
-
+    const chargeRequests = usePointChargeRequestStore(state => state.chargeRequests)
+    const setChargeRequests = usePointChargeRequestStore.getState().setChargeRequests;
 
     //          function: 포인트 충전 요청 데이터 처리 함수            //
     const getPointChargePendingResponse = (responseBody: GetPointChargePendingResponseDto | ResponseDto | null) => {
@@ -24,8 +24,6 @@ const ChargeRequest = () => {
         if (code === 'NMN') alert('존재하지 않는 메뉴입니다.');
         if (code !== 'SU') return;
         const { pointChargeList } = responseBody as GetPointChargePendingResponseDto;
-        console.log(pointChargeList);
-
         setChargeRequests(pointChargeList)
     }
     //          function: 포인트 충전 요청 데이터 가져오는 함수           //
