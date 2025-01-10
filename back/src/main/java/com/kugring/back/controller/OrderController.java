@@ -119,7 +119,7 @@ public class OrderController {
 
         // CORS 헤더 추가 및 MIME 타입 설정
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Access-Control-Allow-Origin", "https://hyunam.site"); // 모든 도메인에서 접근 허용
+        // headers.add("Access-Control-Allow-Origin", "https://hyunam.site"); // 모든 도메인에서 접근 허용
         headers.add("Content-Type", "audio/wav"); // WAV 형식으로 MIME 타입 설정
         headers.add("Content-Disposition", "inline; filename=\"order-audio.wav\""); // 파일 이름 설정
 
