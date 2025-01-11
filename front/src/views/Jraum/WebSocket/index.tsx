@@ -1,5 +1,5 @@
 import { TEST_DOMAIN } from 'constant';
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import usePointChargeStore from 'store/modal/point-charge-modal.store';
 import useWebSocketStore from 'store/web-socket.store';
 
@@ -35,34 +35,33 @@ const WebSocket = () => {
         });
     };
 
+
+    //          state: 웹소켓에서 받아올 음성을 저장할 객채 상태                //
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+
+
     //          function: 주문 음성 듣기 함수               //
     const actionTTS = (orderId: number) => {
-        fetch(`${TEST_DOMAIN}/api/v1/order/${orderId}/audio`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'audio/wav'
-            },
-            mode: 'cors',  // CORS 모드 설정
-        })
-        .then((response) => response.blob())
+        fetch(`${TEST_DOMAIN}/api/v1/order/${orderId}/audio`)
+        .then((response) => response.blob())  // 오디오 데이터를 blob 형태로 받음
         .then((audioBlob) => {
             const audioUrl = URL.createObjectURL(audioBlob);
-            const audio = new Audio(audioUrl);
-            
-            // 로그 추가: 오디오가 로드된 후
-            audio.oncanplaythrough = () => {
-                console.log("Audio loaded successfully");
-                audio.play();
-            };
-        
-            audio.onerror = (error) => {
-                console.error("Audio playback error:", error);
-            };
-        
-            audio.play();
+            if (audioRef.current) {
+                audioRef.current.src = audioUrl;
+                audioRef.current.oncanplaythrough = () => {
+                    console.log('Audio loaded successfully');
+                    audioRef.current?.play().catch((error) => {
+                        console.error('Audio playback error:', error);
+                    });
+                };
+
+                audioRef.current.onerror = (error) => {
+                    console.error('Audio playback error:', error);
+                };
+            }
         })
         .catch((error) => {
-            console.error("Error fetching audio:", error);
+            console.error('Error fetching audio:', error);
         });
     }
 
@@ -93,6 +92,23 @@ const WebSocket = () => {
             OrderTTSSubscribe();
         }
     }, [connected])
+
+    //              effect: TTS를 위해서 처음 렌더링시 Audio객체를 만듬               //
+    useEffect(() => {
+        // 오디오 객체 초기화
+        if (!audioRef.current) {
+            audioRef.current = new Audio();
+        }
+        
+        audioRef.current.oncanplaythrough = () => {
+            console.log('Audio is ready');
+        };
+
+        audioRef.current.onerror = (error) => {
+            console.error('Audio loading error:', error);
+        };
+
+    }, []);
 
 
     //              render: 키오스크 웹소켓 렌더링              //

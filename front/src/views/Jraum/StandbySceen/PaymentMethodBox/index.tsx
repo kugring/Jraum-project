@@ -1,7 +1,5 @@
 import Divider from 'components/Divider'
-import { TEST_DOMAIN } from 'constant';
-import { memo, useEffect, useRef } from 'react';
-import { useWebSocketStore } from 'store';
+import { memo } from 'react';
 import useBlackModalStore from 'store/modal/black-modal.store';
 import usePinUserStore from 'store/pin-user.store';
 import styled from 'styled-components'
@@ -41,71 +39,71 @@ const PaymentMethodBox = () => {
 
 
 
-    //              state: 웹소켓 매니저 상태               //
-    const { manager } = useWebSocketStore.getState();
+    // //              state: 웹소켓 매니저 상태               //
+    // const { manager } = useWebSocketStore.getState();
 
-    const audioRef = useRef<HTMLAudioElement | null>(null);
+    // const audioRef = useRef<HTMLAudioElement | null>(null);
 
-    // 초기 사용자 상호작용을 통해 Audio 객체 생성
-    const enableAudio = () => {
-        if (!audioRef.current) {
-            audioRef.current = new Audio();
-            console.log('Audio object initialized.');
-        }
-    };
+    // // 초기 사용자 상호작용을 통해 Audio 객체 생성
+    // const enableAudio = () => {
+    //     if (!audioRef.current) {
+    //         audioRef.current = new Audio();
+    //         console.log('Audio object initialized.');
+    //     }
+    // };
 
-    // 주문 음성 듣기 함수
-    const actionTTS = (orderId: number) => {
-        fetch(`${TEST_DOMAIN}/api/v1/order/${orderId}/audio`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'audio/wav',
-            },
-            mode: 'cors', // CORS 모드 설정
-        })
-            .then((response) => response.blob())
-            .then((audioBlob) => {
-                if (audioRef.current) {
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    audioRef.current.src = audioUrl;
+    // // 주문 음성 듣기 함수
+    // const actionTTS = (orderId: number) => {
+    //     fetch(`${TEST_DOMAIN}/api/v1/order/${orderId}/audio`, {
+    //         method: 'GET',
+    //         headers: {
+    //             'Content-Type': 'audio/wav',
+    //         },
+    //         mode: 'cors', // CORS 모드 설정
+    //     })
+    //         .then((response) => response.blob())
+    //         .then((audioBlob) => {
+    //             if (audioRef.current) {
+    //                 const audioUrl = URL.createObjectURL(audioBlob);
+    //                 audioRef.current.src = audioUrl;
 
-                    audioRef.current.oncanplaythrough = () => {
-                        console.log('Audio loaded successfully');
-                        audioRef.current?.play().catch((error) => {
-                            console.error('Audio playback error:', error);
-                        });
-                    };
+    //                 audioRef.current.oncanplaythrough = () => {
+    //                     console.log('Audio loaded successfully');
+    //                     audioRef.current?.play().catch((error) => {
+    //                         console.error('Audio playback error:', error);
+    //                     });
+    //                 };
 
-                    audioRef.current.onerror = (error) => {
-                        console.error('Audio playback error:', error);
-                    };
-                }
-            })
-            .catch((error) => {
-                console.error('Error fetching audio:', error);
-            });
-    };
+    //                 audioRef.current.onerror = (error) => {
+    //                     console.error('Audio playback error:', error);
+    //                 };
+    //             }
+    //         })
+    //         .catch((error) => {
+    //             console.error('Error fetching audio:', error);
+    //         });
+    // };
 
-    // 사용자 주문 웹소켓 구독 핸들러
-    const OrderTTSSubscribe = () => {
-        manager?.subscribe('/receive/user/orderTTS', (orderId: number) => {
-            console.log(orderId);
-            actionTTS(orderId);
-        });
-    };
+    // // 사용자 주문 웹소켓 구독 핸들러
+    // const OrderTTSSubscribe = () => {
+    //     manager?.subscribe('/receive/user/orderTTS', (orderId: number) => {
+    //         console.log(orderId);
+    //         actionTTS(orderId);
+    //     });
+    // };
 
-    useEffect(() => {
-        // 웹소켓 구독 설정
-        OrderTTSSubscribe();
+    // useEffect(() => {
+    //     // 웹소켓 구독 설정
+    //     OrderTTSSubscribe();
 
-        // 컴포넌트 언마운트 시 클린업
-        return () => {
-            if (audioRef.current) {
-                audioRef.current.src = '';
-                audioRef.current = null;
-            }
-        };
-    }, []);
+    //     // 컴포넌트 언마운트 시 클린업
+    //     return () => {
+    //         if (audioRef.current) {
+    //             audioRef.current.src = '';
+    //             audioRef.current = null;
+    //         }
+    //     };
+    // }, []);
 
 
 
@@ -125,7 +123,7 @@ const PaymentMethodBox = () => {
 
     //          render: 결제 방식 박스 렌더링             //
     return (
-        <PaymentMethodBoxE onClick={enableAudio}>
+        <PaymentMethodBoxE>
             <Title>결제 방식</Title>
             <Divider />
             <Buttons>
