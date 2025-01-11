@@ -1,5 +1,5 @@
 import { TEST_DOMAIN } from 'constant';
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react';
 import usePointChargeStore from 'store/modal/point-charge-modal.store';
 import useWebSocketStore from 'store/web-socket.store';
 
@@ -26,26 +26,35 @@ const WebSocket = () => {
             setCharging(false);
             if (currentPointChargeId === pointChargeId) {
                 if (status === "거절") {
-                    setMessage("충전 거절")
+                    setMessage("충전 거절");
                 } else if (status === "승인") {
-                    setMessage("충전 완료")
+                    setMessage("충전 완료");
                 }
-                setTimeout(() => setMessage("포인트 충전"), 3000)
+                setTimeout(() => setMessage("포인트 충전"), 3000);
             }
         });
     };
 
 
-    //          state: 웹소켓에서 받아올 음성을 저장할 객채 상태                //
+    //          state: 웹소켓에서 받아올 음성을 저장할 객체 상태                //
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
 
     //          function: 주문 음성 듣기 함수               //
-    const actionTTS = (orderId: number) => {
-        fetch(`${TEST_DOMAIN}/api/v1/order/${orderId}/audio`)
-        .then((response) => response.blob())  // 오디오 데이터를 blob 형태로 받음
-        .then((audioBlob) => {
+    const actionTTS = async (orderId: number) => {
+        try {
+            // 현재 재생 중인 오디오 세션을 멈춤
+            const existingMediaElements = document.querySelectorAll<HTMLMediaElement>('audio, video');
+            existingMediaElements.forEach((mediaElement) => {
+                if (!mediaElement.paused) {
+                    mediaElement.pause();
+                }
+            });
+
+            const response = await fetch(`${TEST_DOMAIN}/api/v1/order/${orderId}/audio`);
+            const audioBlob = await response.blob();
             const audioUrl = URL.createObjectURL(audioBlob);
+
             if (audioRef.current) {
                 audioRef.current.src = audioUrl;
                 audioRef.current.oncanplaythrough = () => {
@@ -55,15 +64,26 @@ const WebSocket = () => {
                     });
                 };
 
+                audioRef.current.onended = () => {
+                    console.log('TTS finished, resuming previous audio.');
+                    existingMediaElements.forEach((mediaElement) => {
+                        if (mediaElement.dataset.wasPlaying === 'true') {
+                            mediaElement.play().catch((error) => {
+                                console.error('Error resuming playback:', error);
+                            });
+                        }
+                    });
+                };
+
                 audioRef.current.onerror = (error) => {
                     console.error('Audio playback error:', error);
                 };
             }
-        })
-        .catch((error) => {
-            console.error('Error fetching audio:', error);
-        });
-    }
+        } catch (error) {
+            console.error('Error fetching or playing audio:', error);
+        }
+    };
+
 
     //              function: 사용자 주문 웹소켓 구독 핸들러               // 
     const OrderTTSSubscribe = () => {
@@ -81,7 +101,7 @@ const WebSocket = () => {
         connect(); // WebSocket 연결
 
         // 컴포넌트 언마운트 시 연결 해제
-        return () => { disconnect() };
+        return () => { disconnect(); };
     }, [initialize, connect, disconnect]);
 
 
@@ -91,7 +111,7 @@ const WebSocket = () => {
             PointChargeRequestSubscribe();
             OrderTTSSubscribe();
         }
-    }, [connected])
+    }, [connected]);
 
     //              effect: TTS를 위해서 처음 렌더링시 Audio객체를 만듬               //
     useEffect(() => {
@@ -114,7 +134,7 @@ const WebSocket = () => {
     //              render: 키오스크 웹소켓 렌더링              //
     return (
         <></>
-    )
-}
+    );
+};
 
-export default WebSocket
+export default WebSocket;
