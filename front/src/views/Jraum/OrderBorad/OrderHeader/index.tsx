@@ -1,84 +1,82 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { TEST_DOMAIN } from 'constant';
-import useWebSocketStore from 'store/web-socket.store';
-import usePointChargeStore from 'store/modal/point-charge-modal.store';
+import styled from 'styled-components'
+import { FaTrash } from 'react-icons/fa'
+import useOrderStore from 'store/modal/order-list.store'
+import { TEST_DOMAIN } from 'constant'
 
-const WebSocket = () => {
-    const { initialize, connect, disconnect } = useWebSocketStore();
-    const wsUrl = TEST_DOMAIN + '/ws'; 
-    const connected = useWebSocketStore(state => state.connected);
-    const { manager } = useWebSocketStore.getState();
-    
-    const [audioReady, setAudioReady] = useState(false);
-    const audioRef = useRef<HTMLAudioElement | null>(null);
+//              component: 주문 헤더 컴포넌트               //
+const OrderHeader = () => {
 
-    // 오디오 준비 상태 관리 및 음성 재생 함수
+    //          function: 주문 리스트 리셋하는 함수 (전역함수)            //
+    const setOrderList = useOrderStore(state => state.setOrderList)
+
+
+    //          function: 주문 음성 듣기 함수               //
     const actionTTS = (orderId: number) => {
-        if (!audioRef.current) {
-            console.error('Audio reference is not initialized.');
-            return;
-        }
-
-        fetch(`${TEST_DOMAIN}/api/v1/order/${orderId}/audio`)
+        fetch(`${TEST_DOMAIN}/api/v1/order/${orderId}/audio`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'audio/wav'
+            },
+            mode: 'cors',  // CORS 모드 설정
+        })
             .then((response) => response.blob())
             .then((audioBlob) => {
                 const audioUrl = URL.createObjectURL(audioBlob);
-                if (audioRef.current) {
-                    audioRef.current.src = audioUrl;
-                    audioRef.current.oncanplaythrough = () => {
-                        console.log('Audio loaded successfully');
-                        audioRef.current?.play().catch((error) => {
-                            console.error('Audio playback error:', error);
-                        });
-                    };
+                const audio = new Audio(audioUrl);
 
-                    audioRef.current.onerror = (error) => {
-                        console.error('Audio playback error:', error);
-                    };
-                }
+                // 로그 추가: 오디오가 로드된 후
+                audio.oncanplaythrough = () => {
+                    console.log("Audio loaded successfully");
+                    audio.play();
+                };
+
+                audio.onerror = (error) => {
+                    console.error("Audio playback error:", error);
+                };
+
+                audio.play();
             })
             .catch((error) => {
-                console.error('Error fetching audio:', error);
+                console.error("Error fetching audio:", error);
             });
-    };
+            console.log("누름");
+    }
 
-    const OrderTTSSubscribe = () => {
-        manager?.subscribe('/receive/user/orderTTS', (orderId: number) => {
-            console.log(orderId);
-            actionTTS(orderId);
-        });
-    };
+    //              render: 주문 헤더 렌더링               //
+    return (
+        <Header onClick={()=> actionTTS(1)}>
+            {'장바구니'}
+            <OrderResetButton onClick={() => setOrderList([])}>
+                {'삭제'}
+                <FaTrash size={24} color={"var(--copperRed)"} /> {/* 아이콘 크기와 색상 조정 가능 */}
+            </OrderResetButton>
+        </Header>
+    )
+}
+export default OrderHeader
 
-    useEffect(() => {
-        initialize(wsUrl);
-        connect();
-        return () => { disconnect(); };
-    }, [initialize, connect, disconnect]);
 
-    useEffect(() => {
-        if (connected) {
-            OrderTTSSubscribe();
-        }
-    }, [connected]);
+const Header = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 46px;
+    font-size:32px;
+    color: var(--copperRed);
+`
 
-    useEffect(() => {
-        // 오디오 객체 초기화
-        if (!audioRef.current) {
-            audioRef.current = new Audio();
-        }
-        
-        audioRef.current.oncanplaythrough = () => {
-            setAudioReady(true);
-            console.log('Audio is ready');
-        };
+const OrderResetButton = styled.div`
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
 
-        audioRef.current.onerror = (error) => {
-            console.error('Audio loading error:', error);
-        };
+    width: fit-content;
+    padding: 5px 15px;
 
-    }, []);
+    font-size: 18px;
 
-    return <></>;
-};
-
-export default WebSocket;
+    border-radius: 10px;
+    border: 5px solid var(--copperRed);
+    background-color: var(--lightCream);
+`
