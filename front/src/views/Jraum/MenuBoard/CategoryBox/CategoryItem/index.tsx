@@ -32,10 +32,16 @@ const CategoryItemE = styled.div<{ $check: boolean }>`
     height: 32px;
     border-radius: 50px;
     color: ${({ $check }) => ($check ? 'var(--brickOrange)' : '#bb7a64')};
-    border: ${({ $check }) => ($check ? '4px solid var(--brickOrange)' : '4px solid #bd8a7a')};
+    border: 5px solid ${({ $check }) => ($check ? 'var(--brickOrange)' : '#bd8a7a')};
     background: ${({ $check }) => ($check ? '#FFF' : '#fff2ef')};
     opacity: ${({ $check }) => ($check ? '1' : '0.5')};
     box-sizing: border-box;
     font-size: 18px;
     cursor: pointer;
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        width: 62px;
+        height: 28px;
+        font-size: 16px;
+    }
 `;

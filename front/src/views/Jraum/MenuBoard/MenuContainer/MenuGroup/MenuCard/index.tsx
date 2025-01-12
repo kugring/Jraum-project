@@ -142,8 +142,10 @@ const Card = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width: 180px;
-    height: 250px;
+    width: 180px;    
+    @media (max-width: 768px) {
+        width: 172px;
+    }
 `
 
 const InfoBox = styled.div`
@@ -157,12 +159,22 @@ const Image = styled.img`
     width: 180px;
     height: 180px;
     border-radius: 15px;
-    box-shadow: -3px -3px 3px 0px #FFFFFA, 3px 3px 3px 0px #BDAEA6;
+    box-shadow: 3px 3px 3px 0px #BDAEA6;
+    /* box-shadow: -3px -3px 3px 0px #FFFFFA, 3px 3px 3px 0px #BDAEA6; */
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        width: 172px;
+        height: 172px;
+    }
 `
 
 const MenuName = styled.div`
     font-size: 22px;
     color: var(--brickOrange);
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        font-size: 20px;
+    }
 `
 
 const MenuPrice = styled.div`

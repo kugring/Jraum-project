@@ -145,17 +145,6 @@ const ChargeStatus = () => {
 
 export default memo(ChargeStatus);
 
-const CompletedCharge = styled.div`
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                font-size: 20px;
-                padding: 4px 8px;
-                border-radius: 8px;
-                border: 2px solid #FFF;
-                background-color: var(--coralPink);
-                `;
-
 const PointCharge = styled.div<{ $canPay: boolean }>`
                 display: flex;
                 flex-direction: column;
@@ -166,6 +155,12 @@ const PointCharge = styled.div<{ $canPay: boolean }>`
                 border: 2px solid #FFF;
                 background-color: ${({ $canPay }) => ($canPay ? "var(--goldenPeach)" : "var(--coralPink)")} ;
                 transition: background 0.3s ease-in-out;
+                /* 반응형 스타일 적용 */
+                @media (max-width: 768px) {
+                    font-size: 12px;
+                    padding: 6px 4px;
+                    border-radius: 6px;
+                }
                 `;
 
 const WaitCharge = styled.div`

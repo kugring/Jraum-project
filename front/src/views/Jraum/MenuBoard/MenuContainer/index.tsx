@@ -101,4 +101,10 @@ const Container = styled.div`
     &::-webkit-scrollbar {
         display: none;
     }
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        flex-shrink: 0;
+        width: 100%;
+    }
 `;
+

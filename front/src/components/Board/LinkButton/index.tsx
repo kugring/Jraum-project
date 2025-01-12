@@ -31,7 +31,6 @@ const Container = styled(Link)`
     
     /* 반응형 스타일 적용 */
     @media (max-width: 768px) {
-    font-size: 16px;
-    padding: 4px 4px;
+      font-size: 18px;
     }
 `;

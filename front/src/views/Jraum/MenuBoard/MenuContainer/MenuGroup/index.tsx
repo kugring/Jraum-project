@@ -14,14 +14,14 @@ const MenuGroup = forwardRef<HTMLDivElement, MenuGroupProps>(({ menuList, catego
 
     //          render: 메뉴 그룹 렌더링            //
     return (
-      <Container ref={ref} data-category={category}>
+      <MenuGroupE ref={ref} data-category={category}>
         <CategoryBadge>{category}</CategoryBadge>
-        <MenuGroupBox>
+        <MenuCardBox>
           {menuList.map((menu) => (
             <MenuCard key={menu.menuId} menuId={menu.menuId} image={menu.image} name={menu.name} price={menu.price} temperature={menu.temperature} />
           ))}
-        </MenuGroupBox>
-      </Container>
+        </MenuCardBox>
+      </MenuGroupE>
     );
   });
 
@@ -30,11 +30,20 @@ export default memo(MenuGroup);
 
 
 
-const Container = styled.div`
+const MenuGroupE = styled.div`
     display: flex;
     flex-direction: column;
     gap:16px;
     padding: 16px;
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+      gap: 16px;
+      padding: 16px;
+    }
+    /* 반응형 스타일 적용 */
+    @media (max-width: 376px) {
+      padding: 8px;
+    }
 `
 
 const CategoryBadge = styled.div`
@@ -44,16 +53,69 @@ const CategoryBadge = styled.div`
     width: fit-content;
     height: 42px;
     padding: 0 18px;
-    border: 5px solid #541602;
+    border: 5px solid var(--brickRed);
     border-radius: 50px;
     box-sizing: border-box;
     font-size: 24px;
-    color: #541602;
+    color: var(--brickRed);
     background: #FFF;
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+      font-size: 16px;
+      height: 28px;
+      padding: 0 12px;
+    }
 `
 
-const MenuGroupBox = styled.div`
+const MenuCardBox = styled.div`
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap:4px;
+    gap: calc((100% - 180px * 4) / 3);
+    width: 100%;
+
+
+
+
+    
+    /* 반응형 스타일 적용 */
+    @media (max-width: 1136px) {
+      grid-template-columns: repeat(3, 1fr);
+      gap: calc((100% - 180px * 3 ) / 2);
+      row-gap: 8px;
+    }
+
+        
+    /* 반응형 스타일 적용 */
+    @media (max-width: 948px) {
+      grid-template-columns: repeat(2, 1fr);
+      gap: calc((100% - 180px * 2 ) / 1);
+      row-gap: 8px;
+    }
+
+
+    /* 아래부터는 모바일 */
+
+        
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+      grid-template-columns: repeat(4, 1fr);
+      gap: calc((100% - 172px * 4) / 3);
+      row-gap: 8px;
+    }
+
+
+    /* 반응형 스타일 적용 */
+    @media (max-width: 728px) {
+      grid-template-columns: repeat(3, 1fr);
+      gap: calc((100% - 172px * 3) / 2);
+      row-gap: 8px;
+    }
+      
+
+    /* 반응형 스타일 적용 */
+    @media (max-width: 548px) {
+      grid-template-columns: repeat(2, 1fr);
+      gap: calc((100% - 172px * 2) / 1);
+      row-gap: 8px;
+    }
 `

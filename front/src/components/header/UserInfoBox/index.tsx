@@ -41,18 +41,14 @@ const UserInfoBox = () => {
                         <UserInfo>
                             <UserName>{userName}</UserName>
                             <UserPoint>
-
                                 <Price />
                             </UserPoint>
                         </UserInfo>
-                        <ResetButton onClick={goBackToStart} size={24} style={{ color: '#FFF' }} />
                     </>
                     :
-                    <>
-                        <Today>{formattedDate(new Date())}</Today>
-                        <ResetButton onClick={goBackToStart} size={24} style={{ color: '#FFF' }} />
-                    </>
+                    <Today>{formattedDate(new Date())}</Today>
                 }
+                <ResetButton onClick={goBackToStart} size={24} style={{ color: '#FFF' }} />
             </UserInfoBoxE>
 
         </>
@@ -80,9 +76,8 @@ const UserInfoBoxE = styled.div`
     display:flex;
     align-items: center;
     gap:12px;    
-
     @media (max-width: 768px) {
-    gap:8px;    
+        gap: 8px;    
     }
 `
 
@@ -108,7 +103,7 @@ const UserName = styled.div`
     font-size: 16px;
 
     @media (max-width: 768px) {
-    font-size: 12px;
+    font-size: 14px;
     }
 `
 
@@ -116,15 +111,25 @@ const UserPoint = styled.div`
     font-size: 14px;
 
     @media (max-width: 768px) {
-    font-size: 10px;
+    font-size: 12px;
     }
 `
 
 const ResetButton = styled(FaSignOutAlt)`
     display:flex;
-    padding: 8px 8px;
+    padding: 8px;
+    
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        padding: 4px;
+    }
 `
 
 const Today = styled.div`
     font-size: 24px;
+
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        font-size: 14px;
+    }
 `

@@ -47,15 +47,40 @@ const CategoryBoxE = styled.div`
     height: 7vh;
     box-sizing: border-box;
     box-shadow: 0px 4px 4px 0px rgba(152, 90, 46, 0.25);
+        
+    /* 반응형 스타일 적용 */
+    @media (max-width: 968px) {
+        padding: 0 16px;
+    }
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+    height: 9vw;
+    max-height: 42px;
+    padding: 0 16px;
+    }
+    /* 아이폰 se는 예외처리 */
+    @media (max-width: 376px) {
+      padding: 0 8px;
+    }
 `;
 
 const Title = styled.div`
     font-size: 20px;
     color: var(--brickOrange);
+    
+    /* 반응형 스타일 적용 */
+    @media (max-width: 968px) {
+        display: none;
+    }
 `;
 
 const CategoryGroup = styled.div`
     display: flex;
     gap: 24px;
+    /* 반응형 스타일 적용 */
+    @media (max-width: 968px) {
+        justify-content: space-between;
+        width: 100%;
+    }
 `;
 
