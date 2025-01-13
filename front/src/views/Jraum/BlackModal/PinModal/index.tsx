@@ -47,14 +47,16 @@ const PinModal = () => {
 export default memo(PinModal);
 
 const PinModalE = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 380px;
-  padding: 32px 32px 12px;
-  gap: 24px;
-  border: 16px solid var(--goldenOrange);
-  border-radius: 26px;
-  background-color: var(--seashell);
+    display: flex;
+    flex-direction: column;
+    min-width: 340px;
+    width: 340px;
+    padding: 28px 28px 12px;
+    gap: 12px;
+    border: 12px solid var(--goldenOrange);
+    box-sizing: border-box;
+    border-radius: 26px;
+    background-color: var(--seashell);
 `;
 const Header = styled.div`
   display: flex;
@@ -73,27 +75,30 @@ const Body = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  
 `;
 
 const InputValueBox = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
+  gap: 14px;
 `;
 
 
 const InputValue = styled.div`
+  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 48px;
-  width: 72px;
-  height: 72px;
+    font-size: 38px;
+  aspect-ratio: 1 / 1;
   color: var(--copperOrange);
   border-radius: 10px;
   border: 4px solid var(--goldenOrange);
   background: #FFF;
+  
 `;
 
 

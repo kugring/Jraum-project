@@ -138,10 +138,7 @@ export default memo(PaymentMethodBox);
 
 
 const PaymentMethodBoxE = styled.div`
-
     margin-top: 100px;
-
-
     display: flex;
     flex-direction: column;
     width: 480px;
@@ -151,11 +148,24 @@ const PaymentMethodBoxE = styled.div`
     border: 14px solid var(--goldenOrange);
     border-radius: 32px;
     background-color: #FFF;
+
+    /* 반응형 스타일 적용 */
+    @media (max-width: 968px) {
+        width: 340px;
+        padding: 16px;
+        border: 8px solid var(--goldenOrange);
+        border-radius: 16px;
+    }
 `
 
 const Title = styled.div`
     font-size: 32px;
     color: var(--copperBrown);
+
+    /* 반응형 스타일 적용 */
+    @media (max-width: 968px) {
+    font-size: 24px;
+    }
 `
 
 
@@ -163,8 +173,16 @@ const Buttons = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
+    height: 100px;
     font-size: 32px;
     gap: 32px;
+
+    /* 반응형 스타일 적용 */
+    @media (max-width: 968px) {
+        height: 72px;
+        gap: 16px;
+        font-size: 24px;
+}
 `
 
 const CashButton = styled.div`
@@ -172,8 +190,8 @@ const CashButton = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100px;
-    border-radius: 12px;
+    height: 100%;
+    border-radius: 8px;
     background-color: var(--goldenOrange);
 `
 
@@ -183,7 +201,7 @@ const PointButton = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100px;
-    border-radius: 12px;
+    height: 100%;
+    border-radius: 8px;
     background-color: var(--orange);
 `
