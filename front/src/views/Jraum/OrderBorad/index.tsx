@@ -16,7 +16,7 @@ const OrderBoard = () => {
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [startY, setStartY] = useState<number>(0);
     const [translateY, setTranslateY] = useState<number>(0); // 드래그로 이동한 위치
-    const [isHidden, setIsHidden] = useState<boolean>(false); // 숨김 상태
+    const [isHidden, setIsHidden] = useState<boolean>(true); // 숨김 상태
 
     const handleDragStart = (e: React.MouseEvent | React.TouchEvent): void => {
         e.preventDefault(); // 기본 동작 방지
@@ -153,14 +153,15 @@ const ShowButton = styled.button<{$isHidden: boolean}>`
     position: fixed;
     bottom: 16px;
     left: 50%;
-    display: ${({ $isHidden }) => $isHidden ? "none" : "flex"};
     transform: translateX(-50%);
+    display: ${({ $isHidden }) => $isHidden ? "none" : "flex"};
     padding: 12px 24px;
-    background-color: var(--coralBrown);
     color: #fff;
     border: none;
     border-radius: 8px;
     font-size: 16px;
+    font-weight: 700;
     cursor: pointer;
+    background-color: var(--coralOrange);
     }
 `;

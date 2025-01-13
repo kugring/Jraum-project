@@ -64,6 +64,11 @@ const Body = styled.div`
     padding: 4px 0;
     border-radius: 10px;
     background-position: 100% calc(100% + 40px) ;
-  }
+    }
+    
+    /* 반응형 스타일 적용 */
+    @media (max-width: 400px) {
+    background-position: 100% calc(100% + 52px) ;
+    }
 
 `

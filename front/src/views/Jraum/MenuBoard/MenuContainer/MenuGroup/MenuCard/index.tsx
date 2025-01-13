@@ -144,7 +144,7 @@ const Card = styled.div`
     justify-content: space-between;
     width: 180px;    
     @media (max-width: 768px) {
-        width: 172px;
+        width: 150px;
     }
 `
 
@@ -163,8 +163,9 @@ const Image = styled.img`
     /* box-shadow: -3px -3px 3px 0px #FFFFFA, 3px 3px 3px 0px #BDAEA6; */
     /* 반응형 스타일 적용 */
     @media (max-width: 768px) {
-        width: 172px;
-        height: 172px;
+        width: 150px;
+        height: 150px;
+        border-radius: 10px;
     }
 `
 
@@ -173,7 +174,7 @@ const MenuName = styled.div`
     color: var(--brickOrange);
     /* 반응형 스타일 적용 */
     @media (max-width: 768px) {
-        font-size: 20px;
+        font-size: 18px;
     }
 `
 
@@ -181,6 +182,10 @@ const MenuPrice = styled.div`
     font-size: 24px;
     letter-spacing: 0.5px;
     color: var(--copperBrown);
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        font-size: 20px;
+    }
 `
 
 const Temperature = styled.div`
@@ -194,4 +199,8 @@ const Temperature = styled.div`
     color: #fff;
     font-weight:400;
     background-color: ${(props) => (props.children === "HOT" ? "#E7727A " : "#5C76D1")};
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        font-size: 12px;    
+    }
 `;

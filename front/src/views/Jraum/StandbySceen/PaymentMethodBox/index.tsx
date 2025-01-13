@@ -151,7 +151,7 @@ const PaymentMethodBoxE = styled.div`
 
     /* 반응형 스타일 적용 */
     @media (max-width: 768px) {
-        width: 340px;
+        width: 320px;
         padding: 16px;
         border: 8px solid var(--goldenOrange);
         border-radius: 16px;

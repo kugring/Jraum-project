@@ -119,11 +119,23 @@ const PointPayOkModalE = styled.div`
     border-radius: 26px;
     border: 16px solid var(--goldenOrange);
     background: var(--seashell);
+
+    @media (max-width: 768px) {
+        width: 320px;
+        gap: 12px;
+        padding: 24px 20px 12px 18px;
+        border-radius: 20px;
+        border: 12px solid var(--goldenOrange);
+    }
 `
 
 const Title = styled.div`
     color: var(--amberBrown);
     font-size: 32px;
+
+    @media (max-width: 768px) {
+        font-size: 28px;
+    }
 `
 
 const Info = styled.div`
@@ -135,6 +147,10 @@ const Info = styled.div`
 
     font-size: 24px;
     color: var(--copperBrown);
+
+    @media (max-width: 768px) {
+        font-size: 18px;
+    }
 `
 
 const Text = styled.div`
@@ -163,6 +179,12 @@ const GoBackToStartButtonE = styled.div`
     border-radius: 6px;
     border: 4px solid var(--coralPink);
     background: var(--orange);
+
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        height: 52px;
+        font-size: 28px;
+    }
 `
 
 const CountDown = styled.div`

@@ -123,7 +123,7 @@ const PointPayOkModalE = styled.div`
 
     /* 반응형 스타일 적용 */
     @media (max-width: 768px) {
-        width: 340px;
+        width: 320px;
         gap: 16px;
         padding: 24px 26px 12px 26px;
         border-radius: 20px;

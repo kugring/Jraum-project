@@ -4,9 +4,9 @@ import { ResponseDto } from 'apis/response';
 import { MenuListItem } from 'types/interface';
 import { menuCategories } from 'constant';
 import { getActionMenuRequest } from 'apis';
-import GetActiveMenuListResponseDto from 'apis/response/menu/get-menu-list.response.dto';
+import { useMenuCategoryScrollStore } from 'store';
+import { GetActiveMenuListResponseDto } from 'apis/response/menu'; 
 import { forwardRef, memo, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import useMenuCategoryScrollStore from 'store/menu-category-scroll.store';
 
 //          component: 메뉴 컨테이너 컴포넌트           //
 const MenuContainer = forwardRef((_, ref) => {
