@@ -110,22 +110,29 @@ const Board = styled.div<{ $isHidden: boolean, $translateY: number, $isDragging:
         display: ${({ $isHidden }) => $isHidden ? "none" : "flex"};
         width: calc(100% - 8px);
         min-width: 0;
-        height: 50%;
+        height: 45%;
         margin: 0 4px;
         border-radius: 24px 24px 0 0;
-        border: 4px solid var(--coralBrown);
+        border-top: 4px solid var(--coralBrown);
+        border-right: 4px solid var(--coralBrown);
+        border-left: 4px solid var(--coralBrown);
+        border-bottom: 0;
         transform: translateY(${(props) => props.$translateY}px);
         transition: ${(props) => (props.$isDragging ? "none" : "transform 0.3s ease")};
     }
 `;
 
 const DragBar = styled(FaAngleDown)`
+    display: none;
+
+    @media (max-width: 768px) {
     display: flex;
     width: 100%;
     font-size: 16px;
     color: var(--antiqueCream);
     transform: scaleX(2); /* x축으로 두 배 늘림 */
     cursor: grab; /* 드래그 커서 */
+    }
 `;
 
 const OrderFooter = styled.div`
@@ -140,6 +147,9 @@ const OrderFooter = styled.div`
 `;
 
 const ShowButton = styled.button<{$isHidden: boolean}>`
+    display: none;
+
+    @media (max-width: 768px) {
     position: fixed;
     bottom: 16px;
     left: 50%;
@@ -152,4 +162,5 @@ const ShowButton = styled.button<{$isHidden: boolean}>`
     border-radius: 8px;
     font-size: 16px;
     cursor: pointer;
+    }
 `;

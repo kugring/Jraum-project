@@ -60,11 +60,13 @@ const Header = styled.div`
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    padding: 6px 0;
     font-size:32px;
     color: var(--copperRed);
         
     /* 반응형 스타일 적용 */
     @media (max-width: 768px) {
+    padding: 0;
     font-size:24px;
     }
 `
