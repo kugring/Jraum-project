@@ -69,6 +69,13 @@ const ButtonBox = styled.div`
     justify-content: space-between;
     align-items: center;
     height: 120px;
+  
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+    justify-content: start;
+    height: 60px;
+    gap: 14px;
+    }
 `
 
 const Label = styled.div`
@@ -76,6 +83,11 @@ const Label = styled.div`
     text-align: center;
     font-size: 36px;
     color: var(--brickOrange);
+  /* 반응형 스타일 적용 */
+  @media (max-width: 768px) {
+    width: 88px;
+    font-size: 20px;
+  }
 `
 
 const Buttons = styled.div`
@@ -84,6 +96,14 @@ const Buttons = styled.div`
     gap: 16px;
     padding-right: 12px;
     width: 363px;
+    
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        flex: 1;
+        width: auto;
+        gap: 6px;
+        padding-right: 6px;
+    }
 `
 
 const ButtonE = styled.div<{ $select: boolean }>`
@@ -91,11 +111,19 @@ const ButtonE = styled.div<{ $select: boolean }>`
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 26px;
     padding: 12px 0;
+    font-size: 26px;
     border-radius: 10px;
     color: #FFF;
     border: 5px solid var(--coralPink);
     background-color: var(--coralOrange);
     opacity: ${({ $select }) => ($select ? '1' : '0.4')};
+    
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        font-size: 12px;
+        border-radius: 6px;
+        padding: 8px 0;
+        border: 2px solid var(--coralPink);
+    }
 `

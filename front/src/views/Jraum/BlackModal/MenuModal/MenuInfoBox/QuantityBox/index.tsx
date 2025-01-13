@@ -16,7 +16,7 @@ const QuantityBox = () => {
             <Quantity>
                 <QuantityNum />
             </Quantity>
-            <Plus size={26} color="#FFF" onClick={incMQty} />
+            <Plus color="#FFF" onClick={incMQty} />
         </Container>
     )
 }
@@ -46,7 +46,7 @@ const Minus = () => {
 
     //          render: 마이너스 버튼 렌더링           //
     return (
-        <MinusE size={26} color={isPositive ? "#FFF" : "var(--lightCream)"} style={{ opacity: isPositive ? "1" : "0.6" }} onClick={decMQty} />
+        <MinusE color={isPositive ? "#FFF" : "var(--lightCream)"} style={{ opacity: isPositive ? "1" : "0.6" }} onClick={decMQty} />
     )
 
 }
@@ -61,23 +61,47 @@ const Container = styled.div`
     box-sizing: border-box;
     border: 3px solid var(--lightBrown);
     background: #FFF;
+        
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        width: 84px;
+        border-radius: 6px;
+    }
 `
 
 const MinusE = styled(FaMinus)`
+    font-size: 26px;
     padding: 8px;
     border-radius: 4px;
-    background-color: var(--goldenPeach);
+    background-color: var(--goldenPeach);   
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+    font-size: 12px;
+    padding: 4px;
+    border-radius: 2px;
+}
 `
 
 const Quantity = styled.div`
     flex: 1;
     text-align: center;
     font-size: 34px;
-    color: var(--copperBrown);
+    color: var(--copperBrown);  
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+    font-size: 16px;
+}
 `
 
 const Plus = styled(FaPlus)`
+    font-size: 26px;
     padding: 8px;
     border-radius: 4px;
     background-color: var(--goldenPeach);
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+    font-size: 12px;
+    padding: 4px;
+    border-radius: 2px;
+}
 `

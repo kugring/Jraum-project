@@ -22,4 +22,10 @@ const Container = styled.div`
     flex-direction: column;
     border-radius: 10px;
     border: 3px solid #E4B6A6;
+  
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+      border-radius: 6px;
+      border: 2px solid #E4B6A6;
+    }
 `

@@ -39,7 +39,7 @@ const Counter = ({ option }: { option: OptionListItem }) => {
       <Quantity>
         <QuantityNum option={option} />
       </Quantity>
-      <Plus size={24} color="#FFF" onClick={() => incOpQty(option.optionId)} />
+      <Plus color="#FFF" onClick={() => incOpQty(option.optionId)} />
     </CounterE>
   )
 }
@@ -70,7 +70,7 @@ const Minus = ({ option }: { option: OptionListItem }) => {
 
   //          render: 마이너스 버튼 렌더링           //
   return (
-      <MinusE size={26} color='#FFF' $active={isPositive} style={{ opacity: isPositive ? "1" : "0.6" }} onClick={() => decOpQty(option.optionId)} />
+      <MinusE color='#FFF' $active={isPositive} style={{ opacity: isPositive ? "1" : "0.6" }} onClick={() => decOpQty(option.optionId)} />
   )
 
 }
@@ -93,35 +93,60 @@ const OptionPrice = ({ option }: { option: OptionListItem }) => {
 
 const QuantityBox = styled.div`
   display: flex;
-  justify-content: space-between;
   height: 72px;
   border-bottom: 1px solid var(--pinkBeige);
   &:last-child {
     border-bottom: none;
   }
+    
+  /* 반응형 스타일 적용 */
+  @media (max-width: 768px) {
+  gap: 16px;
+  height: 60px;
+  }
+`
+
+
+const Label = styled.div`
+    display: flex;
+    align-items: center;
+    width: 140px;
+    padding-left: 36px;
+    box-sizing: border-box;
+    font-size: 32px;
+    color: var(--brickOrange);
+    
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+    padding-left: 14px;
+    width: 88px;
+    font-size: 20px;
+    }
 `
 
 const Info = styled.div`
+  flex: 1;
   display: flex;
   justify-content: end;
   align-items: center;
   gap: 38px;
   width: 380px;
-`
-
-const Label = styled.div`
-    display: flex;
-    padding-left: 36px;
-    align-items: center;
-    width: 140px;
-    box-sizing: border-box;
-    font-size: 32px;
-    color: var(--brickOrange);
+  
+  /* 반응형 스타일 적용 */
+  @media (max-width: 768px) {
+  width: auto;
+  gap: 16px;
+}
 `
 
 const Price = styled.div`
     font-size: 26px;
     color: var(--copperBrown);
+  
+  /* 반응형 스타일 적용 */
+  @media (max-width: 768px) {
+    font-size: 16px;
+}
 `
 
 
@@ -133,14 +158,28 @@ const CounterE = styled.div`
     padding-right: 12px;
     border-radius: 8px;
     box-sizing: border-box;
+  
+  /* 반응형 스타일 적용 */
+  @media (max-width: 768px) {
+    width: 68px;
+    padding-right: 4px;
+}
 `
 
 
 const MinusE = styled(FaMinus) <{ $active: boolean }>`
+    font-size: 26px;
     padding: 4px;
     border-radius: 4px;
     background-color: var(--coralOrange);
     opacity: ${props => props.$active ? "1" : "0.6"};
+  
+  /* 반응형 스타일 적용 */
+  @media (max-width: 768px) {
+    font-size: 14px;
+    padding: 2px;
+    border-radius: 2px;
+}
 `
 
 const Quantity = styled.div`
@@ -148,10 +187,23 @@ const Quantity = styled.div`
     text-align: center;
     font-size: 30px;
     color: var(--copperBrown);
+  
+  /* 반응형 스타일 적용 */
+  @media (max-width: 768px) {
+    font-size: 16px;
+}
 `
 
 const Plus = styled(FaPlus)`
-    padding: 4px;
+    font-size: 24px;
+    padding: 5px;
     border-radius: 4px;
     background-color: var(--coralOrange);
+  
+  /* 반응형 스타일 적용 */
+  @media (max-width: 768px) {
+    font-size: 14px;
+    padding: 2px;
+    border-radius: 2px;
+}
 `

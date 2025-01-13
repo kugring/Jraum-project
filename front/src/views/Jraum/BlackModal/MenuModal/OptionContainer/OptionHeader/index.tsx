@@ -34,4 +34,8 @@ const Header = styled.div`
 const Divider = styled.div`
     margin: 14px 0;
     border-left: 2px solid var(--pinkBeige);
+  /* 반응형 스타일 적용 */
+  @media (max-width: 768px) {
+    margin: 8px 0;
+  }
 `

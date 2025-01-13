@@ -95,18 +95,38 @@ const MenuInfoContainer = styled.div`
   border-radius: 28px;
   border: 16px solid var(--goldenOrange);
   background: #FFF5EE;
+  
+  /* 반응형 스타일 적용 */
+  @media (max-width: 768px) {
+    // 갤럭시8의 크키가 360이다
+    width: 340px;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    border: 6px solid var(--goldenOrange);
+}
 `
 
 const ModalTop = styled.div`
   position: relative;
   display: flex;
   justify-content: space-between;
+  gap: 24px;
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+      gap: 18px;
+    }
 `
 const ModalBottom = styled.div`
     display: flex;
     justify-content: space-between;
     gap: 24px;
     height: 80px;
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+      gap: 16px;
+      height: 52px;
+    }
 `
 
 const Close = styled.div`
@@ -120,18 +140,31 @@ const Close = styled.div`
     color: #FFF;
     border: 5px solid var(--unnamed, #FC8D08);
     background: var(--unnamed, #FFC346);
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+    font-size: 24px;
+    width: 88px;
+    border-radius: 6px;
+    border: 2px solid var(--unnamed, #FC8D08);
+  }
 `
 
 const Save = styled.div`
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 380px;
     font-size: 36px;
     box-sizing: border-box;
     border-radius: 10px;
     color: #FFF;
     border: 4px solid #FF4E28;
     background: var(--unnamed, #FC8D08);
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+    font-size: 24px;
+    border-radius: 6px;
+    border: 2px solid #FF4E28;
+  }
     
 `

@@ -31,4 +31,10 @@ const Title = styled.div<{ $active: boolean }>`
     min-width: 82px;
     color: ${({ $active }) => ($active ? "var(--coralPink)" : "var(--pinkBeige)")};
     border-bottom: ${({ $active }) => ($active ? "3px solid var(--coralPink)" : "none")};
+  /* 반응형 스타일 적용 */
+  @media (max-width: 768px) {
+    font-size: 16px;
+    padding: 8px 0 6px 0;
+    min-width: 42px;
+  }
 `

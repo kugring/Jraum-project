@@ -27,6 +27,13 @@ const Image = styled.img`
   height: 160px;
   border-radius: 15px;
   background: lightgray 50% / cover no-repeat;
+  
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+      width: 100px;
+      height: 100px;
+      border-radius: 6px;
+    }
 `
 
 const Temperature = styled.div`
@@ -38,6 +45,14 @@ const Temperature = styled.div`
     font-size: 16px;
     border-radius: 4px;
     color: #fff;
-    font-weight:400;
     background-color: ${(props) => (props.children === "HOT" ? "#E7727A " : "#5C76D1")};
+  
+  /* 반응형 스타일 적용 */
+  @media (max-width: 768px) {
+    top: 6px;
+    left: 6px;    
+    padding: 2px;
+    font-size: 8px;
+    border-radius: 2px;
+  }
 `;

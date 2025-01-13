@@ -64,9 +64,9 @@ const OrderBoard = () => {
     return (
         <>
             <Board
-                isHidden={isHidden}
-                translateY={translateY}
-                isDragging={isDragging}
+                $isHidden={isHidden}
+                $translateY={translateY}
+                $isDragging={isDragging}
                 onMouseDown={handleDragStart}
                 onTouchStart={handleDragStart}
                 onMouseMove={handleDragMove}
@@ -82,14 +82,14 @@ const OrderBoard = () => {
                     <OrderPayButton />
                 </OrderFooter>
             </Board>
-            <ShowButton isHidden={!isHidden} onClick={handleShowBoard}>⬆️ 장바구니 {totalQuantity}개</ShowButton>
+            <ShowButton $isHidden={!isHidden} onClick={handleShowBoard}>⬆️ 장바구니 {totalQuantity}개</ShowButton>
         </>
     );
 };
 
 export default OrderBoard;
 
-const Board = styled.div<{ isHidden: boolean, translateY: number, isDragging: boolean }>`
+const Board = styled.div<{ $isHidden: boolean, $translateY: number, $isDragging: boolean }>`
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -105,15 +105,15 @@ const Board = styled.div<{ isHidden: boolean, translateY: number, isDragging: bo
     @media (max-width: 768px) {
     position: absolute;
     bottom: 0;
-    display: ${({ isHidden }) => isHidden ? "none" : "flex"};
+    display: ${({ $isHidden }) => $isHidden ? "none" : "flex"};
     width: calc(100% - 8px);
     min-width: 0;
     height: 50%;
     margin: 0 4px;
     border-radius: 24px 24px 0 0;
     border: 4px solid var(--coralBrown);
-    transform: translateY(${(props) => props.translateY}px);
-    transition: ${(props) => (props.isDragging ? "none" : "transform 0.3s ease")};
+    transform: translateY(${(props) => props.$translateY}px);
+    transition: ${(props) => (props.$isDragging ? "none" : "transform 0.3s ease")};
     }
 `;
 
@@ -143,11 +143,11 @@ const OrderFooter = styled.div`
     }
 `
 
-const ShowButton = styled.button<{isHidden: boolean}>`
+const ShowButton = styled.button<{$isHidden: boolean}>`
     position: fixed;
     bottom: 16px;
     left: 50%;
-    display: ${({ isHidden }) => isHidden ? "none" : "flex"};
+    display: ${({ $isHidden }) => $isHidden ? "none" : "flex"};
     transform: translateX(-50%);
     padding: 12px 24px;
     background-color: var(--coralBrown);

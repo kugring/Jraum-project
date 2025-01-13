@@ -44,14 +44,28 @@ const Price = memo(() => {
 const InfoBox = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   width: 376px;
-  padding: 32px 0 12px 0;
+  gap:12px;
+  padding-top: 24px;
+  
+  
+  /* 반응형 스타일 적용 */
+  @media (max-width: 768px) {
+    flex: 1;
+    width: auto;
+    gap: 4px;
+    padding-top: 12px;
+  }
 `
 
 const MenuName = styled.div`
   font-size: 40px;
   color: var(--brickOrange);
+  /* 반응형 스타일 적용 */
+  @media (max-width: 768px) {
+  font-size: 22px;
+  }
 `
 
 const MenuCount = styled.div`
@@ -59,9 +73,17 @@ const MenuCount = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 0 10px 0 4px;
+  /* 반응형 스타일 적용 */
+  @media (max-width: 768px) {
+  padding: 0;
+  }
 `
 
 const MenuPrice = styled.div`
     font-size: 36px;
     color: var(--copperBrown);
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+    font-size: 18px;
+    }
 `

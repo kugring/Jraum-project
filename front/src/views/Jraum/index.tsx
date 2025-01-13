@@ -8,6 +8,7 @@ import WebSocket from './WebSocket';
 //          component: 제이라움 화면 컴포넌트           //
 const Jraum = () => {
 
+  //            render: 제이라움 화면 컴포넌트           //
   return (
     <Container>
       <WebSocket />
