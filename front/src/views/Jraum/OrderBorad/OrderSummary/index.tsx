@@ -69,6 +69,11 @@ const Summary = styled.div`
     background: #FFF;
     box-shadow: 0px 0px 8px 0px var(--mochaBrown);
 
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+    padding: 6px 0;
+    }
+
 `
 const TotalQuantity = styled.div`
     flex: 1;

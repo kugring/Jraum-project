@@ -5,12 +5,12 @@ import OrderPayButton from './OrderPayButton';
 import OrderBody from './OrderBody';
 import { useState } from 'react';
 import { useOrderStore } from 'store/modal';
+import { FaAngleDown } from "react-icons/fa6";
 
-//          component: 주문 보드 컴포넌트             //
+//              component: 주문 보드 컴포넌트             //
 const OrderBoard = () => {
 
-
-    //          state: 주문 음료 총 갯수 상태           //
+    //              state: 주문 음료 총 갯수 상태           //
     const totalQuantity = useOrderStore(state => state.orderList).map(item => item.quantity).reduce((acc, quantity) => acc + quantity, 0);
 
     const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -19,37 +19,38 @@ const OrderBoard = () => {
     const [isHidden, setIsHidden] = useState<boolean>(false); // 숨김 상태
 
     const handleDragStart = (e: React.MouseEvent | React.TouchEvent): void => {
+        e.preventDefault(); // 기본 동작 방지
         setIsDragging(true);
         const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
         setStartY(clientY);
     };
 
     const handleDragMove = (e: React.MouseEvent | React.TouchEvent): void => {
+        e.preventDefault(); // 기본 동작 방지
         if (!isDragging) return;
-    
+
         const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
         const deltaY = clientY - startY;
-        const newTranslateY = translateY + deltaY;
-    
-        // translateY 값이 0 미만으로 내려가지 않도록 제한
-        if (newTranslateY >= 0) {
-            setTranslateY(newTranslateY); // 위치 갱신
-            setStartY(clientY);
+
+        if (deltaY > 20) { // 특정 드래그 거리 이상일 때만 동작
+            const newTranslateY = translateY + deltaY;
+            if (newTranslateY >= 0) {
+                setTranslateY(newTranslateY);
+                setStartY(clientY);
+            }
         }
     };
 
     const handleDragEnd = (): void => {
+        if (!isDragging) return;
         setIsDragging(false);
 
-        // 위치 결정: 화면 아래로 내려가거나, 다시 올림
-        const threshold = window.innerHeight * 0.2; // 화면의 40%를 기준으로
+        const threshold = window.innerHeight * 0.1; // 화면의 10% 기준
         if (translateY > threshold) {
-            // 화면 아래로 숨기기
-            setTranslateY(window.innerHeight);
+            setTranslateY(window.innerHeight); // 숨기기
             setIsHidden(true);
         } else {
-            // 기본 위치로 되돌리기
-            setTranslateY(0);
+            setTranslateY(0); // 원래 위치로 되돌리기
             setIsHidden(false);
         }
     };
@@ -59,22 +60,23 @@ const OrderBoard = () => {
         setIsHidden(false);
     };
 
-
-    //          render: 주문 보드 렌더링            //
+    //              render: 주문 보드 렌더링             //
     return (
         <>
             <Board
                 $isHidden={isHidden}
                 $translateY={translateY}
                 $isDragging={isDragging}
-                onMouseDown={handleDragStart}
-                onTouchStart={handleDragStart}
-                onMouseMove={handleDragMove}
-                onTouchMove={handleDragMove}
-                onMouseUp={handleDragEnd}
-                onTouchEnd={handleDragEnd}
             >
-                <DragBar />
+                <DragBar
+                    onClick={() => setIsHidden(true)}
+                    onMouseDown={handleDragStart}
+                    onTouchStart={handleDragStart}
+                    onMouseMove={handleDragMove}
+                    onTouchMove={handleDragMove}
+                    onMouseUp={handleDragEnd}
+                    onTouchEnd={handleDragEnd}
+                />
                 <OrderHeader />
                 <OrderBody />
                 <OrderFooter>
@@ -82,7 +84,9 @@ const OrderBoard = () => {
                     <OrderPayButton />
                 </OrderFooter>
             </Board>
-            <ShowButton $isHidden={!isHidden} onClick={handleShowBoard}>⬆️ 장바구니 {totalQuantity}개</ShowButton>
+            <ShowButton $isHidden={!isHidden} onClick={handleShowBoard}>
+                ⬆️ 장바구니 {totalQuantity}개
+            </ShowButton>
         </>
     );
 };
@@ -96,39 +100,33 @@ const Board = styled.div<{ $isHidden: boolean, $translateY: number, $isDragging:
     width: 30%;
     min-width: 360px;
     height: 100%;
-    gap: 12px;
     box-sizing: border-box;
     padding: 12px 16px 20px;
     background-color: var(--creamyYellow);
-    
-    /* 반응형 스타일 적용 */
+
     @media (max-width: 768px) {
-    position: absolute;
-    bottom: 0;
-    display: ${({ $isHidden }) => $isHidden ? "none" : "flex"};
-    width: calc(100% - 8px);
-    min-width: 0;
-    height: 50%;
-    margin: 0 4px;
-    border-radius: 24px 24px 0 0;
-    border: 4px solid var(--coralBrown);
-    transform: translateY(${(props) => props.$translateY}px);
-    transition: ${(props) => (props.$isDragging ? "none" : "transform 0.3s ease")};
+        position: absolute;
+        bottom: 0;
+        display: ${({ $isHidden }) => $isHidden ? "none" : "flex"};
+        width: calc(100% - 8px);
+        min-width: 0;
+        height: 50%;
+        margin: 0 4px;
+        border-radius: 24px 24px 0 0;
+        border: 4px solid var(--coralBrown);
+        transform: translateY(${(props) => props.$translateY}px);
+        transition: ${(props) => (props.$isDragging ? "none" : "transform 0.3s ease")};
     }
 `;
 
-const DragBar = styled.div`
-    display: none;
-    /* 반응형 스타일 적용 */
-    @media (max-width: 768px) {
-        display: flex;
-        width: 72px;
-        margin: 4px 0 0 0;
-        border: 2px solid var(--antiqueCream);
-        border-radius: 1000px;
-    }
-`
-
+const DragBar = styled(FaAngleDown)`
+    display: flex;
+    width: 100%;
+    font-size: 16px;
+    color: var(--antiqueCream);
+    transform: scaleX(2); /* x축으로 두 배 늘림 */
+    cursor: grab; /* 드래그 커서 */
+`;
 
 const OrderFooter = styled.div`
     display: flex;
@@ -136,12 +134,10 @@ const OrderFooter = styled.div`
     width: 100%;
     gap: 12px;
 
-    
-    /* 반응형 스타일 적용 */
     @media (max-width: 768px) {
         flex-direction: row;
     }
-`
+`;
 
 const ShowButton = styled.button<{$isHidden: boolean}>`
     position: fixed;

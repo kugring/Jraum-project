@@ -83,6 +83,11 @@ const Card = styled.div`
   &::-webkit-scrollbar {
     display: none;
   }
+    
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+    padding: 10px 14px 2px;
+    }
 `;
 
 const Buttons = styled.div`

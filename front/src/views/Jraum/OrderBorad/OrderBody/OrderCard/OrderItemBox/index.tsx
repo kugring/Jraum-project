@@ -156,6 +156,12 @@ const OrderItemBoxE = styled.div`
   background: #FFF5EE;
   box-shadow: 5px 5px 5px 0px #C4A08C;
   scroll-snap-align: start;
+    
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+      height: 52px;
+     padding: 8px;
+  }
 `;
 
 const InfoBox = styled.div`
@@ -179,11 +185,21 @@ const Img = styled.img`
 const Name = styled.div`
   font-size: 16px;
   color: var(--brickOrange);
+    
+  /* 반응형 스타일 적용 */
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
 `;
 
 const PriceE = styled.div`
   font-size: 14px;
   color: var(--copperBrown);
+  
+  /* 반응형 스타일 적용 */
+  @media (max-width: 768px) {
+    font-size: 12px;
+  }
 `;
 
 const OptionBadgesE = styled.div`

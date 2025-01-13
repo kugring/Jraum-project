@@ -39,6 +39,7 @@ const Body = styled.div`
     flex-direction: column;
     width: 100%;
     padding: 8px 0;
+    margin: 12px 0;
     box-sizing: border-box;
     border-radius: 16px;
     background-color: #fff;
@@ -51,14 +52,16 @@ const Body = styled.div`
     &::-webkit-scrollbar {
     display: none;
   }
-
-
     background-image: url(${BackgroundImage});
     background-size: cover;
     background-position: bottom;
     background-repeat: no-repeat;
     position: relative;
     z-index: 0; /* 기본 z-index 설정 */
-
+    
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+    padding: 4px 0;
+    }
 
 `

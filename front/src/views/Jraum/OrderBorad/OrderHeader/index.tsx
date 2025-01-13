@@ -47,7 +47,7 @@ const OrderHeader = () => {
             {'장바구니'}
             <OrderResetButton onClick={() => setOrderList([])}>
                 {'삭제'}
-                <FaTrash size={24} color={"var(--copperRed)"} /> {/* 아이콘 크기와 색상 조정 가능 */}
+                <DeleteIcon/> {/* 아이콘 크기와 색상 조정 가능 */}
             </OrderResetButton>
         </Header>
     )
@@ -60,9 +60,13 @@ const Header = styled.div`
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    height: 46px;
     font-size:32px;
     color: var(--copperRed);
+        
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+    font-size:24px;
+    }
 `
 
 const OrderResetButton = styled.div`
@@ -79,4 +83,21 @@ const OrderResetButton = styled.div`
     border-radius: 10px;
     border: 5px solid var(--copperRed);
     background-color: var(--lightCream);
+        
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+    padding: 2px 6px;
+    font-size:16px;
+    border-radius: 6px;
+    border: 3px solid var(--copperRed);
+}
+`
+
+const DeleteIcon = styled(FaTrash)`
+    font-size: 16px;
+    color: var(--copperRed);
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+    font-size:16px;
+}
 `
