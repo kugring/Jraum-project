@@ -9,10 +9,9 @@ import { useOrderStore } from 'store/modal';
 //          component: 주문 보드 컴포넌트             //
 const OrderBoard = () => {
 
-    
+
     //          state: 주문 음료 총 갯수 상태           //
     const totalQuantity = useOrderStore(state => state.orderList).map(item => item.quantity).reduce((acc, quantity) => acc + quantity, 0);
-
 
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [startY, setStartY] = useState<number>(0);
@@ -27,12 +26,16 @@ const OrderBoard = () => {
 
     const handleDragMove = (e: React.MouseEvent | React.TouchEvent): void => {
         if (!isDragging) return;
-
+    
         const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
         const deltaY = clientY - startY;
         const newTranslateY = translateY + deltaY;
-        setTranslateY(newTranslateY); // 위치 갱신
-        setStartY(clientY);
+    
+        // translateY 값이 0 미만으로 내려가지 않도록 제한
+        if (newTranslateY >= 0) {
+            setTranslateY(newTranslateY); // 위치 갱신
+            setStartY(clientY);
+        }
     };
 
     const handleDragEnd = (): void => {
@@ -60,34 +63,33 @@ const OrderBoard = () => {
     //          render: 주문 보드 렌더링            //
     return (
         <>
-            {!isHidden && (
-                <Board
-                    translateY={translateY}
-                    isDragging={isDragging}
-                    onMouseDown={handleDragStart}
-                    onTouchStart={handleDragStart}
-                    onMouseMove={handleDragMove}
-                    onTouchMove={handleDragMove}
-                    onMouseUp={handleDragEnd}
-                    onTouchEnd={handleDragEnd}
-                >
-                    <DragBar />
-                    <OrderHeader />
-                    <OrderBody />
-                    <OrderFooter>
-                        <OrderSummary />
-                        <OrderPayButton />
-                    </OrderFooter>
-                </Board>
-            )}
-            {isHidden && <ShowButton onClick={handleShowBoard}>⬆️ 장바구니 {totalQuantity}개</ShowButton>}
+            <Board
+                isHidden={isHidden}
+                translateY={translateY}
+                isDragging={isDragging}
+                onMouseDown={handleDragStart}
+                onTouchStart={handleDragStart}
+                onMouseMove={handleDragMove}
+                onTouchMove={handleDragMove}
+                onMouseUp={handleDragEnd}
+                onTouchEnd={handleDragEnd}
+            >
+                <DragBar />
+                <OrderHeader />
+                <OrderBody />
+                <OrderFooter>
+                    <OrderSummary />
+                    <OrderPayButton />
+                </OrderFooter>
+            </Board>
+            <ShowButton isHidden={!isHidden} onClick={handleShowBoard}>⬆️ 장바구니 {totalQuantity}개</ShowButton>
         </>
     );
 };
 
 export default OrderBoard;
 
-const Board = styled.div<{translateY: number, isDragging: boolean}>`
+const Board = styled.div<{ isHidden: boolean, translateY: number, isDragging: boolean }>`
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -103,7 +105,7 @@ const Board = styled.div<{translateY: number, isDragging: boolean}>`
     @media (max-width: 768px) {
     position: absolute;
     bottom: 0;
-    display: flex;
+    display: ${({ isHidden }) => isHidden ? "none" : "flex"};
     width: calc(100% - 8px);
     min-width: 0;
     height: 50%;
@@ -141,16 +143,17 @@ const OrderFooter = styled.div`
     }
 `
 
-const ShowButton = styled.button`
-  position: fixed;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 12px 24px;
-  background-color: var(--coralBrown);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
+const ShowButton = styled.button<{isHidden: boolean}>`
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    display: ${({ isHidden }) => isHidden ? "none" : "flex"};
+    transform: translateX(-50%);
+    padding: 12px 24px;
+    background-color: var(--coralBrown);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
 `;
