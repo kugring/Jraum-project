@@ -137,7 +137,7 @@ const Title = styled.div`
 
     /* 반응형 스타일 적용 */
     @media (max-width: 768px) {
-        font-size: 28px;
+        font-size: 26px;
     }
 `
 

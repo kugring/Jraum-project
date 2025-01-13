@@ -100,7 +100,7 @@ const Modals = () => {
               case '메뉴':
                 return <MenuModal />;
               case '핀':
-                return <PinModal />;
+                return <CashPayOkModal />;
               case '현금결제':
                 return <CashPayModal />
               case '포인트결제':
