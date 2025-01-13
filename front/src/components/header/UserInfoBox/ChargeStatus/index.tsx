@@ -9,7 +9,6 @@ import usePointChargeStore from 'store/modal/point-charge-modal.store';
 import useBlackModalStore from 'store/modal/black-modal.store';
 import usePinUserStore from 'store/pin-user.store';
 import useOrderStore from 'store/modal/order-list.store';
-import useWebSocketStore from 'store/web-socket.store';
 
 //              component: 충전 상태 컴포넌트              //
 const ChargeStatus = () => {
@@ -21,7 +20,8 @@ const ChargeStatus = () => {
     //              state: 포인트 충전 진행 상태              //
     const charging = usePointChargeStore(state => state.charging);
     //              state: 화이트 모달 상태             //
-    const prePayModal = useBlackModalStore(state => state.whiteModal === '포인트결제');
+    // const prePayModal = useBlackModalStore(state => state.whiteModal === '포인트결제');
+    // 혹시 몰라서 주석은 해놓았는데 문제 생기면 이놈 때문임
     //              state: 충전 취소 질문 상태              //
     const [cancelAlert, setCancelAlert] = useState<boolean>(false);
     //              state: 충전 메세지 상태              //
@@ -30,8 +30,6 @@ const ChargeStatus = () => {
     const currentPoint = usePinUserStore.getState().pinUser?.point!;
     //          state: 주문의 최종 결제 금액 상태            //
     const canPay = useOrderStore(state => state.getTotalPrice() <= currentPoint)
-    //              state: 웹소켓 매니저 상태               //
-    const { manager } = useWebSocketStore.getState();
 
     //              function: 블랙 모달 여는 함수               //
     const openModal = useBlackModalStore.getState().openModal;

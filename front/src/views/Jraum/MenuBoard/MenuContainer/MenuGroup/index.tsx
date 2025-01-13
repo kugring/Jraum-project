@@ -44,6 +44,10 @@ const MenuGroupE = styled.div`
     @media (max-width: 376px) {
       padding: 8px;
     }
+    /* 반응형 스타일 적용 */
+    @media (max-width: 361px) {
+      padding: 5px;
+    }
 `
 
 const CategoryBadge = styled.div`
@@ -72,9 +76,6 @@ const MenuCardBox = styled.div`
     grid-template-columns: repeat(4, 1fr);
     gap: calc((100% - 180px * 4) / 3);
     width: 100%;
-
-
-
 
     
     /* 반응형 스타일 적용 */

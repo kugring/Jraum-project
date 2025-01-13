@@ -9,7 +9,6 @@ const OrderHeader = () => {
     //          function: 주문 리스트 리셋하는 함수 (전역함수)            //
     const setOrderList = useOrderStore(state => state.setOrderList)
 
-
     //          function: 주문 음성 듣기 함수               //
     const actionTTS = (orderId: number) => {
         fetch(`${TEST_DOMAIN}/api/v1/order/${orderId}/audio`, {
@@ -39,12 +38,12 @@ const OrderHeader = () => {
             .catch((error) => {
                 console.error("Error fetching audio:", error);
             });
-            console.log("누름");
+        console.log("누름");
     }
 
     //              render: 주문 헤더 렌더링               //
     return (
-        <Header onClick={()=> actionTTS(1)}>
+        <Header onClick={() => actionTTS(1)}>
             {'장바구니'}
             <OrderResetButton onClick={() => setOrderList([])}>
                 {'삭제'}
@@ -60,6 +59,7 @@ const Header = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
     height: 46px;
     font-size:32px;
     color: var(--copperRed);
