@@ -81,8 +81,6 @@ const PayButton = () => {
         // 데이터 가져온것을 분할
         const { order, cashName, waitingNum } = responseBody as PostCashOrderResponseDto;
 
-        console.log("order: "+ order);
-        
         // 웹소켓으로 Order 데이터 보내기
         manager?.sendMessage('/send/order', order);
 
@@ -158,11 +156,25 @@ const PayModalE = styled.div`
     border-radius: 26px;
     border: 16px solid var(--goldenOrange);
     background: var(--seashell);
+        
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        width: 306px;
+        gap: 14px;
+        padding: 24px 16px 10px 16px;
+        border-radius: 16px;
+        border: 10px solid var(--goldenOrange);
+    }
 `
 
 const Title = styled.div`
     color: var(--amberBrown);
     font-size: 32px;
+        
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        font-size: 26px;
+    }
 `
 
 const Info = styled.div`
@@ -174,20 +186,25 @@ const Info = styled.div`
 
     font-size: 24px;
     color: var(--copperBrown);
+    
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        padding: 2px 16px 0px 12px;
+        font-size: 16px;
+        box-sizing: border-box;
+    }
 `
 
 const Text = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 14px;
 `
 
 const Point = styled.div`
     display: flex;
     flex-direction: column;
     align-items: end;
-    gap: 14px;
 `
 
 const Buttons = styled.div`
@@ -198,6 +215,13 @@ const Buttons = styled.div`
     color: #FFF;
     gap: 20px;
     font-size: 28px;
+    
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        height: 48px;
+        font-size: 20px;
+        gap: 12px;
+    }
 `
 
 const Close = styled.div`
@@ -209,6 +233,11 @@ const Close = styled.div`
     border-radius: 6px;
     border: 3px solid var(--goldenOrange);
     background: var(--sunsetPeach);
+    
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        width: 62px;
+    }
 `
 
 const PayButtonE = styled.div<{ $action: boolean }>`

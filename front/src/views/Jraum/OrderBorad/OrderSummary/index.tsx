@@ -71,7 +71,8 @@ const Summary = styled.div`
 
     /* 반응형 스타일 적용 */
     @media (max-width: 768px) {
-    padding: 6px 0;
+        padding: 6px 0;
+        border-radius: 6px;
     }
 
 `
@@ -120,5 +121,5 @@ const Price = styled.div`
 `
 
 const Divider = styled.div`
-    border-right: 2.5px dotted var(--copperBrown);
+    border-right: 2px dotted var(--copperBrown);
 `

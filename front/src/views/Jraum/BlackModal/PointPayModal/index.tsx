@@ -1,18 +1,16 @@
 import styled from 'styled-components'
+import SockJS from 'sockjs-client';
 import Divider from 'components/Divider'
 import { memo } from 'react';
-import useOrderStore from 'store/modal/order-list.store';
-import usePinUserStore from 'store/pin-user.store'
-import { formattedPoint, TEST_DOMAIN } from 'constant';
-import useBlackModalStore from 'store/modal/black-modal.store';
-import usePointChargeStore from 'store/modal/point-charge-modal.store';
-import { postPointOrderRequest } from 'apis';
+import { Client } from '@stomp/stompjs';
 import { useCookies } from 'react-cookie';
+import { ResponseDto } from 'apis/response';
+import { usePinUserStore } from 'store';
+import { postPointOrderRequest } from 'apis';
 import { PostPointOrderRequestDto } from 'apis/request/order';
 import { PostPointOrderResponseDto } from 'apis/response/order';
-import { ResponseDto } from 'apis/response';
-import SockJS from 'sockjs-client';
-import { Client } from '@stomp/stompjs';
+import { formattedPoint, TEST_DOMAIN } from 'constant';
+import { useOrderStore, useBlackModalStore, usePointChargeStore } from 'store/modal'; 
 
 //          component: 결제 모달 컴포넌트               //
 const PointPayModal = () => {
@@ -113,7 +111,9 @@ const PointPayModal = () => {
     return (
         <PayModalE>
             <Title>{`[ ${name} ]님`}&nbsp;&nbsp;{`환영합니다!`}</Title>
-            <Divider />
+            <DividerE>
+                <Divider/>
+            </DividerE>
             <Info>
                 <Text>
                     <div>{'보유 금액:'}</div>
@@ -135,11 +135,11 @@ const PointPayModal = () => {
         </PayModalE>
     )
 }
-
 export default memo(PointPayModal);
 
 
 const PayModalE = styled.div`
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -150,14 +150,31 @@ const PayModalE = styled.div`
     border-radius: 26px;
     border: 16px solid var(--goldenOrange);
     background: var(--seashell);
+
+    @media (max-width: 768px) {
+        gap: 12px;
+        padding: 24px 20px 12px 20px;
+        border-radius: 20px;
+        border: 12px solid var(--goldenOrange);
+    }
 `
 
 const Title = styled.div`
+    flex-shrink: 0;
     color: var(--amberBrown);
     font-size: 32px;
+
+    @media (max-width: 768px) {
+        font-size: 24px;
+    }
+`
+
+const DividerE = styled.div`
+    width: 240px;
 `
 
 const Info = styled.div`
+    flex-shrink: 0;
     display: flex;
     justify-content: space-between;
     padding: 0 12px 0 6px;
@@ -166,6 +183,10 @@ const Info = styled.div`
 
     font-size: 24px;
     color: var(--copperBrown);
+
+    @media (max-width: 768px) {
+        font-size: 18px;
+    }
 `
 
 const Text = styled.div`
@@ -183,6 +204,7 @@ const Point = styled.div`
 `
 
 const Buttons = styled.div`
+    flex-shrink: 0;
     display: flex;
     justify-content: space-between;
     width: 100%;
@@ -190,6 +212,12 @@ const Buttons = styled.div`
     color: #FFF;
     gap: 24px;
     font-size: 28px;
+
+    @media (max-width: 768px) {
+        gap: 12px;
+        height: 48px;
+        font-size: 24px;
+    }
 `
 
 const Close = styled.div`
@@ -201,6 +229,10 @@ const Close = styled.div`
     border-radius: 6px;
     border: 4px solid var(--goldenOrange);
     background: var(--goldenSun);
+
+    @media (max-width: 768px) {
+        width: 72px;
+    }
 `
 
 const PayButton = styled.div`

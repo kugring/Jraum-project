@@ -62,6 +62,7 @@ const Body = styled.div`
     /* 반응형 스타일 적용 */
     @media (max-width: 768px) {
     padding: 4px 0;
+    border-radius: 10px;
     background-position: 100% calc(100% + 40px) ;
   }
 

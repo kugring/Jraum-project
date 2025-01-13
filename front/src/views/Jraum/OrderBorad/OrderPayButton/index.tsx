@@ -59,7 +59,7 @@ const PayButton = styled.div<{ $exist: boolean }>`
 	/* 반응형 스타일 적용 */
 	@media (max-width: 768px) {
 		padding: 2px 12px;
- 		font-size: 24px;
+ 		font-size: 22px;
 		border-radius: 8px;
 		
 		&::before{

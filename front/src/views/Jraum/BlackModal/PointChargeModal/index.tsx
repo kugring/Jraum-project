@@ -13,7 +13,6 @@ import { postPointChargeRequest } from 'apis'
 import { PostPointChargeRequestDto } from 'apis/request/pointCharge'
 import { PostPointChargeResponseDto } from 'apis/response/pointCharge'
 import useWebSocketStore from 'store/web-socket.store'
-import { log } from 'console'
 
 //          component: 포인트 충전 모달 텀포넌트            //
 const PointChargeModal = () => {
@@ -62,7 +61,7 @@ const PointChargeModal = () => {
         <PointChargeModalE>
             <Header>
                 <Title>{`포인트 충전`}</Title>
-                <Close onClick={closeModal} size={42} color='#FFF'></Close>
+                <Close onClick={closeModal} color='#FFF'></Close>
             </Header>
             <InputValue />
             <MessageBox>{`잔액: ${formattedPoint(currentPoint!)}원 / 결제금액: ${formattedPoint(totalPrice)}원`}</MessageBox>
@@ -84,7 +83,7 @@ const PointChargeModal = () => {
                 <NumberButton onClick={() => buttonEdit('9')} >9</NumberButton>
                 <NumberButton onClick={() => buttonEdit('00')} >00</NumberButton>
                 <NumberButton onClick={() => buttonEdit('0')} >0</NumberButton>
-                <DeleteButton onClick={handleDelete} size={42} color='var(--copperOrange)'></DeleteButton>
+                <DeleteButton onClick={handleDelete} color='var(--copperOrange)'></DeleteButton>
             </NumberBoard>
             <ChargeButton />
         </PointChargeModalE>
@@ -178,7 +177,6 @@ const ChargeButton = () => {
         setPointChargeId(pointChargeRequest.pointChargeId)
         // 충전 요청의 ID 설정
         setCharging(true)
-        console.log("pointChargeRequest: " + pointChargeRequest);
 
         const { manager } = useWebSocketStore.getState();
         manager?.sendMessage('/send/pointCharge/request', pointChargeRequest); // 메시지 전송
@@ -198,12 +196,20 @@ const PointChargeModalE = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 36px 42px 24px 42px;
     width: 480px;
+    padding: 36px 42px 24px 42px;
     box-sizing: border-box;
     border-radius: 26px;
     border: 16px solid var(--goldenOrange);
     background: var(--seashell);
+
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        width: 320px;
+        padding: 24px 24px 12px 24px;
+        border-radius: 16px;
+        border: 12px solid var(--goldenOrange);
+}
 `
 
 const Header = styled.div`
@@ -215,11 +221,22 @@ const Header = styled.div`
 const Title = styled.div`
     font-size: 42px;
     color: var(--brickOrange);
+
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        font-size: 36px;
+    }
 `
 
 const Close = styled(IoClose)`
-  border-radius: 6px;
-  background-color: var(--coralPink);
+    font-size: 42px;
+    border-radius: 6px;
+    background-color: var(--coralPink);
+
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        font-size: 36px;
+    }
 `;
 
 const InputValueE = styled.div`
@@ -235,22 +252,44 @@ const InputValueE = styled.div`
     border-radius: 10px;
     background: #FFF;
     border: 6px solid var(--goldenPeach);
+
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        height: 48px;
+        padding: 12px 14px;
+        margin-top: 12px;
+    }
 `
 
 const Placeholder = styled.div`
     font-size: 18px;
     color: var(--pinkBeige);
+
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        font-size: 14px;
+    }
 `
 
 const ChargePoint = styled.div`
-        font-size: 32px;
-        color: var(--copperBrown);
+    font-size: 32px;
+    color: var(--copperBrown);
+
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        font-size: 18px;
+    }
 `
 
 const MessageBox = styled.div`
     font-size: 16px;
     padding: 8px 0 16px 0;
     color: var(--coralOrange);
+
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        font-size: 12px;
+    }
 `
 
 const Badges = styled.div`
@@ -258,13 +297,17 @@ const Badges = styled.div`
     justify-content: space-between;
     width: 100%;
     color: #FFF;
-    
 `
 const Badge = styled.div`
     font-size: 20px;
     padding: 8px 6px;
     border-radius: 6px;
     background-color: var(--orange);
+
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        font-size: 12px;
+    }
 `
 const NumberBoard = styled.div`
     display: grid;
@@ -274,21 +317,33 @@ const NumberBoard = styled.div`
     padding: 6px 0;
 `;
 const NumberButton = styled.div`
-  padding: 18px 0;
-  text-align: center;
-  font-size: 36px;
-  border-radius: 5px;
-  cursor: pointer;
-  color: var(--copperOrange);
+    padding: 18px 0;
+    text-align: center;
+    font-size: 36px;
+    border-radius: 5px;
+    cursor: pointer;
+    color: var(--copperOrange);
+
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        padding: 12px 0;
+        font-size: 26px;
+    }
 `;
 
 const DeleteButton = styled(FaDeleteLeft)`
-  padding: 18px 0;    
-  width: 100%;
-  font-size: 32px;
-  border-radius: 5px;
-  cursor: pointer;
-  transform: translateX(-4px);
+    padding: 18px 0;    
+    width: 100%;
+    font-size: 42px;
+    border-radius: 5px;
+    cursor: pointer;
+    transform: translateX(-4px);
+
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        padding: 12px 0;
+        font-size: 30px;
+    }
 `;
 
 const ChargeButtonE = styled.div<{ $action: boolean }>`
@@ -305,4 +360,11 @@ const ChargeButtonE = styled.div<{ $action: boolean }>`
     background-color: ${({ $action }) => $action ? "var(--orange)" : "var(--creamyYellow)"} ;
 
     transition: all 300ms;
+
+    /* 반응형 스타일 적용 */
+    @media (max-width: 768px) {
+        height: 48px;
+        font-size: 28px;
+        border-radius: 10px;
+    }
 `

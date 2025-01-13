@@ -150,7 +150,7 @@ const PaymentMethodBoxE = styled.div`
     background-color: #FFF;
 
     /* 반응형 스타일 적용 */
-    @media (max-width: 968px) {
+    @media (max-width: 768px) {
         width: 340px;
         padding: 16px;
         border: 8px solid var(--goldenOrange);
@@ -163,7 +163,7 @@ const Title = styled.div`
     color: var(--copperBrown);
 
     /* 반응형 스타일 적용 */
-    @media (max-width: 968px) {
+    @media (max-width: 768px) {
     font-size: 24px;
     }
 `
@@ -178,7 +178,7 @@ const Buttons = styled.div`
     gap: 32px;
 
     /* 반응형 스타일 적용 */
-    @media (max-width: 968px) {
+    @media (max-width: 768px) {
         height: 72px;
         gap: 16px;
         font-size: 24px;
