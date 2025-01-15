@@ -1,19 +1,18 @@
+import { TEST_DOMAIN } from 'constant';
 import { ResponseDto } from './response';
 import axios, { AxiosResponse } from 'axios';
-import { PatchPointChargeApprovalRequestDto, PatchPointChargeDeclineRequestDto, PostPointChargeRequestDto, PostPointDirectChargeRequestDto } from './request/pointCharge';
-import { GetActiveMenuListResponseDto, GetMenuPageResponseDto, PatchMenuResponseDto, PatchMenuSequenceResponseDto, PostMenuResponseDto } from './response/menu';
-import { DeletePointChargeResponseDto, GetPointChargeListResponseDto, GetPointChargeStatusResponseDto, GetPointChargePendingResponseDto, PatchPointChargeApprovalResponseDto, PatchPointChargeDeclineResponseDto, PostPointChargeResponseDto } from './response/pointCharge';
-import { CheckCertificationRequestDto, EmailCertificationRequestDto, IdCheckRequestDto, JraumSignUpRequestDto, NicknameDpCheckRequestDto, PinDpCheckRequestDto, PostPinCheckRequestDto, SignInRequestDto, SignUpRequestDto } from './request/auth';
-import { CheckCertificationResponseDto, EmailCertificationResponseDto, IdcheckResponseDto, JraumSignUpResponseDto, NicknameDpcheckResponseDto, PinDpcheckResponseDto, PostPinCheckResponseDto, SignInResponseDto, SignUpResponseDto } from './response/auth';
-import { GetOrderListResponseDto, GetOrderManagementResponseDto, PatchOrderApproveResponseDto, PatchOrderRefundResponseDto, PostCashOrderResponseDto, PostPointOrderResponseDto } from './response/order';
-import { PatchOrderApproveRequestDto, PatchOrderRefundRequestDto, PostCashOrderRequestDto, PostPointOrderRequestDto } from './request/order';
+import { PatchUserEditRequestDto } from './request/user';
 import { PostPinCheckManagerRequestDto } from './request/manager';
 import { PostPinCheckManagerResponseDto } from './response/manager';
-import { TEST_DOMAIN } from 'constant';
-import { PatchMenuRequestDto, patchMenuSuquenceRequestDto, PostMenuRequestDto } from './request/menu';
 import { GetSortedUserResponseDto, PatchUserEditResponseDto } from './response/user';
-import { PatchUserEditRequestDto } from './request/user';
-import PostPointDirectChargeResponseDto from './response/pointCharge/post-point-direct-charge.response.dto';
+import { PatchMenuRequestDto, patchMenuSuquenceRequestDto, PostMenuRequestDto } from './request/menu';
+import { PatchOrderApproveRequestDto, PatchOrderRefundRequestDto, PostCashOrderRequestDto, PostPointOrderRequestDto } from './request/order';
+import { GetActiveMenuListResponseDto, GetMenuPageResponseDto, PatchMenuResponseDto, PatchMenuSequenceResponseDto, PostMenuResponseDto } from './response/menu';
+import { PatchPointChargeApprovalRequestDto, PatchPointChargeDeclineRequestDto, PostPointChargeRequestDto, PostPointDirectChargeRequestDto } from './request/pointCharge';
+import { GetOrderListResponseDto, GetOrderManagementResponseDto, PatchOrderApproveResponseDto, PatchOrderRefundResponseDto, PostCashOrderResponseDto, PostPointOrderResponseDto } from './response/order';
+import { CheckCertificationRequestDto, EmailCertificationRequestDto, IdCheckRequestDto, JraumSignUpRequestDto, NicknameDpCheckRequestDto, PinDpCheckRequestDto, PostPinCheckRequestDto, SignInRequestDto, SignUpRequestDto } from './request/auth';
+import { CheckCertificationResponseDto, EmailCertificationResponseDto, IdcheckResponseDto, JraumSignUpResponseDto, NicknameDpcheckResponseDto, PinDpcheckResponseDto, PostPinCheckResponseDto, SignInResponseDto, SignUpResponseDto } from './response/auth';
+import { DeletePointChargeResponseDto, GetPointChargeListResponseDto, GetPointChargeStatusResponseDto, GetPointChargePendingResponseDto, PatchPointChargeApprovalResponseDto, PatchPointChargeDeclineResponseDto, PostPointChargeResponseDto, PostPointDirectChargeResponseDto } from './response/pointCharge';
 
 
 
@@ -384,12 +383,23 @@ export const postPointOrderRequest = async (requestBody: PostPointOrderRequestDt
     return result;
 }
 
-export const getOrderManagementRequest = async (accessToken: string) => {
-    const result = await axios.get(GET_ORDER_MANAGEMENT_URL(), authorization(accessToken))
-        .then(responseHandler<GetOrderManagementResponseDto>)
-        .catch(errorHandler)
-    return result;
-}
+// export const getOrderManagementRequest = async (accessToken: string) => {
+//     const result = await axios.get(GET_ORDER_MANAGEMENT_URL(), authorization(accessToken))
+//         .then(responseHandler<GetOrderManagementResponseDto>)
+//         .catch(errorHandler)
+//     return result;
+// }
+
+export const getOrderManagementRequest = async (accessToken: string): Promise<GetOrderManagementResponseDto> => {
+    try {
+      const response = await axios.get(GET_ORDER_MANAGEMENT_URL(), authorization(accessToken));
+      return responseHandler<GetOrderManagementResponseDto>(response);
+    } catch (error) {
+      // 에러를 React Query에서 관리하도록 그대로 던짐
+      throw errorHandler(error);
+    }
+  };
+
 
 export const getOrderListRequest = async (accessToken: string, page: number = 0, size: number = 10, name?: string, status?: string, date?: string) => {
     const result = await axios

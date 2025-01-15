@@ -1,15 +1,14 @@
 import styled from 'styled-components';
-import useBlackModalStore from 'store/modal/black-modal.store';
-import { memo, useEffect, useState } from 'react';
-import PinModal from './PinModal';
 import MenuModal from './MenuModal';
-import PointChargeModal from './PointChargeModal';
-import usePointChargeStore from 'store/modal/point-charge-modal.store';
-import usePinUserStore from 'store/pin-user.store';
-import PointPayOkModal from './PointPayOkModal';
-import PointPayModal from './PointPayModal';
 import CashPayModal from './CashPayModal';
+import PointPayModal from './PointPayModal';
 import CashPayOkModal from './CashPayOkModal';
+import PointPayOkModal from './PointPayOkModal';
+import PointChargeModal from './PointChargeModal';
+import { usePinUserStore } from 'store';
+import { memo, useEffect, useState } from 'react';
+import { useBlackModalStore, usePointChargeStore } from 'store/modal'; 
+import PinModal from './PinModal';
 
 
 //        component: 모달 모음 컴포넌트       //
@@ -100,7 +99,7 @@ const Modals = () => {
               case '메뉴':
                 return <MenuModal />;
               case '핀':
-                return <CashPayOkModal />;
+                return <PinModal />;
               case '현금결제':
                 return <CashPayModal />
               case '포인트결제':

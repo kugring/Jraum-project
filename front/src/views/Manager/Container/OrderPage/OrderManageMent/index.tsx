@@ -11,6 +11,7 @@ import { PatchOrderApproveRequestDto } from "apis/request/order";
 import { OrderDetail, OrderManagement } from "types/interface";
 import { getOrderManagementRequest, patchOrderApproveRequest } from "apis";
 import { GetOrderManagementResponseDto, PatchOrderApproveResponseDto } from "apis/response/order";
+import { useQuery } from "@tanstack/react-query";
 
 //          component: 주문 페이지 컴포넌트             //
 const OrderManageMent = () => {
@@ -41,6 +42,8 @@ const BadgeBox = memo(() => {
     const setOrders = useOrderManagementStore(state => state.setOrders);
     //          function: 보여질 주문 데이터 설정 상태         //
     const setShowOrder = useOrderManagementStore(state => state.setShowOrder);
+
+
     //          function: 주문 데이터 처리 함수            //
     const getOrderManagementResponse = (responseBody: GetOrderManagementResponseDto | ResponseDto | null) => {
         if (!responseBody) return;
@@ -55,40 +58,53 @@ const BadgeBox = memo(() => {
         }
     }
     //          function: 주문 뱃지 데이터 가져오는 함수           //
-    const orderBadge = () => {
-        if (!cookies.managerToken) return;
-        getOrderManagementRequest(cookies.managerToken).then(getOrderManagementResponse)
-    }
+    const { data: ordersQ, isFetching, isSuccess } = useQuery<GetOrderManagementResponseDto>({
+        queryKey: ['orderManagement'],
+        queryFn: () => getOrderManagementRequest(cookies.managerToken),
+        staleTime: 1000 * 10, // 10초
+        // notifyOnChangeProps: ['data'] // 'data' 필드가 변경될 때만 리렌더링        
+    });
 
     //          effect: 처음 렌더링시 화면에 주문 상태 보여줌           //
     useEffect(() => {
-        orderBadge()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [length]);
+        // ordersQ가 변경될 때만 호출
+        if (isSuccess && ordersQ) {
+            getOrderManagementResponse(ordersQ);
+            console.log(ordersQ);
+            console.log(isFetching);
+            console.log(isSuccess);
+        }
+        console.log("렌더링 된거임"+ length);
+        
+    }, [ordersQ, isSuccess, length]);
+
 
     //          render: 주문 뱃지 박스 렌더링            //
     return (
         <>
-            {orders!.length > 0 ?
+            {!isSuccess ? (
+                <NoWaiting>로딩중...</NoWaiting>
+            ) : orders && orders.length > 0 ? (
                 <WaitingBoxE>
-                    {orders!.map((order) => (
-                        <Badge key={order.orderId} order={order} /> // id 또는 고유 값 사용
+                    {orders.map((order) => (
+                        <Badge key={order.orderId} order={order} />
                     ))}
                 </WaitingBoxE>
-                :
-                <NoWaiting> 주문 없음 </NoWaiting>
-            }
+            ) : (
+                <NoWaiting>주문 없음</NoWaiting>
+            )}
         </>
     )
 })
 
 //          component: 주문 뱃지 컴포넌트           //
 const Badge = memo(({ order }: { order: OrderManagement }) => {
-
     //          state: 보여질 주문 데이터 설정 상태         //
     const selected = useOrderManagementStore(state => state.showOrder?.orderId === order.orderId);
-    //          state: 프로필필 상태         //
+
+    //          state: 프로필 상태         //
     const profileImage = order.profileImage !== null ? order.profileImage : defaultUserImage;
+
     //          state: 포지션 상태          //
     const position = () => {
         if (order.position === null && order.office === null) {
@@ -100,36 +116,44 @@ const Badge = memo(({ order }: { order: OrderManagement }) => {
         }
     };
 
-
     //          function: 보여질 주문 데이터 설정 상태         //
     const setShowOrder = useOrderManagementStore(state => state.setShowOrder);
 
+    // BadgeLeft 컴포넌트
+    const BadgeLeftE = memo(({ profileImage, name, position }: { profileImage: string, name: string, position: string }) => (
+        <BadgeLeft>
+            <ProfileImageE src={profileImage} />
+            <UserInfo>
+                <NameE>{name}</NameE>
+                {position && <PositionE>{position}</PositionE>}
+            </UserInfo>
+        </BadgeLeft>
+    ));
 
+    // BadgeRight 컴포넌트
+    const BadgeRightE = memo(({ payMethod, hotCount, coldCount }: { payMethod: string, hotCount: number, coldCount: number }) => (
+        <BadgeRight>
+            <PayMethod>{payMethod}</PayMethod>
+            <Tem>🔥{hotCount} / 🧊{coldCount}</Tem>
+        </BadgeRight>
+    ));
 
     //          render: 주문 뱃지 렌더링            //
     return (
         <BadgeE onClick={() => setShowOrder(order)} $select={selected}>
-            <BadgeLeft>
-                <ProfileImage src={profileImage} />
-                <UserInfo>
-                    <NameE>{order.name}</NameE>
-                    {order.position !== null &&
-                        <Position>{position()}</Position>
-                    }
-                </UserInfo>
-            </BadgeLeft>
-            <BadgeRight>
-                <PayMethod>{order.payMethod}</PayMethod>
-                <Tem>🔥{order.hotCount} / 🧊{order.coldCount}</Tem>
-            </BadgeRight>
+            <BadgeLeftE
+                profileImage={profileImage}
+                name={order.name}
+                position={position()}
+            />
+            <BadgeRightE
+                payMethod={order.payMethod}
+                hotCount={order.hotCount}
+                coldCount={order.coldCount}
+            />
         </BadgeE>
-    )
-}, (prevProps, nextProps) => {
-    // name, image, price, quantity, tem 프롭에 대해 깊은 비교
-    return (
-        isEqual(prevProps.order, nextProps.order)
     );
-});
+}, (prevProps, nextProps) => isEqual(prevProps.order, nextProps.order));
 
 
 
@@ -197,52 +221,72 @@ const OrderCard = memo(({ item }: { item: OrderDetail }) => {
 
 
 //          component: 주문 요약 박스 컴포넌트          //
-const OrderSummaryBox = () => {
+const OrderSummaryBox = memo(() => {
 
     //          state: 주문 데이터 상태         //
     const show = useOrderManagementStore(state => state.orders?.length !== 0);
-    const Total = () => {
-        return <>{useOrderManagementStore(state => state.showOrder?.totalQuantity ? `총: ${state.showOrder?.totalQuantity!}잔` : '')}</>
-    }
     //          state: 보여지는 주문 상태           //
-    const order = useOrderManagementStore(state => state.showOrder!);
-    //          state: 프로필필 상태         //
-    const profileImage = order && order.profileImage ? order.profileImage : defaultUserImage;
+    const name = useOrderManagementStore(state => state.showOrder?.name || '');
+    //          state: 보여지는 주문 상태           //
+    const office = useOrderManagementStore(state => state.showOrder?.office || null);
+    //          state: 보여지는 주문 상태           //
+    const position = useOrderManagementStore(state => state.showOrder?.position || null);
 
-    //          state: 포지션 상태          //
-    const position = () => {
-        if (order.position === null && order.office === null) {
+
+    //          state: 포지션 상태 계산          //
+    const positionInfo = () => {
+        if (position === null && office === null) {
             return '';
-        } else if (order.position === null && order.office !== null) {
+        } else if (position === null && office !== null) {
             return '단체';
         } else {
-            return `${order.position} / ${order.office}`;
+            return `${position} / ${office}`;
         }
     };
 
+
+    //          state: 주문 데이터 상태         //
+    const ProfileImage = () => {
+        return <><ProfileImageE src={useOrderManagementStore(state => state.showOrder?.profileImage || defaultUserImage)} /></>
+    }
+
+    //          state: 주문 데이터 상태         //
+    const Total = () => {
+        return <>{useOrderManagementStore(state => state.showOrder?.totalQuantity ? `총: ${state.showOrder?.totalQuantity!}잔` : '')}</>
+    }
+
+    //          state: 주문 데이터 상태         //
+    const UserName = () => {
+        return <><NameE>{name}</NameE></>
+    }
+
+    //          state: 주문 데이터 상태         //
+    const Position = () => {
+        return <><PositionE>{position && positionInfo()}</PositionE></>
+    }
     //          render: 주문 요약 박스 렌더링               //
     return (
         <OrderInfoBox>
-            {show && order && (
+            {show && name && (
                 <>
                     <SummaryLeft>
-                        <ProfileImage src={profileImage!} />
+                        <ProfileImage />
                         <UserInfo>
-                            <NameE>{order.name}</NameE>
-                            {order.position !== null && (
-                                <Position>{position()}</Position>
-                            )}
+                            <UserName />
+                            <Position />
                         </UserInfo>
                     </SummaryLeft>
                     <SummaryRight>
-                        <TotalQuantity><Total /></TotalQuantity>
+                        <TotalQuantity>
+                            <Total />
+                        </TotalQuantity>
                         <CompletedButton />
                     </SummaryRight>
                 </>
             )}
         </OrderInfoBox>
     );
-}
+}, (prevProps, nextProps) => isEqual(prevProps, nextProps));
 
 //          component: 주문 완료 버튼               //
 const CompletedButton = () => {
@@ -329,6 +373,18 @@ const Page = styled.div`
     box-sizing: border-box;
 `
 
+const GrayOverlay = styled.div`
+    width: 100%;
+    height: 100%;
+    background-color: rgba(128, 128, 128, 0.5); /* 반투명한 회색 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+`;
+
 const WaitingBoxE = styled.div`
     display: flex;
     width: 100%;
@@ -373,7 +429,7 @@ const BadgeLeft = styled.div`
     gap: 6px;
 `
 
-const ProfileImage = styled.img`
+const ProfileImageE = styled.img`
     width: 36px;
     height: 36px;
     border-radius: 6px;
@@ -391,7 +447,7 @@ const NameE = styled.div`
     color: var(--copperBrown);
 `
 
-const Position = styled.div`
+const PositionE = styled.div`
     color: var(--copperBrown);
     font-size: 10px;
 `
