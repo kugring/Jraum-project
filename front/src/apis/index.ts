@@ -401,12 +401,22 @@ export const getOrderManagementRequest = async (accessToken: string): Promise<Ge
   };
 
 
+// export const getOrderListRequest = async (accessToken: string, page: number = 0, size: number = 10, name?: string, status?: string, date?: string) => {
+//     const result = await axios
+//         .get(GET_ORDER_LIST_URL(page, size, name, status, date), authorization(accessToken))
+//         .then(responseHandler<GetOrderListResponseDto>)
+//         .catch(errorHandler);
+//     return result;
+// };
+
 export const getOrderListRequest = async (accessToken: string, page: number = 0, size: number = 10, name?: string, status?: string, date?: string) => {
-    const result = await axios
-        .get(GET_ORDER_LIST_URL(page, size, name, status, date), authorization(accessToken))
-        .then(responseHandler<GetOrderListResponseDto>)
-        .catch(errorHandler);
-    return result;
+    try {
+        const result = await axios.get(GET_ORDER_LIST_URL(page, size, name, status, date), authorization(accessToken));
+        return responseHandler<GetOrderListResponseDto>(result);
+    } catch (error) {
+        // 에러를 React Query에서 관리하도록 그대로 던짐
+        throw errorHandler(error);
+    }
 };
 
 export const patchOrderApproveRequest = async (requestBody: PatchOrderApproveRequestDto, accessToken: string) => {

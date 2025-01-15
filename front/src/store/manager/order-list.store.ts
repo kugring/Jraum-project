@@ -14,7 +14,7 @@ interface OrderListPageStore {
     setName: (name: string) => void;
     setPage: (page: number) => void;
     setStatus: (status: string) => void;
-    setOrders: (orders: OrderList[]) => void;
+    addOrders: (orders: OrderList[]) => void;
     setIsLoading: (isLoading: boolean) => void;
     setLimited: (limited: number) => void;
     resetOrders: () => void;  // resetOrders 함수 추가
@@ -28,13 +28,13 @@ const useOrderListPageStore = create<OrderListPageStore>()(
         page: 0,
         status: '모두',
         limited: 10,
-        isLoading: false,
+        isLoading: true,
         orders: [],
         setEnd: (boolean: boolean) => set({ end: boolean }),
         setName: (name: string) => set({ name }),
         setPage: (page: number) => set({ page }),
         setStatus: (status: string) => set({ status }),
-        setOrders: (newOrders: OrderList[]) =>
+        addOrders: (newOrders: OrderList[]) =>
             set((state) => {
                 // 기존 orders와 newOrders를 합친 후 중복 제거
                 const updatedOrders = [...state.orders, ...newOrders];

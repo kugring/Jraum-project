@@ -10,6 +10,7 @@ interface OrderManagementStore {
     setOrders: (orders: OrderManagement[]) => void;
     setOpenTTS: (boolean: boolean) => void;
     setShowOrder: (order: OrderManagement) => void;
+    toggleOpenTTS: () => void;  // 토글 함수 추가
     removeOrderById: (orderId: number) => void;
 }
 
@@ -21,9 +22,11 @@ const useOrderManagementStore = create<OrderManagementStore>()(
         showOrder: null,
         addOrder: (order) => set((state) => ({ orders: [...state.orders!, order] })),
         setOrders: (orders) => set({ orders: orders }),
-        setOpenTTS: (boolean) => set({ openTTS: boolean}),
+        setOpenTTS: (boolean) => set({ openTTS: boolean }),
         setShowOrder: (order) => set({ showOrder: order }),
+        toggleOpenTTS: () => set((state) => ({ openTTS: !state.openTTS })),
         removeOrderById: (orderId: number) => set((state) => ({ orders: state.orders!.filter(order => order.orderId !== orderId) })),
     }))
 );
+
 export default useOrderManagementStore;

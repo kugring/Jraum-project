@@ -1,16 +1,17 @@
 import styled from 'styled-components'
 import { fromNow } from 'helpers/dayjs'
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import { OrderList } from 'types/interface'
 import { useCookies } from 'react-cookie'
 import { ResponseDto } from 'apis/response'
+import { BiSolidBellRing } from "react-icons/bi";
+import { useWebSocketStore } from 'store'
+import { useBlackModalStore } from 'store/modal'
 import { defaultUserImage, formattedDate, formattedPoint } from 'constant'
 import { patchOrderApproveRequest, patchOrderRefundRequest } from 'apis'
 import { PatchOrderApproveRequestDto, PatchOrderRefundRequestDto } from 'apis/request/order'
 import { PatchOrderApproveResponseDto, PatchOrderRefundResponseDto } from 'apis/response/order'
-import useBlackModalStore from 'store/modal/black-modal.store'
-import { BiSolidBellRing } from "react-icons/bi";
-import useWebSocketStore from 'store/web-socket.store'
+import { isEqual } from 'lodash'
 
 //          component: 주문 목록 카드 컴포넌트            //
 const Card = ({ order }: { order: OrderList }) => {
@@ -92,6 +93,7 @@ const Card = ({ order }: { order: OrderList }) => {
         setMessage("주문 음성 알리기")
         setCallback(() => orderSendTTS(orderId));
     }
+    
 
     //          render: 주문 목록 카드 렌더링            //
     return (
@@ -162,7 +164,8 @@ const Card = ({ order }: { order: OrderList }) => {
         </CardE>
     )
 }
-export default Card
+
+export default memo(Card, (prevProps, nextProps) => isEqual(prevProps.order.orderId, nextProps.order.orderId));
 
 
 

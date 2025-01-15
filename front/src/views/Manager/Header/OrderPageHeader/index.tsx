@@ -6,27 +6,39 @@ import { useOrderManagementStore, useOrderPageStore } from 'store/manager';
 const OrderPageHeader = () => {
 
     //          state: 주문 데이터 상태         //
-    const waitingNum = useOrderManagementStore(state => state.orders?.length);
+    // const waitingNum = useOrderManagementStore(state => state.orders?.length);
     //          state: TTS 음성 듣기 상태         //
-    const openTTS = useOrderManagementStore(state => state.openTTS);
+    // const openTTS = useOrderManagementStore(state => state.openTTS);
     //          state: 서브 페이지 상태               //
-    const subPage = useOrderPageStore(state => state.subPage);
+    // const subPage = useOrderPageStore(state => state.subPage);
     //          function: 서브 페이지를 설정하는 함수               //
-    const setSubPage = useOrderPageStore.getState().setSubPage;
+    // const setSubPage = useOrderPageStore.getState().setSubPage;
     //          function: TTS 음성 듣기 설정 함수         //
-    const setOpenTTS = useOrderManagementStore.getState().setOpenTTS;
+    // const setOpenTTS = useOrderManagementStore.getState().setOpenTTS;
+
+
+    //          subComponent: 주문 대기                 //
+    const WaitingNumE = () => {
+        return <>{`대기: ${useOrderManagementStore(state => state.orders?.length)}`}</>
+    }
+
+    //          subComponent: 서브 페이지                 //
+    const SubPageE = ({ subPage }: { subPage: string }) => {
+        const subPageText = subPage.replace(" ", "");
+        return <><SubPage $select={useOrderPageStore(state => state.subPage) === subPageText} onClick={() => useOrderPageStore.getState().setSubPage(subPageText)}>{subPage}</SubPage></>
+    }
 
     //              render: 관리자 주문 페이지 헤더 렌더링                  //
     return (
         <Header>
             <SubPageBox>
-                <SubPage $select={subPage === "주문관리"} onClick={() => setSubPage("주문관리")}>주문 관리</SubPage>
-                <SubPage $select={subPage === "주문목록"} onClick={() => setSubPage("주문목록")}>주문 목록</SubPage>
+                <SubPageE subPage="주문 관리" />
+                <SubPageE subPage="주문 목록" />
             </SubPageBox>
             <RightE>
-                <WaitingNum>{`대기: ${waitingNum}`}</WaitingNum>
-                <OpenTTS onClick={() => setOpenTTS(!openTTS)}>
-                    {openTTS ? <ImCheckboxChecked size={14} /> : <ImCheckboxUnchecked size={14} />}음성
+                <WaitingNum><WaitingNumE/></WaitingNum>
+                <OpenTTS onClick={() => useOrderManagementStore.getState().toggleOpenTTS()}>
+                    {useOrderManagementStore.getState().openTTS ? <ImCheckboxChecked size={14} /> : <ImCheckboxUnchecked size={14} />}음성
                 </OpenTTS>
             </RightE>
         </Header>

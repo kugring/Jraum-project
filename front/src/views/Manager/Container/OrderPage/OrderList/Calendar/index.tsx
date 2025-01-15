@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 import { StyledCalendarWrapper, StyledCalendar, StyledDate, StyledDot, StyledReset } from "./styles";
 import moment from 'moment';
 import 'react-calendar/dist/Calendar.css';  // 기본 스타일
@@ -112,7 +112,7 @@ const Calendar = () => {
     )
 }
 
-export default Calendar
+export default memo(Calendar);
 
 const Icon = styled.div`
     display: flex;

@@ -3,14 +3,14 @@ import { memo, useEffect, useState } from 'react'
 import { IoSearch } from 'react-icons/io5'
 import useOrderListPageStore from 'store/manager/order-list.store';
 import styled from 'styled-components'
-
+import { IoClose } from "react-icons/io5";
 
 
 //              component: 주문자 이름 검색 필터 컴포넌트              //
 const SearchFilter = () => {
 
     //         state: 이름 상태       //
-    const [value, seValue] = useState('');
+    const [value, setValue] = useState('');
 
     //          function: 주문자 이름 변경 함수       //
     const setName = useOrderListPageStore(state => state.setName);
@@ -25,8 +25,12 @@ const SearchFilter = () => {
     //          render: 주문자 이름 검색 필터 컴포넌트 렌더링             //
     return (
         <SearchFilterE>
-            <Input value={value} onChange={(e) => seValue(e.target.value)} placeholder={'이름을 입력해주세요'}></Input>
-            <IoSearch size={20} color={"var(--orange)"} />
+            <Input value={value} onChange={(e) => setValue(e.target.value)} placeholder={'이름을 입력해주세요'}></Input>
+            {value === "" ?
+                <IoSearch size={20} color={"var(--orange)"} />
+                :
+                <IoClose size={20} color={"var(--orange)"} onClick={() => setValue("")}/>
+            }
         </SearchFilterE>
     )
 }

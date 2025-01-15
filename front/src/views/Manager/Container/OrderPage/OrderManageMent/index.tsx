@@ -43,7 +43,6 @@ const BadgeBox = memo(() => {
     //          function: 보여질 주문 데이터 설정 상태         //
     const setShowOrder = useOrderManagementStore(state => state.setShowOrder);
 
-
     //          function: 주문 데이터 처리 함수            //
     const getOrderManagementResponse = (responseBody: GetOrderManagementResponseDto | ResponseDto | null) => {
         if (!responseBody) return;
@@ -61,13 +60,12 @@ const BadgeBox = memo(() => {
     const { data: ordersQ, isFetching, isSuccess } = useQuery<GetOrderManagementResponseDto>({
         queryKey: ['orderManagement', orders],
         queryFn: () => getOrderManagementRequest(cookies.managerToken),
-        staleTime: 1000 * 10, // 10초
+        staleTime: 1000 * 3, // 3초
         notifyOnChangeProps: ['data'] // 'data' 필드가 변경될 때만 리렌더링        
     });
 
     //          effect: 처음 렌더링시 화면에 주문 상태 보여줌           //
     useEffect(() => {
-        console.log("렌더링 된거임" + length);
         // ordersQ가 변경될 때만 호출
         if (isSuccess && ordersQ) {
             getOrderManagementResponse(ordersQ);
@@ -86,7 +84,7 @@ const BadgeBox = memo(() => {
                 </WaitingBoxE>
             ) : (
                 <NoWaiting>
-                    {isFetching ? '로딩중...' : '주문 없음'}
+                    {isSuccess ? '주문 없음' : '로딩중...'}
                 </NoWaiting>
             )}
         </>
@@ -228,8 +226,6 @@ const OrderSummaryBox = memo(() => {
     const show = useOrderManagementStore(state => state.orders?.length !== 0);
     //          state: 보여지는 주문 상태           //
     // const name = useOrderManagementStore(state => state.showOrder?.name || '');
-
-
 
     //          subComponent: 주문 데이터 상태         //
     const ProfileImage = () => {
