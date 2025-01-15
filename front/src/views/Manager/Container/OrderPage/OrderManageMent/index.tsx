@@ -62,18 +62,15 @@ const BadgeBox = memo(() => {
         queryKey: ['orderManagement', orders],
         queryFn: () => getOrderManagementRequest(cookies.managerToken),
         staleTime: 1000 * 10, // 10초
-        // notifyOnChangeProps: ['data'] // 'data' 필드가 변경될 때만 리렌더링        
+        notifyOnChangeProps: ['data'] // 'data' 필드가 변경될 때만 리렌더링        
     });
 
     //          effect: 처음 렌더링시 화면에 주문 상태 보여줌           //
     useEffect(() => {
-        console.log("렌더링 된거임"+ length);
+        console.log("렌더링 된거임" + length);
         // ordersQ가 변경될 때만 호출
         if (isSuccess && ordersQ) {
             getOrderManagementResponse(ordersQ);
-            console.log(ordersQ);
-            console.log(isFetching);
-            console.log(isSuccess);
         }
     }, [ordersQ, isSuccess, orders]);
 
@@ -81,16 +78,16 @@ const BadgeBox = memo(() => {
     //          render: 주문 뱃지 박스 렌더링            //
     return (
         <>
-            {!isSuccess ? (
-                <NoWaiting>로딩중...</NoWaiting>
-            ) : orders && orders.length > 0 ? (
+            {orders && orders.length > 0 ? (
                 <WaitingBoxE>
                     {orders.map((order) => (
                         <Badge key={order.orderId} order={order} />
                     ))}
                 </WaitingBoxE>
             ) : (
-                <NoWaiting>주문 없음</NoWaiting>
+                <NoWaiting>
+                    {isFetching ? '로딩중...' : '주문 없음'}
+                </NoWaiting>
             )}
         </>
     )
@@ -156,20 +153,20 @@ const Badge = memo(({ order }: { order: OrderManagement }) => {
 
 
 
-//          component: 주문 카드 컴포넌트           //
+//          component: 주문 보드 컴포넌트           //
 const OrderBoard = () => {
 
 
     //          state: 주문 데이터 상태         //
     const showOrder = useOrderManagementStore(state => state.showOrder);
     //          state: 주문 데이터 상태         //
-    const show = useOrderManagementStore(state => state.orders?.length === 0);
+    const show = useOrderManagementStore(state => state.orders?.length !== 0);
 
 
     //          render: 주문 카드 렌더링            //
     return (
         <OrderBoardE $show={show}>
-            {showOrder && showOrder.orderDetails && showOrder.orderDetails.map((item) => (
+            {show && showOrder && showOrder.orderDetails && showOrder.orderDetails.map((item) => (
                 <OrderCard key={item.orderDetailId} item={item} />
             ))}
         </OrderBoardE>
@@ -189,11 +186,16 @@ const OrderCard = memo(({ item }: { item: OrderDetail }) => {
                 <Options>
                     {item.options &&
                         item.options
-                            .filter((option) => option.quantity > 0 && option.detail !== '보통' && option.detail !== '보통컵') // 필터링
+                            .filter((option) => option.quantity > 0 && (option.detail !== '보통' || option.category === "얼음") && option.detail !== '보통컵') // 필터링
                             .sort((a, b) => a.sequence - b.sequence) // sequence 값을 기준으로 오름차순 정렬
                             .map((option) => (
-                                <OptionBadge key={option.id} type={option.detail}>
-                                    {option.category === "시럽" ? <>{option.detail + " " + option.quantity}</> : <> {option.detail} </>}
+                                <OptionBadge key={option.id} type={option.category}>
+                                    {
+                                        option.category === "시럽" ?
+                                            <>{option.detail + " " + option.quantity}</> :
+                                            option.category === "얼음" && option.detail === "보통" ?
+                                                <> {`얼음 보통`} </> : <> {option.detail} </>
+                                    }
                                 </OptionBadge>
                             ))}
                 </Options>
@@ -225,54 +227,50 @@ const OrderSummaryBox = memo(() => {
     //          state: 주문 데이터 상태         //
     const show = useOrderManagementStore(state => state.orders?.length !== 0);
     //          state: 보여지는 주문 상태           //
-    const name = useOrderManagementStore(state => state.showOrder?.name || '');
-    //          state: 보여지는 주문 상태           //
-    const office = useOrderManagementStore(state => state.showOrder?.office || null);
-    //          state: 보여지는 주문 상태           //
-    const position = useOrderManagementStore(state => state.showOrder?.position || null);
+    // const name = useOrderManagementStore(state => state.showOrder?.name || '');
 
 
-    //          state: 포지션 상태 계산          //
-    const positionInfo = () => {
-        if (position === null && office === null) {
-            return '';
-        } else if (position === null && office !== null) {
-            return '단체';
-        } else {
-            return `${position} / ${office}`;
-        }
-    };
 
-
-    //          state: 주문 데이터 상태         //
+    //          subComponent: 주문 데이터 상태         //
     const ProfileImage = () => {
         return <><ProfileImageE src={useOrderManagementStore(state => state.showOrder?.profileImage || defaultUserImage)} /></>
     }
-
-    //          state: 주문 데이터 상태         //
+    //          subComponent: 주문 데이터 상태         //
     const Total = () => {
         return <>{useOrderManagementStore(state => state.showOrder?.totalQuantity ? `총: ${state.showOrder?.totalQuantity!}잔` : '')}</>
     }
-
-    //          state: 주문 데이터 상태         //
+    //          subComponent: 주문 데이터 상태         //
     const UserName = () => {
-        return <><NameE>{name}</NameE></>
+        return <>{useOrderManagementStore(state => state.showOrder?.name || '')}</>
     }
-
-    //          state: 주문 데이터 상태         //
+    //          subComponent: 주문 데이터 상태         //
     const Position = () => {
-        return <><PositionE>{position && positionInfo()}</PositionE></>
+        //          state: 보여지는 주문 상태           //
+        const office = useOrderManagementStore(state => state.showOrder?.office || null);
+        //          state: 보여지는 주문 상태           //
+        const position = useOrderManagementStore(state => state.showOrder?.position || null);
+        //          function: 포지션 상태 계산          //
+        const positionInfo = () => {
+            if (position === null && office === null) {
+                return '';
+            } else if (position === null && office !== null) {
+                return '단체';
+            } else {
+                return `${position} / ${office}`;
+            }
+        };
+        return <>{position && positionInfo()}</>
     }
     //          render: 주문 요약 박스 렌더링               //
     return (
         <OrderInfoBox>
-            {show && name && (
+            {show && (
                 <>
                     <SummaryLeft>
                         <ProfileImage />
                         <UserInfo>
-                            <UserName />
-                            <Position />
+                            <NameE><UserName /></NameE>
+                            <PositionE><Position /></PositionE>
                         </UserInfo>
                     </SummaryLeft>
                     <SummaryRight>
@@ -288,17 +286,14 @@ const OrderSummaryBox = memo(() => {
 }, (prevProps, nextProps) => isEqual(prevProps, nextProps));
 
 //          component: 주문 완료 버튼               //
-const CompletedButton = () => {
+const CompletedButton = memo(() => {
+
 
     //          state: 쿠키 상태            //
     const [cookies,] = useCookies(['managerToken']);
 
     //          state: 보여진 주문 Id 상태              //
-    const orderId = useOrderManagementStore(state => state.showOrder?.orderId)
-    //          state: 보여진 주문 Id 상태              //
     const orders = useOrderManagementStore.getState().orders
-    //          state: TTS 음성 듣기 상태         //
-    const openTTS = useOrderManagementStore(state => state.openTTS);
 
     //          function: 주문들 데이터 설정 상태         //
     const removeOrderById = useOrderManagementStore.getState().removeOrderById;
@@ -312,6 +307,8 @@ const CompletedButton = () => {
         if (code === 'NMN') alert('존재하지 않는 메뉴입니다.');
         if (code === 'NMG') alert('관리자 토큰이 만료되었습니다.');
         if (code !== 'SU') return;
+
+        const orderId = useOrderManagementStore.getState().showOrder?.orderId;
         removeOrderById(orderId!);
 
         //  주문이 완료되고 선택될 주문 설정
@@ -322,6 +319,7 @@ const CompletedButton = () => {
         }
 
         // openTTS가 열려있다면 음성출력을 보내고 닫혀있다면 안보냄
+        const openTTS = useOrderManagementStore.getState().openTTS;
         if (openTTS) {
             const { manager } = useWebSocketStore.getState();
             manager?.sendMessage('/send/orderTTS', { orderId }); // 메시지 전송
@@ -333,6 +331,7 @@ const CompletedButton = () => {
     //          function: 주문 완료 처리하는 함수           //
     const orderCompleted = () => {
         if (!cookies.managerToken) return;
+        const orderId = useOrderManagementStore.getState().showOrder?.orderId;
         const requestBody: PatchOrderApproveRequestDto = { orderId: orderId! }
         patchOrderApproveRequest(requestBody, cookies.managerToken).then(patchOrderApproveResponse)
     }
@@ -355,7 +354,7 @@ const CompletedButton = () => {
             완료
         </CompletedButtonE>
     )
-}
+});
 
 
 
@@ -371,18 +370,6 @@ const Page = styled.div`
     gap: 12px;
     box-sizing: border-box;
 `
-
-const GrayOverlay = styled.div`
-    width: 100%;
-    height: 100%;
-    background-color: rgba(128, 128, 128, 0.5); /* 반투명한 회색 */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 16px;
-    font-weight: bold;
-    color: white;
-`;
 
 const WaitingBoxE = styled.div`
     display: flex;
@@ -507,7 +494,7 @@ const OrderBoardE = styled.div<{ $show: boolean }>`
     }
 
 
-    ${({ $show }) => $show ? `
+    ${({ $show }) => $show ? ``:`
     background-image: url(https://i.pinimg.com/originals/8c/5c/cb/8c5ccb49470c3344e48f18315fa568a6.gif);
     &::after {
     content: '';
@@ -518,7 +505,7 @@ const OrderBoardE = styled.div<{ $show: boolean }>`
     height: 100%;
     border-radius: 14px;
     box-shadow: 0px 0px 8px 0px var(--copperBrown);
-    background-color: rgba(255, 245, 238, 0.95);`: ""}
+    background-color: rgba(255, 245, 238, 0.95);`}
 `
 
 const OrderCardE = styled.div<{ $check: boolean }>`
@@ -582,13 +569,9 @@ const OptionBadge = styled.div<{ type: string }>`
     border-radius: 5px;
     background-color:${({ type }) => {
         switch (type) {
-            case '뜨거움':
+            case '온도':
                 return 'var(--hot)';
-            case '덜~뜨거움':
-                return 'var(--hot)';
-            case '얼음적게':
-                return 'var(--cold)';
-            case '얼음많이':
+            case '얼음':
                 return 'var(--cold)';
             default:
                 return 'var(--orange)'; // 기본값을 설정 (옵션)
