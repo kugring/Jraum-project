@@ -59,7 +59,7 @@ const BadgeBox = memo(() => {
     }
     //          function: 주문 뱃지 데이터 가져오는 함수           //
     const { data: ordersQ, isFetching, isSuccess } = useQuery<GetOrderManagementResponseDto>({
-        queryKey: ['orderManagement'],
+        queryKey: ['orderManagement', orders],
         queryFn: () => getOrderManagementRequest(cookies.managerToken),
         staleTime: 1000 * 10, // 10초
         // notifyOnChangeProps: ['data'] // 'data' 필드가 변경될 때만 리렌더링        
@@ -67,6 +67,7 @@ const BadgeBox = memo(() => {
 
     //          effect: 처음 렌더링시 화면에 주문 상태 보여줌           //
     useEffect(() => {
+        console.log("렌더링 된거임"+ length);
         // ordersQ가 변경될 때만 호출
         if (isSuccess && ordersQ) {
             getOrderManagementResponse(ordersQ);
@@ -74,9 +75,7 @@ const BadgeBox = memo(() => {
             console.log(isFetching);
             console.log(isSuccess);
         }
-        console.log("렌더링 된거임"+ length);
-        
-    }, [ordersQ, isSuccess, length]);
+    }, [ordersQ, isSuccess, orders]);
 
 
     //          render: 주문 뱃지 박스 렌더링            //

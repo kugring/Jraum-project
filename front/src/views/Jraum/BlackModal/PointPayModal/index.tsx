@@ -1,16 +1,14 @@
 import styled from 'styled-components'
-import SockJS from 'sockjs-client';
 import Divider from 'components/Divider'
 import { memo } from 'react';
-import { Client } from '@stomp/stompjs';
 import { useCookies } from 'react-cookie';
 import { ResponseDto } from 'apis/response';
-import { usePinUserStore } from 'store';
+import { formattedPoint } from 'constant';
 import { postPointOrderRequest } from 'apis';
 import { PostPointOrderRequestDto } from 'apis/request/order';
 import { PostPointOrderResponseDto } from 'apis/response/order';
-import { formattedPoint, TEST_DOMAIN } from 'constant';
-import { useOrderStore, useBlackModalStore, usePointChargeStore } from 'store/modal'; 
+import { usePinUserStore, useWebSocketStore } from 'store';
+import { useOrderStore, useBlackModalStore, usePointChargeStore } from 'store/modal';
 
 //          component: 결제 모달 컴포넌트               //
 const PointPayModal = () => {
@@ -53,35 +51,12 @@ const PointPayModal = () => {
         // 데이터 가져온것을 분활       
         const { order, balance, waitingNum } = responseBody as PostPointOrderResponseDto;
 
+
         // 웹소켓 연결 및 데이터 전송
-        // const socket = new SockJS('httplocalhost:4000/ws');
-        const socket = new SockJS('https://'+ TEST_DOMAIN +'/ws');
+        const { manager } = useWebSocketStore.getState();
+        // 웹소켓으로 Order 데이터 보내기
+        manager?.sendMessage('/send/order', order);
 
-        const client = new Client({
-            webSocketFactory: () => socket,
-            onConnect: () => {
-                console.log('Connected to WebSocket');
-
-                // 웹소켓으로 데이터 보내기
-                if (client) {
-                    client.publish({
-                        destination: '/send/order',
-                        body: JSON.stringify(order),  // order 객체를 JSON 문자열로 변환
-                    });
-                } else {
-                    console.error('WebSocket not connected');
-                }
-
-                // 연결 후 바로 종료
-                client.deactivate(); // 데이터 전송 후 연결 종료
-            },
-            onDisconnect: () => {
-                console.log('Disconnected from WebSocket');
-            }
-        });
-
-        // 웹소켓 연결 활성화
-        client.activate();
 
         setPinUser({
             ...pinUser!,
@@ -112,7 +87,7 @@ const PointPayModal = () => {
         <PayModalE>
             <Title>{`[ ${name} ]님`}&nbsp;&nbsp;{`환영합니다!`}</Title>
             <DividerE>
-                <Divider/>
+                <Divider />
             </DividerE>
             <Info>
                 <Text>

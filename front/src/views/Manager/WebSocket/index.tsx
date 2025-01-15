@@ -26,6 +26,7 @@ const WebSocket = () => {
         const addOrder = useOrderManagementStore.getState().addOrder;
         manager?.subscribe('/receive/manager/order', (order) => {
             addOrder(order);
+            console.log("order: "+ order);
         });
     };
 
@@ -42,7 +43,7 @@ const WebSocket = () => {
     };
 
 
-    //              function: 현금 결제 웹소켓 구독 핸들러               // 
+    //              function: 현금 결제 웹소켓 구독               // 
     const PointChargeRequestSubscribe = () => {
         const setChargeRequests = usePointChargeRequestStore.getState().setChargeRequests;
         const chargeRequests = usePointChargeRequestStore.getState().chargeRequests;
@@ -52,7 +53,7 @@ const WebSocket = () => {
     };
 
 
-    //              event handler: 웹소켓 메제시 전송 핸들러               // 
+    //              function: 웹소켓 현재 현금결제 요청 상태 요구               // 
     const handleSendMessage = () => {
         const { manager } = useWebSocketStore.getState();
         manager?.sendMessage('/send/current/cashPay/info', {  }); // 메시지 전송

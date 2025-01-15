@@ -1,11 +1,10 @@
-import Divider from 'components/Divider'
-import { formattedPoint, JRAUM_PATH } from 'constant';
-import { memo, useEffect, useState } from 'react';
-import { useCookies } from 'react-cookie';
-import useBlackModalStore from 'store/modal/black-modal.store';
-import useOrderStore from 'store/modal/order-list.store';
-import usePinUserStore from 'store/pin-user.store';
 import styled from 'styled-components'
+import Divider from 'components/Divider'
+import { useCookies } from 'react-cookie';
+import { usePinUserStore } from 'store';
+import { memo, useEffect, useState } from 'react';
+import { formattedPoint, JRAUM_PATH } from 'constant';
+import { useBlackModalStore, useOrderStore } from 'store/modal';
 
 //          component: 포인트 결제 완료 모달 컴포넌트               //
 const PointPayOkModal = () => {
