@@ -87,7 +87,9 @@ public class PointServiceImplement implements PointService {
 
     try {
       PointCharge pointCharge = pointChargeRepositoy.findFirstByUser_UserIdOrderByCreatedAtDesc(userId);
-      if(pointCharge == null){return GetPointChargeStatusResponseDto.noExistPointCharge();}
+      if (pointCharge == null) {
+        return GetPointChargeStatusResponseDto.noExistPointCharge();
+      }
       status = pointCharge.getStatus();
       pointChargeId = pointCharge.getPointChargeId();
 
@@ -211,21 +213,28 @@ public class PointServiceImplement implements PointService {
       // 스크롤 이벤트로 인한 데이터 가져오게 도와주는것
       Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
-      // 회원이름 정의
-      String name = Objects.isNull(Name) ? null : "".equals(Name) ? null : Name;
 
       // 상태에 정의
       String status = Objects.isNull(Status) ? null : "모두".equals(Status) ? null : Status;
 
-      // 자바스크립트 Date타입을 LocalDate로 변환
-      // 예외 처리를 추가한 경우
+      // 핀 상태
+      String pin = null;
+
+      // 회원이름 정의
+      String name = Objects.isNull(Name) ? null : "".equals(Name) ? null : Name;
+      
+      // Name이 숫자로 된 4자리인지 확인
+      if (name != null && name.matches("\\d+")) {
+        pin = name; // 숫자로 된 4자리라면 pin에 저장
+        name = null; // name은 null로 설정
+      }
 
       // dateD가 null이 아니면 LocalDateTime으로 변환하고, null일 경우 null을 반환
       LocalDateTime startOfDay = Objects.isNull(Date) ? null : LocalDate.parse(Date).atStartOfDay();
       LocalDateTime endOfDay = Objects.isNull(Date) ? null : LocalDate.parse(Date).atTime(LocalTime.MAX);
 
       // 레파지토리에서 데이터 찾아옴
-      pointCharges = pointChargeRepositoy.findChargeList(name, status, startOfDay, endOfDay, pageable);
+      pointCharges = pointChargeRepositoy.findChargeList(pin, name, status, startOfDay, endOfDay, pageable);
 
     } catch (Exception exception) {
       exception.printStackTrace();
@@ -249,7 +258,7 @@ public class PointServiceImplement implements PointService {
         return PinCheckResponseDto.pinCheckFail();
       }
 
-      String userId =  dto.getUserId().equals("") ? null : dto.getUserId();
+      String userId = dto.getUserId().equals("") ? null : dto.getUserId();
 
       // Dto에서 필요한 정보 가져오기
       int chargePoint = dto.getChargePoint();

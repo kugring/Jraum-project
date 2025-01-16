@@ -33,13 +33,6 @@ public class UserServiceImplement implements UserService {
 
         try {
 
-            System.out.println("페이지: " + page);
-            System.out.println("리미트: " + size);
-            System.out.println("이름: " + Name);
-            System.out.println("정렬: " + Sort);
-
-
-
             // userId로 관리자 계정 조회
             User manager = userRepository.findByUserId(userId);
             // 정보가 없거나 관리자가 아니라면 실패 응답 반환

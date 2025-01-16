@@ -22,7 +22,7 @@ const SearchFilter = ({ setSearchName }: { setSearchName: (name: string) => void
     //          render: 주문자 이름 검색 필터 컴포넌트 렌더링             //
     return (
         <SearchFilterE>
-            <Input value={value} onChange={(e) => setValue(e.target.value)} placeholder={'이름을 입력해주세요'}></Input>
+            <Input value={value} onChange={(e) => setValue(e.target.value)} placeholder={'이름 또는 번호를 입력해주세요'}></Input>
             {value === "" ?
                 <IoSearch size={20} color={"var(--orange)"} />
                 :

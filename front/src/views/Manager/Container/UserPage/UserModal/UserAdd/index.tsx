@@ -5,12 +5,12 @@ import { ResponseDto } from 'apis/response';
 import { FaCaretDown } from "react-icons/fa";
 import { useCookies } from 'react-cookie';
 import { useBlackModalStore } from 'store/modal';
+import { useUserPageModalStore } from 'store/manager';
 import { defaultUserImage, formattedPoint } from 'constant';
 import { ChangeEvent, forwardRef, memo, useEffect, useRef } from 'react';
 import { JraumSignUpRequestDto, NicknameDpCheckRequestDto, PinDpCheckRequestDto } from 'apis/request/auth';
 import { JraumSignUpResponseDto, NicknameDpcheckResponseDto, PinDpcheckResponseDto } from 'apis/response/auth';
 import { fileUploadRequest, jraumSignUpRequest, nicknameDpCheckRequest, pinDpCheckRequest } from 'apis';
-import useUserPageModalStore from 'store/manager/user-page-modal.store';
 
 
 //              component: 회원 등록 모달 컴포넌트                  //
@@ -22,23 +22,26 @@ const UserAdd = () => {
     //          function: 블랙모달 열고 닫는 함수               //
     const closeModal = useBlackModalStore.getState().closeModal;
 
+    // 상태 가져오기
+    const {
+        pin,
+        name,
+        canPin,
+        nickname,
+        initialName,
+        phoneNumber,
+        canNickname,
+        directPoint,
+        selectedValues,
+        profileImage,
+        resetState, // 상태 초기화 함수
+    } = useUserPageModalStore.getState();
+
     //          event handler: 회원 등록 버튼 클릭 이벤트 함수         //
     const onUserAddClickHandler = () => {
         if (!cookies.managerToken) return;
 
-        // 상태 가져오기
-        const {
-            pin,
-            name,
-            canPin,
-            nickname,
-            initialName,
-            phoneNumber,
-            canNickname,
-            directPoint,
-            selectedValues,
-            profileImage,
-        } = useUserPageModalStore.getState();
+
 
         // 유효성 검사 함수
         const validateInput = () => {
@@ -89,6 +92,11 @@ const UserAdd = () => {
         });
         closeModal();
     }
+
+    // 컴포넌트 언마운트 시 상태 리셋
+    useEffect(() => {
+        return () => resetState(null); // 언마운트 시 상태 초기화
+    }, []);
 
     //              render: 회원 등록 모달 렌더링                   //
     return (

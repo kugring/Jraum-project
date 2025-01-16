@@ -102,12 +102,14 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
                         "       TRIM(REPLACE(o.user.name, ' ', '')) LIKE CONCAT('%', TRIM(REPLACE(:name, ' ', '')), '%')) "
                         +
                         "AND (:status IS NULL OR o.status = :status) " +
+                        "AND (:pin IS NULL OR o.user.pin LIKE CONCAT('%', :pin, '%')) " +
                         "AND (:startOfDay IS NULL OR " +
                         "     (o.createdAt >= :startOfDay AND o.createdAt <= :endOfDay)) " +
                         "GROUP BY o.orderId, o.user.name, o.status, o.user.office, o.user.position, " +
                         "         o.payMethod, o.createdAt, o.updatedAt, o.user.profileImage " +
                         "ORDER BY o.createdAt DESC")
         List<GetOrderListResultSet> findOrderList(
+                        @Param("pin") String pin,
                         @Param("name") String name,
                         @Param("status") String status,
                         @Param("startOfDay") LocalDateTime startOfDay,

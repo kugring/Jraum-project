@@ -38,10 +38,12 @@ public interface PointChargeRepositoy extends JpaRepository<PointCharge, Long> {
         // 포인트 충전 내역 출력할때 사용함함
         @Query("SELECT pc FROM PointCharge pc WHERE "
                         + "(:name IS NULL OR pc.user.name LIKE %:name%) AND "
+                        + "(:pin IS NULL OR pc.user.pin LIKE CONCAT('%', :pin, '%')) AND "
                         + "(:status IS NULL OR pc.status = :status) AND "
                         + "(:startOfDay IS NULL OR pc.createdAt >= :startOfDay) AND "
                         + "(:endOfDay IS NULL OR pc.createdAt <= :endOfDay)")
         List<PointCharge> findChargeList(
+                        @Param("pin") String pin,
                         @Param("name") String name,
                         @Param("status") String status,
                         @Param("startOfDay") LocalDateTime startOfDay,

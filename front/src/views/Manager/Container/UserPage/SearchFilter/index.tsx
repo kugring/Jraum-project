@@ -1,17 +1,15 @@
 import styled from 'styled-components'
 import useDebounced from 'hooks/useDebounced';
-import { IoSearch } from 'react-icons/io5'
+import { IoClose, IoSearch } from 'react-icons/io5'
 import { memo, useEffect, useState } from 'react'
-
 
 
 //              component: 주문자 이름 검색 필터 컴포넌트              //
 const SearchFilter = ({setSearchName} : {setSearchName: (name: string) => void}) => {
 
     //         state: 이름 상태       //
-    const [value, seValue] = useState('');
-
-;
+    const [value, setValue] = useState('');
+    
     //          function: 이름 입력에 대한 디바운드 설정 함수           //
     const debouncedName = useDebounced(value, 500);
 
@@ -23,8 +21,12 @@ const SearchFilter = ({setSearchName} : {setSearchName: (name: string) => void})
     //          render: 주문자 이름 검색 필터 컴포넌트 렌더링             //
     return (
         <SearchFilterE>
-            <Input value={value} onChange={(e) => seValue(e.target.value)} placeholder={'이름 또는 번호를 입력해주세요'}></Input>
-            <IoSearch size={20} color={"var(--orange)"} />
+            <Input value={value} onChange={(e) => setValue(e.target.value)} placeholder={'이름 또는 번호를 입력해주세요'}></Input>
+            {value === "" ?
+                <IoSearch size={20} color={"var(--orange)"} />
+                :
+                <IoClose size={20} color={"var(--orange)"} onClick={() => setValue("")} />
+            }
         </SearchFilterE>
     )
 }

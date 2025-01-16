@@ -338,7 +338,7 @@ public class OrderServiceImplement implements OrderService {
 
     @Override
     public ResponseEntity<? super GetOrderListResponseDto> getOrderList(
-            String userId, int page, int size, String nameD, String statusD, String dateD) {
+            String userId, int page, int size, String Name, String Status, String Date) {
 
         List<GetOrderListResultSet> list = null;
 
@@ -355,23 +355,30 @@ public class OrderServiceImplement implements OrderService {
             // 스크롤 이벤트로 인한 데이터 가져오게 도와주는것
             Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
+            // 핀 상태
+            String pin = null;
+
             // 회원이름 정의
-            String name = Objects.isNull(nameD) ? null : "".equals(nameD) ? null : nameD;
-            // String name = (Objects.isNull(nameD) || nameD.isEmpty()) ? null : "%" + nameD
-            // + "%";
+            String name = Objects.isNull(Name) ? null : "".equals(Name) ? null : Name;
+            
+            // Name이 숫자로 된 4자리인지 확인
+            if (name != null && name.matches("\\d+")) {
+                pin = name; // 숫자로 된 4자리라면 pin에 저장
+                name = null; // name은 null로 설정
+            }
 
             // 상태에 정의
-            String status = Objects.isNull(statusD) ? null : "모두".equals(statusD) ? null : statusD;
+            String status = Objects.isNull(Status) ? null : "모두".equals(Status) ? null : Status;
 
             // 자바스크립트 Date타입을 LocalDate로 변환
             // 예외 처리를 추가한 경우
 
-            // dateD가 null이 아니면 LocalDateTime으로 변환하고, null일 경우 null을 반환
-            LocalDateTime startOfDay = Objects.isNull(dateD) ? null : LocalDate.parse(dateD).atStartOfDay();
-            LocalDateTime endOfDay = Objects.isNull(dateD) ? null : LocalDate.parse(dateD).atTime(LocalTime.MAX);
+            // Date가 null이 아니면 LocalDateTime으로 변환하고, null일 경우 null을 반환
+            LocalDateTime startOfDay = Objects.isNull(Date) ? null : LocalDate.parse(Date).atStartOfDay();
+            LocalDateTime endOfDay = Objects.isNull(Date) ? null : LocalDate.parse(Date).atTime(LocalTime.MAX);
 
             // 레파지토리에서 데이터 찾아옴
-            list = orderRepository.findOrderList(name, status, startOfDay, endOfDay, pageable);
+            list = orderRepository.findOrderList(pin, name, status, startOfDay, endOfDay, pageable);
 
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -620,12 +627,12 @@ public class OrderServiceImplement implements OrderService {
     // }).sum();
 
     // // 잔액 확인
-    // int updatedPoint = User.getPoint() - totalPrice;
+    // int upDatePoint = User.getPoint() - totalPrice;
 
     // // 포인트가 음수가 되지 않도록 설정
-    // if (updatedPoint < 0) return PostPointOrderResponseDto.insufficientBlance();
+    // if (upDatePoint < 0) return PostPointOrderResponseDto.insufficientBlance();
     // // 잔여금 저장
-    // User.setPoint(updatedPoint);
+    // User.setPoint(upDatePoint);
 
     // // 수정된_주문_아이템 담기
     // orderList.getOrderList().addAll(orderItems);
