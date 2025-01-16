@@ -1,9 +1,10 @@
-import { defaultUserImage, formattedDate, formattedPoint } from 'constant'
-import React, { useState } from 'react'
-import useUserPageStore from 'store/manager/user-page.store'
-import useBlackModalStore from 'store/modal/black-modal.store'
 import styled from 'styled-components'
+import { isEqual } from 'lodash'
 import { SortedUser } from 'types/interface'
+import { memo, useState } from 'react'
+import { useUserPageStore } from 'store/manager'
+import { useBlackModalStore } from 'store/modal'
+import { defaultUserImage, formattedDate, formattedPoint } from 'constant'
 
 //              component: 회원 목록 카드 컴포넌트                  //
 const Card = ({ user }: { user: SortedUser }) => {
@@ -11,7 +12,7 @@ const Card = ({ user }: { user: SortedUser }) => {
     //              state: 하단 정보 공개 상태                  //
     const [show, setShow] = useState<boolean>(false);
     //          state: 정렬 기준            //
-    const sort = useUserPageStore(state => state.sort);
+    const sort = useUserPageStore.getState().sort;
     //              function: 블랙 모달 여는 함수               //
     const openModal = useBlackModalStore.getState().openModal;
     //              function: 화이트 모달 설정하는 함수               //
@@ -25,9 +26,9 @@ const Card = ({ user }: { user: SortedUser }) => {
         openModal();
     }
 
-    //              render: 회원 목록 카드 렌더링               //
-    return (
-        <CardE>
+    //              subComponent: 카드 탑 서브컴포넌트                  //
+    const CardTopE = () => {
+        return (
             <CardTop onClick={() => setShow(!show)}>
                 <UserInfo>
                     <ProfileImage src={user.profileImage ? user.profileImage : defaultUserImage}></ProfileImage>
@@ -36,14 +37,19 @@ const Card = ({ user }: { user: SortedUser }) => {
                         <Position>{user.position} / {user.office}</Position>
                     </Info>
                 </UserInfo>
-                <CardTopRight onClick={() => console.log(sort)}>
+                <CardTopRight>
                     <UserType>{user.office !== "단체" ? "개인 회원" : "단체 회원"}</UserType>
                     <CurrentPoint>
                         {sort === "번호순" ? `핀: ${user.pin}` : `${formattedPoint(user.point)}원`}
                     </CurrentPoint>
                 </CardTopRight>
             </CardTop>
-            <CardBottom $show={show}>
+        )
+    }
+    //              subComponent: 카드 바텀 서브컴포넌트                  //
+    const CardBottomE = () => {
+        return (
+            <>
                 <OrderDate>
                     <YYYYMMDD>{formattedDate(user.createdAt)}</YYYYMMDD>
                     <Pin>
@@ -74,13 +80,22 @@ const Card = ({ user }: { user: SortedUser }) => {
                     <Cancel onClick={() => setShow(false)}>닫기</Cancel>
                     <Completed onClick={editUserModal}>정보 수정</Completed>
                 </Buttons>
+            </>
+        )
+    }
+
+    //              render: 회원 목록 카드 렌더링               //
+    return (
+        <CardE>
+            <CardTopE />
+            <CardBottom $show={show}>
+                <CardBottomE />
             </CardBottom>
         </CardE>
     )
 }
 
-export default Card
-
+export default memo(Card, (prevProps, nextProps) => isEqual(prevProps.user.userId, nextProps.user.userId));
 
 
 const CardE = styled.div`

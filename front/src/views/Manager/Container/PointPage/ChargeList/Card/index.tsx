@@ -1,11 +1,12 @@
 import { defaultUserImage, formattedPoint } from 'constant'
 import { fromNow } from 'helpers/dayjs'
+import { isEqual } from 'lodash'
+import { memo } from 'react'
 import styled from 'styled-components'
 import PointChargeDetail from 'types/interface/point-charge-detail.interface'
 
 //              component: 포인트 충전 내역 카트 컴포넌트                 //
 const Card = ({ chargeDetail }: { chargeDetail: PointChargeDetail }) => {
-
 
     //              render: 포인트 충전 내역 카드 렌더링                    //
     return (
@@ -28,7 +29,8 @@ const Card = ({ chargeDetail }: { chargeDetail: PointChargeDetail }) => {
     )
 }
 
-export default Card
+export default memo(Card, (prevProps, nextProps) => isEqual(prevProps.chargeDetail.pointChargeId, nextProps.chargeDetail.pointChargeId));
+
 
 
 const CardE = styled.div`

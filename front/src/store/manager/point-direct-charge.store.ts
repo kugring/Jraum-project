@@ -31,7 +31,7 @@ const usePointDirectChargeStore = create<PointDirectChargeStore>()(
     name: '',
     sort: '최근',
     page: 0,
-    limited: 10,
+    limited: 15,
     isLoading: false,
     users: [],
     directPoint: '',

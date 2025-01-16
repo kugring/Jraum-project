@@ -25,7 +25,7 @@ const OrderPageHeader = () => {
     //          subComponent: 서브 페이지                 //
     const SubPageE = ({ subPage }: { subPage: string }) => {
         const subPageText = subPage.replace(" ", "");
-        return <><SubPage $select={useOrderPageStore(state => state.subPage) === subPageText} onClick={() => useOrderPageStore.getState().setSubPage(subPageText)}>{subPage}</SubPage></>
+        return <><SubPage $select={useOrderPageStore(state => state.subPage === subPageText)} onClick={() => useOrderPageStore.getState().setSubPage(subPageText)}>{subPage}</SubPage></>
     }
 
     //              render: 관리자 주문 페이지 헤더 렌더링                  //

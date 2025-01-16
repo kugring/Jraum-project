@@ -5,18 +5,19 @@ import styled from 'styled-components'
 //              component: 관리자 포인트 페이지 헤더 컴포넌트               //
 const PointPageHeader = () => {
 
-    //          state: 서브 페이지 상태               //
-    const subPage = usePointPageStore(state => state.subPage);    
-    //          function: 서브 페이지를 설정하는 함수               //
-    const setSubPage = usePointPageStore.getState().setSubPage;
+    //          subComponent: 서브 페이지                 //
+    const SubPageE = ({ subPage }: { subPage: string }) => {
+        const subPageText = subPage.replace(" ", "");
+        return <><SubPage $select={usePointPageStore(state => state.subPage === subPageText)} onClick={() => usePointPageStore.getState().setSubPage(subPageText)}>{subPage}</SubPage></>
+    }
 
     //              render: 관리자 포인트 페이지 헤더 렌더링                //
     return (
         <Header>
             <SubPageBox>
-                <SubPage $select={subPage === "직접충전"} onClick={() => setSubPage("직접충전")}>직접 충전</SubPage>
-                <SubPage $select={subPage === "충전요청"} onClick={() => setSubPage("충전요청")}>충전 요청</SubPage>
-                <SubPage $select={subPage === "충전내역"} onClick={() => setSubPage("충전내역")}>충전 내역</SubPage>
+                <SubPageE subPage={'직접 충전'}/>
+                <SubPageE subPage={'충전 요청'}/>
+                <SubPageE subPage={'충전 내역'}/>
             </SubPageBox>
         </Header>
     )

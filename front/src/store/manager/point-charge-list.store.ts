@@ -3,17 +3,18 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
 interface PointChargeListStore {
+    end: boolean;
     name: string;
     page: number;
     status: string;
     limited: number;
     isLoading: boolean;
     chargeList: PointChargeDetail[];
+    setEnd: (boolean: boolean) => void;
     setName: (name: string) => void;
     setPage: (page: number) => void;
     setStatus: (status: string) => void;
-    setChargeList: (chargeList: PointChargeDetail[]) => void;
-
+    addChargeList: (chargeList: PointChargeDetail[]) => void;
     setIsLoading: (isLoading: boolean) => void;
     setLimited: (limited: number) => void;
     resetChargeList: () => void;
@@ -22,16 +23,18 @@ interface PointChargeListStore {
 // Zustand 상태 생성
 const usePointChargeListStore = create<PointChargeListStore>()(
     devtools((set) => ({
+        end: false,
         name: '',
         page: 0,
         status: '모두',
         limited: 10,
         isLoading: false,
         chargeList: [],
+        setEnd: (boolean: boolean) => set({ end: boolean }),
         setName: (name: string) => set({ name }),
         setPage: (page: number) => set({ page }),
         setStatus: (status: string) => set({ status }),
-        setChargeList: (newChargeList: PointChargeDetail[]) =>
+        addChargeList: (newChargeList: PointChargeDetail[]) =>
             set((state) => {
                 // 기존 chargeList와 newChargeList를 합친 후 중복 제거
                 const updatedChargeList = [...state.chargeList, ...newChargeList];

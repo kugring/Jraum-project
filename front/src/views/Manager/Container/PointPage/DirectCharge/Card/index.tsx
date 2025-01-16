@@ -1,16 +1,17 @@
 import styled from 'styled-components'
-import { useState } from 'react'
+import { toast } from 'react-toastify'
+import { isEqual } from 'lodash'
 import { useCookies } from 'react-cookie'
 import { SortedUser } from 'types/interface'
 import { ResponseDto } from 'apis/response'
-import useBlackModalStore from 'store/modal/black-modal.store'
+import { memo, useState } from 'react'
+import { useBlackModalStore } from 'store/modal'
 import { IoCaretDownOutline } from 'react-icons/io5'
-import usePointDirectChargeStore from 'store/manager/point-direct-charge.store'
+import { usePointDirectChargeStore } from 'store/manager'
 import { postPointDirectChargeRequest } from 'apis'
 import { PostPointDirectChargeRequestDto } from 'apis/request/pointCharge'
 import { PostPointDirectChargeResponseDto } from 'apis/response/pointCharge'
 import { defaultUserImage, formattedPoint } from 'constant'
-import { toast } from 'react-toastify'
 
 //              component: 포인트 직접 충전 컴포넌트                  //
 const Card = ({ user }: { user: SortedUser }) => {
@@ -69,9 +70,8 @@ const Card = ({ user }: { user: SortedUser }) => {
         setWhiteModal("안내창");
         setMessage("직접 충전하시겠습니까?")
         setCallback(onDirectCharge);
-        console.log(chargePoint);
-
     }
+
 
     //              render: 포인트 직접 충전 렌더링                 //
     return (
@@ -102,7 +102,7 @@ const Card = ({ user }: { user: SortedUser }) => {
     )
 }
 
-export default Card
+export default  memo(Card, (prevProps, nextProps) => isEqual(prevProps.user.userId, nextProps.user.userId));
 
 
 

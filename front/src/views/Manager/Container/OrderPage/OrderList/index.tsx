@@ -126,7 +126,7 @@ const CardBoxE = () => {
         const { orders } = responseBody as GetOrderListResponseDto;
         addOrders(orders);
         setIsLoading(false);
-        if (orders.length < 10) { setEnd(true); }
+        if (orders.length < limit) { setEnd(true); }
     }
 
     //          function: 주문 목록 불러오는 함수            //
@@ -276,6 +276,6 @@ const CardBox = styled.div`
 `
 
 const Message = styled.div`
-    transform: translateY(2vh);
+    padding: 24px;
     color: var(--copperBrown);
 `

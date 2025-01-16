@@ -1,17 +1,76 @@
-import styled from 'styled-components'
-import { HiUserAdd } from "react-icons/hi";
-import useBlackModalStore from 'store/modal/black-modal.store';
 import Card from './Card';
+import styled from 'styled-components'
+import SearchFilter from './SearchFilter';
+import { HiUserAdd } from "react-icons/hi";
 import { useEffect } from 'react';
 import { useCookies } from 'react-cookie';
+import { ResponseDto } from 'apis/response';
+import { useUserPageStore } from 'store/manager';
+import { useBlackModalStore } from 'store/modal';
 import { getSortedUserRequest } from 'apis';
 import { GetSortedUserResponseDto } from 'apis/response/user';
-import { ResponseDto } from 'apis/response';
-import SearchFilter from './SearchFilter';
-import useUserPageStore from 'store/manager/user-page.store';
+import { useQuery } from '@tanstack/react-query';
 
 //              component: 회원 페이지 컴포넌트                 //
 const UserPage = () => {
+
+    //                render: 회원 페이지 렌더링                  ..
+    return (
+        <UserPageE>
+            <FilterE />
+            <CardBoxE />
+        </UserPageE>
+    )
+}
+export default UserPage
+
+
+//              subComponent: 회원 필터 컴포넌트                //
+const FilterE = () => {
+
+    //      function: 회원 모달 여는 함수       //
+    const openModal = useBlackModalStore(state => state.openModal);
+    //      function: 회원 모달 여는 함수       //
+    const setWhiteModal = useBlackModalStore(state => state.setWhiteModal);
+    //      function: 회원등록 모달 여는 함수      //
+    const userAdd = () => {
+        openModal()
+        setWhiteModal("회원등록")
+    }
+
+    //              function: 정렬 클릭 이벤트 핸드러               //
+    const onSortClickHandler = (sort: string) => {
+        const setEnd = useUserPageStore.getState().setEnd;
+        const setPage = useUserPageStore.getState().setPage;
+        const setSort = useUserPageStore.getState().setSort;
+        setSort(sort);
+        setEnd(false);
+        setPage(0);
+    }
+    //              function: 이름 설정 함수                //
+    const setName = useUserPageStore(state => state.setName);
+
+    //              subComponent: 장렬 버튼 컴포넌트                //
+    const SquanceE = ({ Sort }: { Sort: string }) => { return (<Squance $select={useUserPageStore(state => state.sort === Sort)} onClick={() => onSortClickHandler(Sort)}>{Sort}</Squance>) }
+
+    //              render: 회원 필터 렌더링                //
+    return (
+        <Filter>
+            <ButtonFilter>
+                <SquanceE Sort={"최근"} />
+                <SquanceE Sort={"이름"} />
+                <SquanceE Sort={"등록"} />
+                <SquanceE Sort={"번호"} />
+                <UserAdd onClick={userAdd} size={24} color={"#FFF"} />
+            </ButtonFilter>
+            <SearchFilter setSearchName={setName} />
+        </Filter>
+    )
+}
+
+
+//              subComponent: 회원 카드 박스 서브 컴포넌트                  //
+const CardBoxE = () => {
 
     //          state: 쿠키 상태            //
     const [cookies,] = useCookies(['managerToken']);
@@ -37,35 +96,23 @@ const UserPage = () => {
     const setUsers = useUserPageStore.getState().setUsers;
     const resetUsers = useUserPageStore.getState().resetUsers;
     const setIsLoading = useUserPageStore.getState().setIsLoading;
-    const setName = useUserPageStore(state => state.setName);
 
 
-    //      function: 회원 모달 여는 함수       //
-    const openModal = useBlackModalStore(state => state.openModal);
-    //      function: 회원 모달 여는 함수       //
-    const setWhiteModal = useBlackModalStore(state => state.setWhiteModal);
-    //      function: 회원등록 모달 여는 함수      //
-    const userAdd = () => {
-        openModal()
-        setWhiteModal("회원등록")
-    }
-
-    //          function: 정렬된 회원 목록 가져오는 함수           //
-    const getSortedUser = () => {
-
-        const SORT_MAPPING: Record<string, string> = {
-            "최근": "updatedAt",
-            "이름": "name",
-            "등록": "createdAt",
-            "번호": "pin",
-        };
-
-        const sorted = SORT_MAPPING[sort] || "";
-
-        getSortedUserRequest(cookies.managerToken, page, limit, name, sorted).then(getSortedUserResponse)
-    }
-
-
+    //          function: 회원 목록 불러오는 함수            //
+    const { data: usersQ, isSuccess } = useQuery<GetSortedUserResponseDto>({
+        queryKey: ['usuersQ', page, limit, name, sort],  // 의존성 배열에 상태를 추가하여 쿼리 실행
+        queryFn: () => {
+            const SORT_MAPPING: Record<string, string> = {
+                "최근": "updatedAt",
+                "이름": "name",
+                "등록": "createdAt",
+                "번호": "pin",
+            };
+            const sorted = SORT_MAPPING[sort] || "";
+            return getSortedUserRequest(cookies.managerToken, page, limit, name, sorted);
+        },
+        staleTime: 1000 * 3, // 3초
+    });
 
 
     //          function:  정렬된 회원 목록 처리 하는는 함수            //
@@ -86,6 +133,26 @@ const UserPage = () => {
         }
     }
 
+    //          effect: 데이터 성공적으로 불러왔을 때 처리          //
+    useEffect(() => {
+        //          주문자 이름, 상태, 날짜가 변경될 때마다 기존 주문을 리셋하고 새로 데이터를 요청합니다.
+        resetUsers(); // 기존 주문 목록을 리셋
+        setPage(0); // 페이지 번호를 0으로 초기화
+        setEnd(false); // 끝 상태를 false로 초기화
+        setIsLoading(true); // 로딩 상태를 true로 설정
+
+        // 데이터 요청을 위한 새로운 API 호출
+        // setIsLoading 상태 변경 후 바로 getOrderListRequest를 호출합니다.
+    }, [name, sort]); // name, status, date가 변경될 때마다 실행됩니다.
+
+    //          effect: 데이터 불러오기 성공 시 처리          //
+    useEffect(() => {
+        if (isSuccess && usersQ) {
+            getSortedUserResponse(usersQ);
+        }
+    }, [isSuccess, usersQ]);
+
+
 
     //          function: 스크롤 이벤트 핸들러          //
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -99,59 +166,23 @@ const UserPage = () => {
         }
     };
 
-    //          function: 정렬 클릭 이벤트 핸드러               //
-    const onSortClickHandler = (sort: string) => {
-        setSort(sort);
-        setEnd(false);
-        setPage(0);
-    }
-
-    //          effect: 이름, 상태, 날짜가 변경되면 페이지 리셋하고 다시 불러오기       //
-    useEffect(() => {
-        setPage(0);
-        resetUsers();
-        getSortedUser();
-        setIsLoading(false);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [name, sort]);
-
-    //          effect: 이름, 상태, 날짜가 변경되면 페이지 리셋하고 다시 불러오기       //
-    useEffect(() => {
-        if (page === 0) {
-            return;
-        } else {
-            getSortedUser();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page]);
 
     //          effect: 언마운트 될때만 실행되는 이펙트             //
-    useEffect(() => () => {setSort("최근"); setPage(0);setEnd(false);}, [setSort, setPage, setEnd]);
+    useEffect(() => () => { setSort("최근"); setPage(0); setEnd(false); }, [setSort, setPage, setEnd]);
 
-    //                render: 회원 페이지 렌더링                  ..
+    //              render: 회원 카드 박스 렌더링                  //
     return (
-        <UserPageE>
-            <Filter>
-                <ButtonFilter>
-                    <Squance $select={sort === "최근"} onClick={() => onSortClickHandler("최근")}>최근</Squance>
-                    <Squance $select={sort === "이름"} onClick={() => onSortClickHandler("이름")}>이름</Squance>
-                    <Squance $select={sort === "등록"} onClick={() => onSortClickHandler("등록")}>등록</Squance>
-                    <Squance $select={sort === "번호"} onClick={() => onSortClickHandler("번호")}>번호</Squance>
-                    <UserAdd onClick={userAdd} size={24} color={"#FFF"} />
-                </ButtonFilter>
-                <SearchFilter setSearchName={setName} />
-            </Filter>
-            <CardBox onScroll={handleScroll}>
-                {users.map((user) => (
-                    <Card key={user.userId} user={user} />
-                ))}
-                {!end && isLoading && <div>Loading...</div>}
-                {end && <div>끝</div>}
-            </CardBox>
-        </UserPageE>
+        <CardBox onScroll={handleScroll}>
+            {users.map((user) => (
+                <Card key={user.userId} user={user} />
+            ))}
+            {!end && isLoading && <Message>Loading...</Message>}
+            {end && <Message>--- 더이상 데이터 없음 ---</Message>}
+        </CardBox>
     )
 }
-export default UserPage
+
+
 
 
 
@@ -209,6 +240,7 @@ const UserAdd = styled(HiUserAdd)`
 const CardBox = styled.div`
     display: flex;
     flex-direction: column;
+    align-items: center;
     width: 100%;
     height: 100%;
     gap: 4px;
@@ -218,4 +250,9 @@ const CardBox = styled.div`
     &::-webkit-scrollbar {              // 크롬
     display: none;
     }
+`
+
+const Message = styled.div`
+    color: var(--copperBrown);
+    padding: 24px;
 `

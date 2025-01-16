@@ -35,7 +35,7 @@ const authorization = (accessToken: string) => {
 
 //  기존에는 포트를 적어줘야 했지는 https 통신으로 443으로 고정됨됨
 // const DOMAIN = 'https://' + TEST_DOMAIN + ':4000';
-const DOMAIN = TEST_DOMAIN; 
+const DOMAIN = TEST_DOMAIN;
 
 
 
@@ -150,12 +150,21 @@ const GET_SORTED_USER_URL = (page: number, size: number, name?: string, sort?: s
 };
 const PATCH_USER_EDIT_URL = () => `${API_DOMAIN}/user/manager/edit`;
 
+// export const getSortedUserRequest = async (accessToken: string, page: number = 0, size: number = 10, name?: string, sort?: string) => {
+//     const result = await axios.get(GET_SORTED_USER_URL(page, size, name, sort), authorization(accessToken))
+//         .then(responseHandler<GetSortedUserResponseDto>)
+//         .catch(errorHandler)
+//     return result;
+// }
 export const getSortedUserRequest = async (accessToken: string, page: number = 0, size: number = 10, name?: string, sort?: string) => {
-    const result = await axios.get(GET_SORTED_USER_URL(page, size, name, sort), authorization(accessToken))
-        .then(responseHandler<GetSortedUserResponseDto>)
-        .catch(errorHandler)
-    return result;
-}
+    try {
+        const result = await axios.get(GET_SORTED_USER_URL(page, size, name, sort), authorization(accessToken));
+        return responseHandler<GetSortedUserResponseDto>(result);
+    } catch (error) {
+        // 에러를 React Query에서 관리하도록 그대로 던짐
+        throw errorHandler(error);
+    }
+};
 
 export const patchUserEditRequest = async (request: PatchUserEditRequestDto, accessToken: string) => {
     const result = await axios.patch(PATCH_USER_EDIT_URL(), request, authorization(accessToken))
@@ -316,12 +325,22 @@ export const patchPointChargeDeclineRequest = async (requestBody: PatchPointChar
     return result;
 }
 
+// export const getPointChargeListRequest = async (accessToken: string, page: number = 0, size: number = 10, name?: string, status?: string, date?: string) => {
+//     const result = await axios.get(GET_POINT_CHARGE_List_URL(page, size, name, status, date), authorization(accessToken))
+//         .then(responseHandler<GetPointChargeListResponseDto>)
+//         .catch(errorHandler)
+//     return result;
+// }
+
 export const getPointChargeListRequest = async (accessToken: string, page: number = 0, size: number = 10, name?: string, status?: string, date?: string) => {
-    const result = await axios.get(GET_POINT_CHARGE_List_URL(page, size, name, status, date), authorization(accessToken))
-        .then(responseHandler<GetPointChargeListResponseDto>)
-        .catch(errorHandler)
-    return result;
-}
+    try {
+        const result = await axios.get(GET_POINT_CHARGE_List_URL(page, size, name, status, date), authorization(accessToken));
+        return responseHandler<GetPointChargeListResponseDto>(result);
+    } catch (error) {
+        // 에러를 React Query에서 관리하도록 그대로 던짐
+        throw errorHandler(error);
+    }
+};
 
 export const getPointChargePendingRequest = async (accessToken: string) => {
     const result = await axios.get(GET_POINT_CHARGE_PENDING_URL(), authorization(accessToken))
@@ -392,13 +411,13 @@ export const postPointOrderRequest = async (requestBody: PostPointOrderRequestDt
 
 export const getOrderManagementRequest = async (accessToken: string): Promise<GetOrderManagementResponseDto> => {
     try {
-      const response = await axios.get(GET_ORDER_MANAGEMENT_URL(), authorization(accessToken));
-      return responseHandler<GetOrderManagementResponseDto>(response);
+        const response = await axios.get(GET_ORDER_MANAGEMENT_URL(), authorization(accessToken));
+        return responseHandler<GetOrderManagementResponseDto>(response);
     } catch (error) {
-      // 에러를 React Query에서 관리하도록 그대로 던짐
-      throw errorHandler(error);
+        // 에러를 React Query에서 관리하도록 그대로 던짐
+        throw errorHandler(error);
     }
-  };
+};
 
 
 // export const getOrderListRequest = async (accessToken: string, page: number = 0, size: number = 10, name?: string, status?: string, date?: string) => {

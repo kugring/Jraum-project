@@ -1,15 +1,16 @@
 import styled from 'styled-components'
+import { toast } from 'react-toastify';
 import { CiEdit } from "react-icons/ci";
+import { ResponseDto } from 'apis/response';
 import { FaCaretDown } from "react-icons/fa";
-import { fileUploadRequest, jraumSignUpRequest, nicknameDpCheckRequest, pinDpCheckRequest } from 'apis';
-import { defaultUserImage, formattedPoint } from 'constant';
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
-import useBlackModalStore from 'store/modal/black-modal.store';
 import { useCookies } from 'react-cookie';
+import { useBlackModalStore } from 'store/modal';
+import { defaultUserImage, formattedPoint } from 'constant';
+import { ChangeEvent, memo, useEffect, useRef } from 'react';
 import { JraumSignUpRequestDto, NicknameDpCheckRequestDto, PinDpCheckRequestDto } from 'apis/request/auth';
 import { JraumSignUpResponseDto, NicknameDpcheckResponseDto, PinDpcheckResponseDto } from 'apis/response/auth';
-import { ResponseDto } from 'apis/response';
-import { toast } from 'react-toastify';
+import { fileUploadRequest, jraumSignUpRequest, nicknameDpCheckRequest, pinDpCheckRequest } from 'apis';
+import useUserPageModalStore from 'store/manager/user-page-modal.store';
 
 
 //              component: 회원 등록 모달 컴포넌트                  //
@@ -17,39 +18,45 @@ const UserAdd = () => {
 
     //          state: 쿠키 상태                //
     const [cookies,] = useCookies();
-    //          state: 메뉴 이미지 상태             //
-    const [profileImage, setProfileImage] = useState<string>('');
+
     //          state: 핀 상태              //
-    const [pin, setPin] = useState<string>("");
+    const pin = useUserPageModalStore(state => state.pin)
     //          state: 핀 가능 상태              //
-    const [canPin, setCanPin] = useState<boolean>(false);
+    const canPin = useUserPageModalStore(state => state.canPin)
     //          state: 이름 상태              //
-    const [name, setName] = useState<string>("");
-    //          state: 이름 상태              //
-    const [initialName, setInitialName] = useState<string>("");
+    const name = useUserPageModalStore(state => state.name)
+    //          state: 초성 상태              //
+    const initialName = useUserPageModalStore(state => state.initialName)
     //          state: 닉네임 상태              //
-    const [nickname, setNickname] = useState<string>("");
+    const nickname = useUserPageModalStore(state => state.nickname)
     //          state: 닉네임 가능 상태              //
-    const [canNickname, setCanNickname] = useState<boolean>(false);
+    const canNickname = useUserPageModalStore(state => state.canNickname)
     //          state: 전화번호 상태              //
-    const [phoneNumber, setPhoneNumber] = useState<string>("");
+    const phoneNumber = useUserPageModalStore(state => state.phoneNumber)
     //          state: 직접 충전 포인트 상태              //
-    const [directPoint, setDirectPoint] = useState<string>("0");
-    //            state: 이미지 파일 인풋 참조 상태           //
-    const imageInputRef = useRef<HTMLInputElement | null>(null);
-    //          state: 드랍다운 열림림 상태              //
-    const [openDropdowns, setOpenDropdowns] = useState<{ [key: string]: boolean }>({
-        office: false,
-        position: false,
-    });
+    const directPoint = useUserPageModalStore(state => state.directPoint)
+
+    //          state: 드랍다운 열림 상태              //
+    const openDropdowns = useUserPageModalStore(state => state.openDropdowns)
     //          state: 드롭다운의 값 상태               //
-    const [selectedValues, setSelectedValues] = useState({
-        office: "선택",
-        position: "선택",
-    });
+    const selectedValues = useUserPageModalStore(state => state.selectedValues)
+
     //          state: 드롭다운의 참조 상태             //
     const officeRef = useRef<HTMLDivElement>(null);
     const positionRef = useRef<HTMLDivElement>(null);
+
+    //          function: 회원 페이지 모달 설정 함수                //
+    const setPin = useUserPageModalStore.getState().setPin;
+    const setCanPin = useUserPageModalStore.getState().setCanPin;
+    const setName = useUserPageModalStore.getState().setName;
+    const setInitialName = useUserPageModalStore.getState().setInitialName;
+    const setNickname = useUserPageModalStore.getState().setNickname;
+    const setCanNickname = useUserPageModalStore.getState().setCanNickname;
+    const setPhoneNumber = useUserPageModalStore.getState().setPhoneNumber;
+    const setDirectPoint = useUserPageModalStore.getState().setDirectPoint;
+    const setOpenDropdowns = useUserPageModalStore.getState().setOpenDropdowns;
+    const setSelectedValues = useUserPageModalStore.getState().setSelectedValues;
+
 
     //          function: 블랙모달 열고 닫는 함수               //
     const closeModal = useBlackModalStore.getState().closeModal;
@@ -141,57 +148,43 @@ const UserAdd = () => {
         setPhoneNumber(formattedValue); // 상태에 포맷팅된 전화번호 값 저장
     };
     //          function: 토글을 열고 닫는 함수             //
-    const toggleDropdown = (dropdown: string) => {
-        setOpenDropdowns((prev) => ({
-            ...prev,
-            [dropdown]: !prev[dropdown],
+    const toggleDropdown = (dropdown: "office" | "position") => {
+        setOpenDropdowns((prevState) => ({
+            ...prevState, // 기존 상태를 유지
+            [dropdown]: !prevState[dropdown], // 해당 드롭다운의 상태를 반전시켜서 토글
         }));
     };
+
     //          event handler: 드롭박스 옵션 클릭 이벤트 핸들러             //
     const handleOptionClick = (dropdown: string, value: string) => {
         console.log(dropdown, value);
-        setSelectedValues((prev) => ({
-            ...prev,
-            [dropdown]: value,
+        // selectedValues 상태 업데이트
+        setSelectedValues((prevState) => ({
+            ...prevState, // 이전 상태를 유지하면서
+            [dropdown]: value, // 동적으로 키 설정
         }));
-        setOpenDropdowns((prev) => ({
-            ...prev,
-            [dropdown]: false,
+
+        // openDropdowns 상태 업데이트 (해당 드롭다운을 닫음)
+        setOpenDropdowns((prevState) => ({
+            ...prevState, // 이전 상태를 유지하면서
+            [dropdown]: false, // 해당 드롭다운 상태를 닫음
         }));
     };
-    //          event handler: 드롭박스 외부 클릭 이벤트 핸들러             //
-    const handleClickOutside = (e: MouseEvent) => {
-        if (officeRef.current && !officeRef.current.contains(e.target as Node)) {
-            setOpenDropdowns((prev) => ({
-                ...prev,
-                office: false,
-            }));
-        }
-        if (positionRef.current && !positionRef.current.contains(e.target as Node)) {
-            setOpenDropdowns((prev) => ({
-                ...prev,
-                position: false,
-            }));
-        }
-    };
-    //            function: file upload response 처리 함수           //
-    const fileUploadResponse = (image: string | null) => {
-        if (!image) return
-        setProfileImage(image);
-    }
-    //            event handler: 프로필 이미지 변경 이벤트 처리            //
-    const onImageChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
-        if (!event.target.files || !event.target.files.length) return;
-        const file = event.target.files[0];
-        const data = new FormData();
-        data.append('file', file);
-        fileUploadRequest(data).then(fileUploadResponse)
-    }
-    //            event handler: 프로필 박스 클릭 이벤트 처리            //
-    const onProfileImageBoxClickHandler = () => {
-        if (!imageInputRef.current) return;
-        imageInputRef.current.click();
-    }
+    // //          event handler: 드롭박스 외부 클릭 이벤트 핸들러             //
+    // const handleClickOutside = (e: MouseEvent) => {
+    //     if (officeRef.current && !officeRef.current.contains(e.target as Node)) {
+    //         setOpenDropdowns((prev) => ({
+    //             ...prev,
+    //             office: false,
+    //         }));
+    //     }
+    //     if (positionRef.current && !positionRef.current.contains(e.target as Node)) {
+    //         setOpenDropdowns((prev) => ({
+    //             ...prev,
+    //             position: false,
+    //         }));
+    //     }
+    // };
 
     //          event handler: 회원 등록 버튼 클릭 이벤트 함수         //
     const onUserAddClickHandler = () => {
@@ -212,7 +205,7 @@ const UserAdd = () => {
             nickname: nickname,
             phoneNumber: phoneNumber,
             initialName: initialName,
-            profileImage: profileImage
+            profileImage: useUserPageModalStore.getState().profileImage
         }
         jraumSignUpRequest(requestBody, cookies.managerToken).then(jraumSignUpResponse)
     };
@@ -229,59 +222,118 @@ const UserAdd = () => {
             autoClose: 1500,
             position: "top-center",
             closeOnClick: true, // 클릭 시 바로 사라짐
-          });
+        });
         closeModal();
     }
 
-    //            effect: 드롭다운 외부 클릭 이벤트 이펙터                //
-    useEffect(() => {
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
+
+    //                  subComponent: 프로필 서브 컴포넌트                  //
+    const ProfileImageBoxE = () => {
+        //          state: 메뉴 이미지 상태             //
+        const profileImage = useUserPageModalStore(state => state.profileImage)
+
+        //            state: 이미지 파일 인풋 참조 상태           //
+        const imageInputRef = useRef<HTMLInputElement | null>(null);
+
+        //            event handler: 프로필 박스 클릭 이벤트 처리            //
+        const onProfileImageBoxClickHandler = () => {
+            if (!imageInputRef.current) return;
+            imageInputRef.current.click();
+        }
+
+        //            function: file upload response 처리 함수           //
+        const fileUploadResponse = (image: string | null) => {
+            const setProfileImage = useUserPageModalStore.getState().setProfileImage;
+            if (!image) return
+            setProfileImage(image);
+        }
+        //            event handler: 프로필 이미지 변경 이벤트 처리            //
+        const onImageChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+            if (!event.target.files || !event.target.files.length) return;
+            const file = event.target.files[0];
+            const data = new FormData();
+            data.append('file', file);
+            fileUploadRequest(data).then(fileUploadResponse)
+        }
+        return (
+            <ProfileImageBox onClick={() => { onProfileImageBoxClickHandler(); console.log("눌리긴함?"); }}>
+                <PropfileImage style={{ backgroundImage: `url(${profileImage ? profileImage : defaultUserImage})` }}></PropfileImage>
+                <ProfileImageEdit size={16} />
+                <input ref={imageInputRef} type='file' accept='image/*' style={{ display: 'none' }} onChange={onImageChangeHandler} />
+            </ProfileImageBox>
+        )
+    }
+
+    const OptionBoxE = ({ dropdown, list }: { dropdown: "office" | "position"; list: string[] }) => {
+        const optionRef = useRef<HTMLDivElement | null>(null);
+
+        // 외부 클릭 감지 핸들러
+        const handleClickOutside = (e: MouseEvent) => {
+            if (optionRef.current && !optionRef.current.contains(e.target as Node)) {
+                setOpenDropdowns((prev) => ({
+                    ...prev,
+                    [dropdown]: false, // 해당 드롭다운만 닫음
+                }));
+            }
+        };
+
+        // 외부 클릭 이벤트를 등록 및 해제
+        useEffect(() => {
+            if (openDropdowns[dropdown]) {
+                document.addEventListener("mousedown", handleClickOutside);
+                console.log("열음");
+                
+            } else {
+                document.removeEventListener("mousedown", handleClickOutside);
+                console.log("닫음");
+            }
+            return () => {
+                document.removeEventListener("mousedown", handleClickOutside);
+                console.log("언마운트");
+            };
+        }, [selectedValues[dropdown]]); // dropdown 변경 시 이벤트를 재설정
+
+        return (
+            <OptionBox $isOpen={openDropdowns[dropdown]} ref={optionRef}>
+                {list.map((item) => (
+                    <Option
+                        key={item}
+                        $action={selectedValues[dropdown] === item}
+                        onClick={() => handleOptionClick(dropdown, item)}
+                    >
+                        {item}
+                    </Option>
+                ))}
+            </OptionBox>
+        );
+    };
 
     //              render: 회원 등록 모달 렌더링                   //
     return (
         <UserAddE>
             <Title>회원 등록</Title>
-            <ProfileImageBox onClick={onProfileImageBoxClickHandler}>
-                <PropfileImage style={{ backgroundImage: `url(${profileImage ? profileImage : defaultUserImage})` }}></PropfileImage>
-                <ProfileImageEdit size={16} />
-                <input ref={imageInputRef} type='file' accept='image/*' style={{ display: 'none' }} onChange={onImageChangeHandler} />
-            </ProfileImageBox>
+            <ProfileImageBoxE />
             <InputContainer>
                 <HeaderInputBox>
-                    <InputBox ref={positionRef}>
+                    <InputBox>
                         <InputTitle>부서*</InputTitle>
                         <DropDown onClick={() => toggleDropdown("position")}>
                             <Value style={{ opacity: selectedValues.position === "선택" ? 0.5 : 1 }}>{selectedValues.position}</Value>
                             <FaCaretDown />
                         </DropDown>
-                        <OptionBox $isOpen={openDropdowns.position}>
-                            <Option $action={selectedValues.position === "기타"} onClick={() => handleOptionClick("position", "기타")}>기타</Option>
-                            <Option $action={selectedValues.position === "유치부"} onClick={() => handleOptionClick("position", "유치부")}>유치부</Option>
-                            <Option $action={selectedValues.position === "아동부"} onClick={() => handleOptionClick("ofpositionfice", "아동부")}>아동부</Option>
-                            <Option $action={selectedValues.position === "중고등부"} onClick={() => handleOptionClick("position", "중고등부")}>중고등부</Option>
-                            <Option $action={selectedValues.position === "청년부"} onClick={() => handleOptionClick("position", "청년부")}>청년부</Option>
-                            <Option $action={selectedValues.position === "남전도"} onClick={() => handleOptionClick("position", "남전도")}>남전도</Option>
-                            <Option $action={selectedValues.position === "여전도"} onClick={() => handleOptionClick("position", "여전도")}>여전도</Option>
-                            <Option $action={selectedValues.position === "교역자"} onClick={() => handleOptionClick("position", "교역자")}>교역자</Option>
-                        </OptionBox>
+                        {selectedValues.position &&
+                            <OptionBoxE dropdown='position' list={["기타", "유치부", "아동부", "중고등부", "청년부", "남전도", "여전도", "교역자"]} />
+                        }
                     </InputBox>
-                    <InputBox ref={officeRef}>
+                    <InputBox>
                         <InputTitle>직책*</InputTitle>
                         <DropDown onClick={() => toggleDropdown("office")}>
                             <Value style={{ opacity: selectedValues.office === "선택" ? 0.5 : 1 }}>{selectedValues.office}</Value>
                             <FaCaretDown />
                         </DropDown>
-                        <OptionBox $isOpen={openDropdowns.office}>
-                            <Option $action={selectedValues.office === "성도"} onClick={() => handleOptionClick("office", "성도")}>성도</Option>
-                            <Option $action={selectedValues.office === "집사"} onClick={() => handleOptionClick("office", "집사")}>집사</Option>
-                            <Option $action={selectedValues.office === "안수집사"} onClick={() => handleOptionClick("office", "안수집사")}>안수집사</Option>
-                            <Option $action={selectedValues.office === "권사"} onClick={() => handleOptionClick("office", "권사")}>권사</Option>
-                            <Option $action={selectedValues.office === "장로"} onClick={() => handleOptionClick("office", "장로")}>장로</Option>
-                            <Option $action={selectedValues.office === "단체"} onClick={() => handleOptionClick("office", "단체")}>단체</Option>
-                            <Option $action={selectedValues.office === "기타"} onClick={() => handleOptionClick("office", "기타")}>기타</Option>
-                        </OptionBox>
+                        {selectedValues.office &&
+                            <OptionBoxE dropdown='office' list={["성도", "집사", "안수집사", "권사", "장로", "단체", "기타"]} />
+                        }
                     </InputBox>
                     <InputBox>
                         <InputTitle>회원번호*
@@ -320,7 +372,7 @@ const UserAdd = () => {
         </UserAddE>
     )
 }
-export default UserAdd
+export default memo(UserAdd);
 
 
 const UserAddE = styled.div`
