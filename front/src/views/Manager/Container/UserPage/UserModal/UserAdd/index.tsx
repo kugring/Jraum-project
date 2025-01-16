@@ -6,7 +6,7 @@ import { FaCaretDown } from "react-icons/fa";
 import { useCookies } from 'react-cookie';
 import { useBlackModalStore } from 'store/modal';
 import { defaultUserImage, formattedPoint } from 'constant';
-import { ChangeEvent, memo, useEffect, useRef } from 'react';
+import { ChangeEvent, forwardRef, memo, useEffect, useRef } from 'react';
 import { JraumSignUpRequestDto, NicknameDpCheckRequestDto, PinDpCheckRequestDto } from 'apis/request/auth';
 import { JraumSignUpResponseDto, NicknameDpcheckResponseDto, PinDpcheckResponseDto } from 'apis/response/auth';
 import { fileUploadRequest, jraumSignUpRequest, nicknameDpCheckRequest, pinDpCheckRequest } from 'apis';
@@ -19,58 +19,282 @@ const UserAdd = () => {
     //          state: 쿠키 상태                //
     const [cookies,] = useCookies();
 
-    //          state: 핀 상태              //
-    const pin = useUserPageModalStore(state => state.pin)
-    //          state: 핀 가능 상태              //
-    const canPin = useUserPageModalStore(state => state.canPin)
-    //          state: 이름 상태              //
-    const name = useUserPageModalStore(state => state.name)
-    //          state: 초성 상태              //
-    const initialName = useUserPageModalStore(state => state.initialName)
-    //          state: 닉네임 상태              //
-    const nickname = useUserPageModalStore(state => state.nickname)
-    //          state: 닉네임 가능 상태              //
-    const canNickname = useUserPageModalStore(state => state.canNickname)
-    //          state: 전화번호 상태              //
-    const phoneNumber = useUserPageModalStore(state => state.phoneNumber)
-    //          state: 직접 충전 포인트 상태              //
-    const directPoint = useUserPageModalStore(state => state.directPoint)
-
-    //          state: 드랍다운 열림 상태              //
-    const openDropdowns = useUserPageModalStore(state => state.openDropdowns)
-    //          state: 드롭다운의 값 상태               //
-    const selectedValues = useUserPageModalStore(state => state.selectedValues)
-
-    //          state: 드롭다운의 참조 상태             //
-    const officeRef = useRef<HTMLDivElement>(null);
-    const positionRef = useRef<HTMLDivElement>(null);
-
-    //          function: 회원 페이지 모달 설정 함수                //
-    const setPin = useUserPageModalStore.getState().setPin;
-    const setCanPin = useUserPageModalStore.getState().setCanPin;
-    const setName = useUserPageModalStore.getState().setName;
-    const setInitialName = useUserPageModalStore.getState().setInitialName;
-    const setNickname = useUserPageModalStore.getState().setNickname;
-    const setCanNickname = useUserPageModalStore.getState().setCanNickname;
-    const setPhoneNumber = useUserPageModalStore.getState().setPhoneNumber;
-    const setDirectPoint = useUserPageModalStore.getState().setDirectPoint;
-    const setOpenDropdowns = useUserPageModalStore.getState().setOpenDropdowns;
-    const setSelectedValues = useUserPageModalStore.getState().setSelectedValues;
-
-
     //          function: 블랙모달 열고 닫는 함수               //
     const closeModal = useBlackModalStore.getState().closeModal;
-    //          function: 핀 입력시 중간에 form처리 하는 함수         //
-    const handlePinChange = (inputValue: string) => {
-        if (inputValue.length > 4) return;
-        setPin(inputValue); // 상태에 숫자 값 저장
+
+    //          event handler: 회원 등록 버튼 클릭 이벤트 함수         //
+    const onUserAddClickHandler = () => {
         if (!cookies.managerToken) return;
-        if (inputValue.length === 4) {
-            const requestBody: PinDpCheckRequestDto = { pin: inputValue }
-            console.log(inputValue);
-            pinDpCheckRequest(requestBody, cookies.managerToken).then(pinDpCheckResponse)
-        }
+
+        // 상태 가져오기
+        const {
+            pin,
+            name,
+            canPin,
+            nickname,
+            initialName,
+            phoneNumber,
+            canNickname,
+            directPoint,
+            selectedValues,
+            profileImage,
+        } = useUserPageModalStore.getState();
+
+        // 유효성 검사 함수
+        const validateInput = () => {
+            if (!canPin) return "회원번호의 중복을 주의해주세요.";
+            if (!canNickname) return "닉네임의 중복을 주의해주세요.";
+            if (name.length < 2) return "이름을 두자리 이상 작성해주세요";
+            if (pin.length !== 4) return "회원번호 4자리를 입력해주세요";
+            if (directPoint === "") return "포인트를 작성해주세요";
+            if (selectedValues.office === "선택") return "직책을 선택해주세요";
+            if (selectedValues.position === "선택") return "부서를 선택해주세요";
+            return null;
+        };
+
+        // 유효성 검사 실행
+        const errorMessage = validateInput();
+        if (errorMessage) return alert(errorMessage);
+
+        // 요청 데이터 생성
+        const requestBody: JraumSignUpRequestDto = {
+            pin,
+            name,
+            point: parseInt(directPoint, 10),
+            office: selectedValues.office,
+            position: selectedValues.position,
+            nickname,
+            phoneNumber,
+            initialName,
+            profileImage,
+        };
+
+        // 회원 등록 요청
+        jraumSignUpRequest(requestBody, cookies.managerToken).then(jraumSignUpResponse);
     };
+
+    //          function: 회원 등록 처리 함수          //
+    const jraumSignUpResponse = (responseBody: JraumSignUpResponseDto | ResponseDto | null) => {
+        if (!responseBody) return;
+        const { code } = responseBody;
+        if (code === 'DBE') alert('데이터베이스 오류입니다.');
+        if (code === 'NMG') alert('관리자 토큰이 만료되었습니다.');
+        if (code === 'DN') alert('닉네임이 중복되었습니다.');
+        if (code === 'DP') alert('회원번호가 중복되었습니다.');
+        if (code !== 'SU') return;
+        toast.success('정상적으로 회원이 등록되었습니다.', {
+            autoClose: 1500,
+            position: "top-center",
+            closeOnClick: true, // 클릭 시 바로 사라짐
+        });
+        closeModal();
+    }
+
+    //              render: 회원 등록 모달 렌더링                   //
+    return (
+        <UserAddE>
+            <Title>회원 등록</Title>
+            <ProfileImageBoxE />
+            <InputContainer>
+                <HeaderInputBox>
+                    <DropdownE title={"부서*"} dropdown='position' list={["기타", "유치부", "아동부", "중고등부", "청년부", "남전도", "여전도", "교역자"]} />
+                    <DropdownE title={"직책*"} dropdown='office' list={["성도", "집사", "안수집사", "권사", "장로", "단체", "기타"]} />
+                    <PinInputBoxE />
+                </HeaderInputBox>
+                <NameInputBoxE />
+                <NicknameInputBoxE />
+                <PhoneNumberInputBoxE />
+                <DirectPointInputBoxE />
+                <Buttons>
+                    <Cancel onClick={closeModal}>취소</Cancel>
+                    <AddComplete onClick={onUserAddClickHandler}>회원 등록</AddComplete>
+                </Buttons>
+            </InputContainer>
+        </UserAddE>
+    )
+}
+export default memo(UserAdd);
+
+//                  component: 프로필 박스 컴포넌트                  //
+const ProfileImageBoxE = () => {
+
+    //              state: 메뉴 이미지 상태             //
+    const profileImage = useUserPageModalStore(state => state.profileImage)
+
+    //              state: 이미지 파일 인풋 참조 상태           //
+    const imageInputRef = useRef<HTMLInputElement | null>(null);
+
+    //              event handler: 프로필 박스 클릭 이벤트 처리            //
+    const onProfileImageBoxClickHandler = () => {
+        if (!imageInputRef.current) return;
+        imageInputRef.current.click();
+    }
+
+    //              function: file upload response 처리 함수           //
+    const fileUploadResponse = (image: string | null) => {
+        const setProfileImage = useUserPageModalStore.getState().setProfileImage;
+        if (!image) return
+        setProfileImage(image);
+    }
+    //              event handler: 프로필 이미지 변경 이벤트 처리            //
+    const onImageChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+        if (!event.target.files || !event.target.files.length) return;
+        const file = event.target.files[0];
+        const data = new FormData();
+        data.append('file', file);
+        fileUploadRequest(data).then(fileUploadResponse)
+    }
+    //              render: 프로필 박스 컴포넌트                //
+    return (
+        <ProfileImageBox onClick={onProfileImageBoxClickHandler}>
+            <PropfileImage style={{ backgroundImage: `url(${profileImage ? profileImage : defaultUserImage})` }}></PropfileImage>
+            <ProfileImageEdit size={16} />
+            <input ref={imageInputRef} type='file' accept='image/*' style={{ display: 'none' }} onChange={onImageChangeHandler} />
+        </ProfileImageBox>
+    )
+}
+//                  component: 드롭다운 박스 컴포넌트                  //
+const DropdownE = memo((({ title, dropdown, list }: { title: string; dropdown: "office" | "position"; list: string[] }) => {
+
+    //          state: 드롭박스 참조 상태               //
+    const dropdownBoxRef = useRef<HTMLDivElement | null>(null)
+
+    //          function: 토글을 열고 닫는 함수             //
+    const toggleDropdown = (dropdown: "office" | "position") => {
+        const setOpenDropdowns = useUserPageModalStore.getState().setOpenDropdowns;
+        setOpenDropdowns((prevState) => ({
+            ...prevState, // 기존 상태를 유지
+            [dropdown]: !prevState[dropdown], // 해당 드롭다운의 상태를 반전시켜서 토글
+        }));
+    };
+
+    //              render: 드롭박스 박스 컴포넌트                //
+    return (
+        <InputBox ref={dropdownBoxRef}>
+            <InputTitle>{title}</InputTitle>
+            <DropDown onClick={() => toggleDropdown(dropdown)}>
+                <DropDownValue dropdown={dropdown} />
+                <FaCaretDown />
+            </DropDown>
+            <OptionBoxE ref={dropdownBoxRef} dropdown={dropdown} list={list} />
+        </InputBox>
+    );
+}));
+//                  component: 드롭다운 옵션값 컴포넌트                     //
+const DropDownValue = ({ dropdown }: { dropdown: "office" | "position" }) => {
+
+    //          state: 드롭다운 옵션값 상태               //
+    const selectedValues = useUserPageModalStore((state) => state.selectedValues[dropdown]);
+
+    //                  render: 드롭다운 옵션값 렌더링                     //
+    return (
+        <Value style={{ opacity: selectedValues === "선택" ? 0.5 : 1 }}>{selectedValues}</Value>
+    )
+}
+//                  component: 드롭다운 옵션들 박스 컴포넌트                  //
+const OptionBoxE = memo(
+    forwardRef<HTMLDivElement, { dropdown: "office" | "position"; list: string[] }>(
+        ({ dropdown, list }, ref) => {
+
+            //          state: 드랍다운 열림 상태              //
+            const openDropdowns = useUserPageModalStore((state) => state.openDropdowns[dropdown]);
+
+            //              event handler: 외부 클릭 감지 핸들러                 //
+            const handleClickOutside = (e: MouseEvent) => {
+                if (ref && (ref as React.MutableRefObject<HTMLDivElement>).current) {
+                    const currentRef = (ref as React.MutableRefObject<HTMLDivElement>).current;
+                    if (currentRef && !currentRef.contains(e.target as Node)) {
+                        const setOpenDropdowns = useUserPageModalStore.getState().setOpenDropdowns;
+                        setOpenDropdowns((prev) => ({
+                            ...prev,
+                            [dropdown]: false, // 해당 드롭다운만 닫음
+                        }));
+                    }
+                }
+            };
+
+            //              effect: 외부 클릭 이벤트를 등록 및 해제                 //
+            useEffect(() => {
+                if (openDropdowns) { document.addEventListener("mousedown", handleClickOutside); }
+                return () => { document.removeEventListener("mousedown", handleClickOutside); };
+            }, [openDropdowns]); // dropdown 변경 시 이벤트를 재설정
+
+            //                  render: 옵션들 박스 렌더링                  //
+            return (
+                <OptionBox $isOpen={openDropdowns}>
+                    {list.map((item) => (
+                        <OptionE key={item} item={item} dropdown={dropdown} />
+                    ))}
+                </OptionBox>
+            );
+        }
+    )
+);
+//                  component: 드롭다운 옵션 컴포넌트                  //
+const OptionE = memo(({ item, dropdown }: { item: string, dropdown: "office" | "position", }) => {
+
+    //          state: 드롭다운의 값 상태               //
+    const selectedValues = useUserPageModalStore(state => state.selectedValues[dropdown])
+
+    //          event handler: 드롭박스 옵션 클릭 이벤트 핸들러             //
+    const handleOptionClick = (dropdown: string, value: string) => {
+        const setOpenDropdowns = useUserPageModalStore.getState().setOpenDropdowns;
+        const setSelectedValues = useUserPageModalStore.getState().setSelectedValues;
+        // selectedValues 상태 업데이트
+        setSelectedValues((prevState) => ({
+            ...prevState, // 이전 상태를 유지하면서
+            [dropdown]: value, // 동적으로 키 설정
+        }));
+
+        // openDropdowns 상태 업데이트 (해당 드롭다운을 닫음)
+        setOpenDropdowns((prevState) => ({
+            ...prevState, // 이전 상태를 유지하면서
+            [dropdown]: false, // 해당 드롭다운 상태를 닫음
+        }));
+    };
+
+    //                  render: 드롭다운 옵션 렌더링                  //
+    return (
+        <Option
+            $action={selectedValues === item}
+            onClick={() => handleOptionClick(dropdown, item)}
+        >
+            {item}
+        </Option>
+    )
+})
+//                  component: 회원번호 인풋박스 컴포넌트                  //
+const PinInputBoxE = () => {
+    //                  render: 회원번호 인풋박스 렌더링                  //
+    return (
+        <InputBox>
+            <InputBoxHeader>
+                <InputTitle>회원번호*</InputTitle>
+                <PinInputMessageE />
+            </InputBoxHeader>
+            <PinInputValueE />
+        </InputBox>
+    )
+}
+//                  component: 회원번호 메세지 컴포넌트                  //
+const PinInputMessageE = () => {
+    //          state: 핀 상태              //
+    const pinCheck = useUserPageModalStore(state => state.pin.length === 4)
+    const canPin = useUserPageModalStore(state => state.canPin)
+    //                  render: 회원번호 메세지 렌더링                  //
+    return (
+        <>{pinCheck && <Message $action={canPin}>{canPin ? "가능" : "불가능"}</Message>}</>
+    )
+}
+//                  component: 회원번호 값 컴포넌트                  //
+const PinInputValueE = () => {
+    //          state: 쿠키 상태                //
+    const [cookies,] = useCookies();
+    //          state: 핀 상태              //
+    const pin = useUserPageModalStore(state => state.pin)
+    //          function: 핀 설정 함수              //
+    const setPin = useUserPageModalStore.getState().setPin;
+    const setCanPin = useUserPageModalStore.getState().setCanPin;
     //          function: 핀 중복 체크 완료 처리 이후 함수          //
     const pinDpCheckResponse = (responseBody: PinDpcheckResponseDto | ResponseDto | null) => {
         if (!responseBody) return;
@@ -81,9 +305,40 @@ const UserAdd = () => {
         if (code !== 'SU') return;
         setCanPin(true)
     }
+    //          function: 핀 입력시 중간에 form처리 하는 함수         //
+    const handlePinChange = (inputValue: string) => {
+        if (inputValue.length > 4) return;
+        setPin(inputValue); // 상태에 숫자 값 저장
+        if (!cookies.managerToken) return;
+        if (inputValue.length === 4) {
+            const requestBody: PinDpCheckRequestDto = { pin: inputValue }
+            pinDpCheckRequest(requestBody, cookies.managerToken).then(pinDpCheckResponse)
+        }
+    };
+    //                  render: 회원번호 값 렌더링                  //
+    return (
+        <Input value={pin} onChange={(e) => handlePinChange(e.target.value)} placeholder='1234' />
+    )
+}
+//                  component: 회원 이름 인풋박스 컴포넌트                  //
+const NameInputBoxE = () => {
+    //                  render: 회원 이름 인풋박스 렌더링                  //
+    return (
+        <InputBox>
+            <InputTitle>이름*</InputTitle>
+            <NameInputValue />
+        </InputBox>
+    )
+}
+//                  component: 회원 이름 값 컴포넌트                //
+const NameInputValue = () => {
+    //          state: 이름 상태              //
+    const name = useUserPageModalStore(state => state.name)
     //          function: 이름 입력시 중간에 form처리 하는 함수         //
     const handleNameChange = (inputValue: string) => {
         if (inputValue.length > 8) return;
+        const setName = useUserPageModalStore.getState().setName;
+        const setInitialName = useUserPageModalStore.getState().setInitialName;
         setName(inputValue); // 상태에 숫자 값 저장
         setInitialName(getChosung(inputValue)); // 초성을 저장함
     };
@@ -102,6 +357,45 @@ const UserAdd = () => {
         }
         return chosung;
     };
+    //                  render: 회원 이름 값 렌더링                //
+    return (
+        <Input value={name} onChange={(e) => handleNameChange(e.target.value)} placeholder='이름을 입력해주세요' />
+    )
+}
+//                  component: 닉네임 인풋박스 컴포넌트                  //
+const NicknameInputBoxE = () => {
+    //                  render: 닉네임 인풋박스 렌더링                  //
+    return (
+        <InputBox>
+            <InputBoxHeader>
+                <InputTitle>닉네임</InputTitle>
+                <NicknameInputMessageE />
+            </InputBoxHeader>
+            <NicknameInputValueE />
+        </InputBox>
+    )
+}
+//                  component: 닉네임 메세지 컴포넌트                  //
+const NicknameInputMessageE = () => {
+    //          state: 닉네임 상태              //
+    const nicknameCheck = useUserPageModalStore(state => state.nickname.length >= 2)
+    const canNickname = useUserPageModalStore(state => state.canNickname)
+    //                  render: 회원번호 메세지 렌더링                  //
+    return (
+        <>{nicknameCheck && <Message $action={canNickname}>{canNickname ? "가능" : "불가능"}</Message>}</>
+    )
+}
+//                  component: 닉네임 값 컴포넌트                  //
+const NicknameInputValueE = () => {
+    //          state: 쿠키 상태                //
+    const [cookies,] = useCookies();
+    //          state: 닉네임 상태              //
+    const nickname = useUserPageModalStore(state => state.nickname)
+
+    //          function: 닉테임 설정 함수             //
+    const setNickname = useUserPageModalStore.getState().setNickname;
+    const setCanNickname = useUserPageModalStore.getState().setCanNickname;
+
     //          function: 닉네임 입력시 중간에 form처리 하는 함수         //
     const handleNicknameChange = (inputValue: string) => {
         if (inputValue.length > 15) return;
@@ -122,12 +416,26 @@ const UserAdd = () => {
         if (code !== 'SU') return;
         setCanNickname(true)
     }
-    //          function: 가격 입력시 중간에 form처리 하는 함수         //
-    const handlePointChange = (inputValue: string) => {
-        if (inputValue.length > 8) return;
-        const numericValue = inputValue.replace(/[^0-9]/g, ""); // 숫자 외 제거
-        setDirectPoint(numericValue); // 상태에 숫자 값 저장
-    };
+    //                  render: 닉네임 값 렌더링                  //
+    return (
+        <Input value={nickname} onChange={(e) => handleNicknameChange(e.target.value)} placeholder='닉네임을 입력해주세요 (필수 X)' />
+    )
+}
+//                  component: 전화번호 인풋박스 컴포넌트                  //
+const PhoneNumberInputBoxE = () => {
+    //                  render: 회원 전화번호 인풋박스 렌더링                  //
+    return (
+        <InputBox>
+            <InputTitle>전화번호</InputTitle>
+            <PhoneNumberInputValue />
+        </InputBox>
+    )
+}
+//                  component: 전화번호 값 컴포넌트                //
+const PhoneNumberInputValue = () => {
+    //          state: 전화번호 상태              //
+    const phoneNumber = useUserPageModalStore(state => state.phoneNumber)
+    const setPhoneNumber = useUserPageModalStore.getState().setPhoneNumber;
     //          function: 전화번호 입력시 중간에 포맷을 처리하는 함수
     const handlePhoneNumberChange = (inputValue: string) => {
         // 숫자만 남기기
@@ -147,232 +455,43 @@ const UserAdd = () => {
         }
         setPhoneNumber(formattedValue); // 상태에 포맷팅된 전화번호 값 저장
     };
-    //          function: 토글을 열고 닫는 함수             //
-    const toggleDropdown = (dropdown: "office" | "position") => {
-        setOpenDropdowns((prevState) => ({
-            ...prevState, // 기존 상태를 유지
-            [dropdown]: !prevState[dropdown], // 해당 드롭다운의 상태를 반전시켜서 토글
-        }));
-    };
-
-    //          event handler: 드롭박스 옵션 클릭 이벤트 핸들러             //
-    const handleOptionClick = (dropdown: string, value: string) => {
-        console.log(dropdown, value);
-        // selectedValues 상태 업데이트
-        setSelectedValues((prevState) => ({
-            ...prevState, // 이전 상태를 유지하면서
-            [dropdown]: value, // 동적으로 키 설정
-        }));
-
-        // openDropdowns 상태 업데이트 (해당 드롭다운을 닫음)
-        setOpenDropdowns((prevState) => ({
-            ...prevState, // 이전 상태를 유지하면서
-            [dropdown]: false, // 해당 드롭다운 상태를 닫음
-        }));
-    };
-    // //          event handler: 드롭박스 외부 클릭 이벤트 핸들러             //
-    // const handleClickOutside = (e: MouseEvent) => {
-    //     if (officeRef.current && !officeRef.current.contains(e.target as Node)) {
-    //         setOpenDropdowns((prev) => ({
-    //             ...prev,
-    //             office: false,
-    //         }));
-    //     }
-    //     if (positionRef.current && !positionRef.current.contains(e.target as Node)) {
-    //         setOpenDropdowns((prev) => ({
-    //             ...prev,
-    //             position: false,
-    //         }));
-    //     }
-    // };
-
-    //          event handler: 회원 등록 버튼 클릭 이벤트 함수         //
-    const onUserAddClickHandler = () => {
-        if (!cookies.managerToken) return;
-        if (selectedValues.position === "선택") return alert("부서를 선택해주세요");
-        if (selectedValues.office === "선택") return alert("직책을 선택해주세요");
-        if (pin.length !== 4) return alert("회원번호 4자리를 입력해주세요");
-        if (!canPin) return alert("회원번호의 중복을 주의해주세요.");
-        if (name.length < 2) return alert("이름을 두자리 이상 작성해주세요");
-        if (!canNickname) return alert("닉네임의 중복을 주의해주세요.");
-        if (directPoint === "") return alert("포인트를 작성해주세요");
-        const requestBody: JraumSignUpRequestDto = {
-            pin: pin,
-            name: name,
-            point: parseInt(directPoint, 10),
-            office: selectedValues.office,
-            position: selectedValues.position,
-            nickname: nickname,
-            phoneNumber: phoneNumber,
-            initialName: initialName,
-            profileImage: useUserPageModalStore.getState().profileImage
-        }
-        jraumSignUpRequest(requestBody, cookies.managerToken).then(jraumSignUpResponse)
-    };
-    //          function: 회원 등록 처리 함수          //
-    const jraumSignUpResponse = (responseBody: JraumSignUpResponseDto | ResponseDto | null) => {
-        if (!responseBody) return;
-        const { code } = responseBody;
-        if (code === 'DBE') alert('데이터베이스 오류입니다.');
-        if (code === 'NMG') alert('관리자 토큰이 만료되었습니다.');
-        if (code === 'DN') alert('닉네임이 중복되었습니다.');
-        if (code === 'DP') alert('회원번호가 중복되었습니다.');
-        if (code !== 'SU') return;
-        toast.success('정상적으로 회원이 등록되었습니다.', {
-            autoClose: 1500,
-            position: "top-center",
-            closeOnClick: true, // 클릭 시 바로 사라짐
-        });
-        closeModal();
-    }
-
-
-    //                  subComponent: 프로필 서브 컴포넌트                  //
-    const ProfileImageBoxE = () => {
-        //          state: 메뉴 이미지 상태             //
-        const profileImage = useUserPageModalStore(state => state.profileImage)
-
-        //            state: 이미지 파일 인풋 참조 상태           //
-        const imageInputRef = useRef<HTMLInputElement | null>(null);
-
-        //            event handler: 프로필 박스 클릭 이벤트 처리            //
-        const onProfileImageBoxClickHandler = () => {
-            if (!imageInputRef.current) return;
-            imageInputRef.current.click();
-        }
-
-        //            function: file upload response 처리 함수           //
-        const fileUploadResponse = (image: string | null) => {
-            const setProfileImage = useUserPageModalStore.getState().setProfileImage;
-            if (!image) return
-            setProfileImage(image);
-        }
-        //            event handler: 프로필 이미지 변경 이벤트 처리            //
-        const onImageChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
-            if (!event.target.files || !event.target.files.length) return;
-            const file = event.target.files[0];
-            const data = new FormData();
-            data.append('file', file);
-            fileUploadRequest(data).then(fileUploadResponse)
-        }
-        return (
-            <ProfileImageBox onClick={() => { onProfileImageBoxClickHandler(); console.log("눌리긴함?"); }}>
-                <PropfileImage style={{ backgroundImage: `url(${profileImage ? profileImage : defaultUserImage})` }}></PropfileImage>
-                <ProfileImageEdit size={16} />
-                <input ref={imageInputRef} type='file' accept='image/*' style={{ display: 'none' }} onChange={onImageChangeHandler} />
-            </ProfileImageBox>
-        )
-    }
-
-    const OptionBoxE = ({ dropdown, list }: { dropdown: "office" | "position"; list: string[] }) => {
-        const optionRef = useRef<HTMLDivElement | null>(null);
-
-        // 외부 클릭 감지 핸들러
-        const handleClickOutside = (e: MouseEvent) => {
-            if (optionRef.current && !optionRef.current.contains(e.target as Node)) {
-                setOpenDropdowns((prev) => ({
-                    ...prev,
-                    [dropdown]: false, // 해당 드롭다운만 닫음
-                }));
-            }
-        };
-
-        // 외부 클릭 이벤트를 등록 및 해제
-        useEffect(() => {
-            if (openDropdowns[dropdown]) {
-                document.addEventListener("mousedown", handleClickOutside);
-                console.log("열음");
-                
-            } else {
-                document.removeEventListener("mousedown", handleClickOutside);
-                console.log("닫음");
-            }
-            return () => {
-                document.removeEventListener("mousedown", handleClickOutside);
-                console.log("언마운트");
-            };
-        }, [selectedValues[dropdown]]); // dropdown 변경 시 이벤트를 재설정
-
-        return (
-            <OptionBox $isOpen={openDropdowns[dropdown]} ref={optionRef}>
-                {list.map((item) => (
-                    <Option
-                        key={item}
-                        $action={selectedValues[dropdown] === item}
-                        onClick={() => handleOptionClick(dropdown, item)}
-                    >
-                        {item}
-                    </Option>
-                ))}
-            </OptionBox>
-        );
-    };
-
-    //              render: 회원 등록 모달 렌더링                   //
+    //                  render: 회원 전화번호 값 렌더링                //
     return (
-        <UserAddE>
-            <Title>회원 등록</Title>
-            <ProfileImageBoxE />
-            <InputContainer>
-                <HeaderInputBox>
-                    <InputBox>
-                        <InputTitle>부서*</InputTitle>
-                        <DropDown onClick={() => toggleDropdown("position")}>
-                            <Value style={{ opacity: selectedValues.position === "선택" ? 0.5 : 1 }}>{selectedValues.position}</Value>
-                            <FaCaretDown />
-                        </DropDown>
-                        {selectedValues.position &&
-                            <OptionBoxE dropdown='position' list={["기타", "유치부", "아동부", "중고등부", "청년부", "남전도", "여전도", "교역자"]} />
-                        }
-                    </InputBox>
-                    <InputBox>
-                        <InputTitle>직책*</InputTitle>
-                        <DropDown onClick={() => toggleDropdown("office")}>
-                            <Value style={{ opacity: selectedValues.office === "선택" ? 0.5 : 1 }}>{selectedValues.office}</Value>
-                            <FaCaretDown />
-                        </DropDown>
-                        {selectedValues.office &&
-                            <OptionBoxE dropdown='office' list={["성도", "집사", "안수집사", "권사", "장로", "단체", "기타"]} />
-                        }
-                    </InputBox>
-                    <InputBox>
-                        <InputTitle>회원번호*
-                            {pin.length === 4 &&
-                                <Message $action={canPin}>{canPin ? "가능" : "불가능"}</Message>
-                            }
-                        </InputTitle>
-                        <Input value={pin} onChange={(e) => handlePinChange(e.target.value)} placeholder='1234' />
-                    </InputBox>
-                </HeaderInputBox>
-                <InputBox>
-                    <InputTitle>이름*</InputTitle>
-                    <Input value={name} onChange={(e) => handleNameChange(e.target.value)} placeholder='이름을 입력해주세요' />
-                </InputBox>
-                <InputBox>
-                    <InputTitle>닉네임
-                        {nickname.length >= 2 &&
-                            <Message $action={canNickname}>{canNickname ? "가능" : "불가능"}</Message>
-                        }
-                    </InputTitle>
-                    <Input value={nickname} onChange={(e) => handleNicknameChange(e.target.value)} placeholder='닉네임을 입력해주세요 (필수 X)' />
-                </InputBox>
-                <InputBox>
-                    <InputTitle>전화번호</InputTitle>
-                    <Input value={phoneNumber} onChange={(e) => handlePhoneNumberChange(e.target.value)} placeholder='전화번호를 입력해주세요 (필수 X)' />
-                </InputBox>
-                <InputBox>
-                    <InputTitle>포인트*</InputTitle>
-                    <Input value={`${directPoint === "" ? "" : formattedPoint(parseInt(directPoint, 10))}`} onChange={(e) => handlePointChange(e.target.value)} placeholder='포인트를 입력해주세요' />
-                </InputBox>
-                <Buttons>
-                    <Cancel onClick={closeModal}>취소</Cancel>
-                    <AddComplete onClick={onUserAddClickHandler}>회원 등록</AddComplete>
-                </Buttons>
-            </InputContainer>
-        </UserAddE>
+        <Input value={phoneNumber} onChange={(e) => handlePhoneNumberChange(e.target.value)} placeholder='전화번호를 입력해주세요 (필수 X)' />
     )
 }
-export default memo(UserAdd);
+//                  component: 포인트 직접충전 인풋박스 컴포넌트                  //
+const DirectPointInputBoxE = () => {
+    //                  render: 포인트 직접충전 인풋박스 렌더링                  //
+    return (
+        <InputBox>
+            <InputTitle>포인트</InputTitle>
+            <DirectPointInputValue />
+        </InputBox>
+    )
+}
+//                  component: 포인트 직접충전 값 컴포넌트                //
+const DirectPointInputValue = () => {
+
+    //          state: 직접 충전 포인트 상태              //
+    const directPoint = useUserPageModalStore(state => state.directPoint)
+    //          function: 직접 충전 포인트 설정 함수                //
+    const setDirectPoint = useUserPageModalStore.getState().setDirectPoint;
+
+    //          function: 가격 입력시 중간에 form처리 하는 함수         //
+    const handlePointChange = (inputValue: string) => {
+        if (inputValue.length > 8) return;
+        const numericValue = inputValue.replace(/[^0-9]/g, ""); // 숫자 외 제거
+        setDirectPoint(numericValue); // 상태에 숫자 값 저장
+    };
+
+    //                  render: 포인트 직접충전 값 렌더링                //
+    return (
+        <Input value={`${directPoint === "" ? "" : formattedPoint(parseInt(directPoint, 10))}`} onChange={(e) => handlePointChange(e.target.value)} placeholder='포인트를 입력해주세요' />
+    )
+}
+
+
 
 
 const UserAddE = styled.div`
@@ -452,10 +571,13 @@ const HeaderInputBox = styled.div`
     gap: 12px;
 `
 
-const InputTitle = styled.div`
+const InputBoxHeader = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
+`
+
+const InputTitle = styled.div`
     color: var(--antiqueCream);
     font-size: 12px;
 `
@@ -538,7 +660,7 @@ const Input = styled.input`
 `
 
 const Message = styled.div<{ $action: boolean }>`
-    font-size: 10px;
+    font-size: 9px;
     color: ${({ $action }) => $action ? "var(--cold)" : "var(--hot)"};
 `
 
