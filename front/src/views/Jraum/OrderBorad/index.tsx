@@ -5,7 +5,7 @@ import OrderPayButton from './OrderPayButton';
 import OrderBody from './OrderBody';
 import { useState } from 'react';
 import { useOrderStore } from 'store/modal';
-import { FaAngleDown } from "react-icons/fa6";
+import { BsChevronCompactDown } from "react-icons/bs";
 
 //              component: 주문 보드 컴포넌트             //
 const OrderBoard = () => {
@@ -122,7 +122,7 @@ const Board = styled.div<{ $isHidden: boolean, $translateY: number, $isDragging:
     }
 `;
 
-const DragBar = styled(FaAngleDown)`
+const DragBar = styled(BsChevronCompactDown)`
     display: none;
 
     @media (max-width: 768px) {
@@ -130,7 +130,7 @@ const DragBar = styled(FaAngleDown)`
     width: 100%;
     font-size: 16px;
     color: var(--antiqueCream);
-    transform: scaleX(2); /* x축으로 두 배 늘림 */
+    transform: scaleX(2.5) scaleY(2); /* x축 2배, y축 1.5배 크기 조정 */
     cursor: grab; /* 드래그 커서 */
     }
 `;

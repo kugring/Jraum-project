@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 import useBlackModalStore from 'store/modal/black-modal.store';
 import { memo, useEffect, useState } from 'react';
-import MenuAdd from '../Container/MenuPage/MenuModal/MenuAdd';
-import MenuEdit from '../Container/MenuPage/MenuModal/MenuEdit';
+import MenuAdd from '../Container/MenuPage/MenuList/MenuModal/MenuAdd';
+import MenuEdit from '../Container/MenuPage/MenuList/MenuModal/MenuEdit';
 import UserAdd from '../Container/UserPage/UserModal/UserAdd';
 import UserEdit from '../Container/UserPage/UserModal/UserEdit';
 import CashPayModal from './CashPayModal';

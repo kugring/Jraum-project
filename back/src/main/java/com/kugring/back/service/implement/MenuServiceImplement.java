@@ -2,6 +2,7 @@ package com.kugring.back.service.implement;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,8 @@ import com.kugring.back.repository.UserRepository;
 import com.kugring.back.repository.resultSet.GetActiveMenuListResultSet;
 import com.kugring.back.repository.resultSet.GetMenuPageResultSet;
 import com.kugring.back.service.MenuService;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -75,30 +78,52 @@ public class MenuServiceImplement implements MenuService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<? super PatchMenuSequenceResponseDto> patchMenuSequence(String userId,
             PatchMenuSequenceRequestDto dto) {
         try {
-            // userId로 데이터 조회
+            // userId로 사용자 조회
             User user = userRepository.findByUserId(userId);
-            // 정보가 없다면 예외처리
-            if (user == null)
+            if (user == null) {
                 return PinCheckResponseDto.pinCheckFail();
-            if (!user.getRole().trim().equals("ROLE_ADMIN")) {
+            }
+
+            // 관리자 권한 확인
+            if (!"ROLE_ADMIN".equals(user.getRole().trim())) {
                 return PatchMenuSequenceResponseDto.notExistedManager();
             }
-            // 메뉴Id로 조회 이후 null 인 경우 예외처리리
-            Menu menu = menuRepository.findByMenuId(dto.getMenuId());
-            if (menu == null) {
+
+            // 모든 menuId를 한 번에 조회
+            List<Long> menuIds = dto.getMenuSequence()
+                    .stream()
+                    .map(PatchMenuSequenceRequestDto.MenuSequenceDto::getMenuId)
+                    .collect(Collectors.toList());
+
+            // 메뉴 리스트 조회
+            List<Menu> menus = menuRepository.findAllById(menuIds);
+
+            // 존재하지 않는 메뉴 확인
+            if (menus.size() != menuIds.size()) {
                 return PatchMenuSequenceResponseDto.notExistedMenu();
             }
-            // 메뉴의 순서 수정정
-            menu.setSequence(dto.getSequence());
-            // 수정된 메뉴 저장
-            menuRepository.save(menu);
+
+            // 메뉴 순서 업데이트
+            Map<Long, Integer> sequenceMap = dto.getMenuSequence()
+                    .stream()
+                    .collect(Collectors.toMap(
+                            PatchMenuSequenceRequestDto.MenuSequenceDto::getMenuId,
+                            PatchMenuSequenceRequestDto.MenuSequenceDto::getSequence));
+
+            menus.forEach(menu -> menu.setSequence(sequenceMap.get(menu.getMenuId())));
+
+            // 모든 변경사항 저장
+            menuRepository.saveAll(menus);
+
         } catch (Exception exception) {
             exception.printStackTrace();
             return ResponseDto.databaseError();
         }
+
         return PatchMenuSequenceResponseDto.success();
     }
 
@@ -187,9 +212,8 @@ public class MenuServiceImplement implements MenuService {
             menu.setEspressoShot(dto.getEspressoShot());
             menu.setOptions(options);
 
-            System.out.println("추가되는 옵션 이름: "+options.get(0).getCategory());
-            System.out.println("추가되는 옵션의 갯수: "+options.size());
-
+            System.out.println("추가되는 옵션 이름: " + options.get(0).getCategory());
+            System.out.println("추가되는 옵션의 갯수: " + options.size());
 
             // 메뉴 저장 (속성 업데이트)
             menuRepository.save(menu);

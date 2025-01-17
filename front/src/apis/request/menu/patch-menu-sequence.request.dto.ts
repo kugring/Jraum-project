@@ -1,4 +1,3 @@
 export default interface patchMenuSuquenceRequestDto {
-    menuId: number;
-    sequence: number;
+    menuSequence: { menuId: number, sequence: number }[]
 }

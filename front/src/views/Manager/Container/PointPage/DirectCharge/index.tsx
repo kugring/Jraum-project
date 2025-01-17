@@ -147,8 +147,6 @@ const CardBoxE = () => {
 
     //          function: 스크롤 이벤트 핸들러          //
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-        console.log("이건됌?");
-        
         const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
         if (users.length === 0) return;
         if (isLoading) return;

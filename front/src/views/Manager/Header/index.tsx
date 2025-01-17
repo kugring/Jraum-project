@@ -4,6 +4,7 @@ import OrderPageHeader from './OrderPageHeader';
 import PointPageHeader from './PointPageHeader';
 import useManagerStore from 'store/manager/manager.store';
 import useBlackModalStore from 'store/modal/black-modal.store';
+import MenuPageHeader from './MenuPageHeader';
 
 //          component: 관리자 헤더 컴포넌트              //
 const Header = () => {
@@ -49,7 +50,7 @@ const Header = () => {
                     <div>회원 관리</div>
                 }
                 {isMenu &&
-                    <div>메뉴 관리</div>
+                    <MenuPageHeader/>
                 }
                 {!isOrderPage && !isPoint && !isUser && !isMenu && <div>Manager Main Page</div>}
 

@@ -204,12 +204,24 @@ export const getActionMenuRequest = async () => {
         .catch(errorHandler)
     return result;
 }
+
+// export const getMenuPageRequest = async (category: number | string, accessToken: string) => {
+//     const result = await axios.get(GET_MENU_PAGE_URL(category), authorization(accessToken))
+//         .then(responseHandler<GetMenuPageResponseDto>)
+//         .catch(errorHandler)
+//     return result;
+// }
+
 export const getMenuPageRequest = async (category: number | string, accessToken: string) => {
-    const result = await axios.get(GET_MENU_PAGE_URL(category), authorization(accessToken))
-        .then(responseHandler<GetMenuPageResponseDto>)
-        .catch(errorHandler)
-    return result;
-}
+    try {
+        const result = await axios.get(GET_MENU_PAGE_URL(category), authorization(accessToken));
+        return responseHandler<GetMenuPageResponseDto>(result);
+    } catch (error) {
+        // 에러를 React Query에서 관리하도록 그대로 던짐
+        throw errorHandler(error);
+    }
+};
+
 export const postMenuRequest = async (request: PostMenuRequestDto, accessToken: string) => {
     const result = await axios.post(POST_MENU_URL(), request, authorization(accessToken))
         .then(responseHandler<PostMenuResponseDto>)
@@ -222,6 +234,7 @@ export const patchMenuRequest = async (request: PatchMenuRequestDto, accessToken
         .catch(errorHandler)
     return result;
 }
+
 export const patchMenuSuquenceRequest = async (requestBody: patchMenuSuquenceRequestDto, accessToken: string) => {
 
     const result = await axios.patch(PATCH_MENU_SEQUENCE_URL(), requestBody, authorization(accessToken))

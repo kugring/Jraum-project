@@ -1,6 +1,6 @@
 import OrderList from './OrderList';
-import { memo, useEffect } from 'react';
 import OrderManageMent from './OrderManageMent';
+import { memo, useEffect } from 'react';
 import { useOrderPageStore } from 'store/manager';
 
 //              component: 관리자 주문 페이지 컴포넌트              //

@@ -1,17 +1,17 @@
 import styled from 'styled-components';
+import { toast } from 'react-toastify';
 import { CiEdit } from "react-icons/ci";
-import { FaCaretDown } from "react-icons/fa";
 import { IoCheckbox } from "react-icons/io5";
 import { useCookies } from 'react-cookie';
 import { ResponseDto } from 'apis/response';
-import useBlackModalStore from 'store/modal/black-modal.store';
-import { defaultMenuImage, formattedPoint, optionSelectList } from 'constant';
+import { FaCaretDown } from "react-icons/fa";
+import { useBlackModalStore } from 'store/modal';
 import { PostMenuRequestDto } from 'apis/request/menu';
 import { PostMenuResponseDto } from 'apis/response/menu';
 import { MdOutlineCheckBoxOutlineBlank } from "react-icons/md";
 import { fileUploadRequest, postMenuRequest } from 'apis';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
-import { toast } from 'react-toastify';
+import { defaultMenuImage, formattedPoint, optionSelectList } from 'constant';
 
 //          component: 메뉴 추가 컴포넌트               //
 const MenuAdd = () => {
@@ -30,8 +30,6 @@ const MenuAdd = () => {
     const [price, setPrice] = useState<string>("");
     //          state: 메뉴 활성화 상태             //
     const [status, setStatus] = useState<boolean>(false);
-
-
 
     //          state: 드랍다운 열림림 상태              //
     const [openDropdowns, setOpenDropdowns] = useState<{ [key: string]: boolean }>({

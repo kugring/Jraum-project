@@ -5,11 +5,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PatchMenuSequenceRequestDto {
-    Long menuId;
-    int sequence;
+    private List<MenuSequenceDto> menuSequence;
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MenuSequenceDto {
+        private Long menuId;
+        private int sequence;
+    }
 }
