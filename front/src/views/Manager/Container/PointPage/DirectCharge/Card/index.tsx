@@ -105,15 +105,12 @@ const Card = ({ user }: { user: SortedUser }) => {
 
 export default  memo(Card, (prevProps, nextProps) => isEqual(prevProps.user.userId, nextProps.user.userId));
 
-
-
 const CardE = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 100%;
-    gap: 4px;
     padding: 8px;
     box-sizing: border-box;
     border-radius: 8px;

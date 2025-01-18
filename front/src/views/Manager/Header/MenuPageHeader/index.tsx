@@ -25,7 +25,7 @@ const MenuPageHeader = () => {
         <Header>
             <SubPageBox>
                 <SubPageE subPage={'메뉴 관리'} />
-                <SubPageE subPage={'옵션 관리'} />
+                {/* <SubPageE subPage={'옵션 관리'} /> */}
             </SubPageBox>
 
             {editSequence ?

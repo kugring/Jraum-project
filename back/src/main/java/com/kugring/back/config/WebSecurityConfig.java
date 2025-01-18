@@ -90,8 +90,8 @@ public class WebSecurityConfig {
        
 
         // 모든 ip에 응답 허용
-        corsConfiguration.addAllowedOriginPattern("*");
-        // corsConfiguration.addAllowedOrigin("https://hyunam.site");
+        // corsConfiguration.addAllowedOriginPattern("*");
+        corsConfiguration.addAllowedOrigin("https://hyunam.site");
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.addAllowedHeader("*");
         // setAllowCredentials를 true로 설정시 * (아스타)로 설정이 불가능하고 반드시 명시적으로 직접 기입해야함

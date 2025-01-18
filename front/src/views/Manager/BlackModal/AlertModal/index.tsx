@@ -1,6 +1,6 @@
-import React from 'react'
-import useBlackModalStore from 'store/modal/black-modal.store'
+import { memo } from 'react';
 import styled from 'styled-components'
+import useBlackModalStore from 'store/modal/black-modal.store'
 
 //              component: 경고창 모달 컴포넌트                 //
 const AlertModal = () => {
@@ -25,7 +25,7 @@ const AlertModal = () => {
     )
 }
 
-export default AlertModal
+export default memo(AlertModal);
 
 
 const AlertBox = styled.div`

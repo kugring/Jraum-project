@@ -6,7 +6,7 @@ import BlackModal from './BlackModal'
 import { Outlet } from 'react-router-dom'
 import { useCookies } from 'react-cookie'
 import { ToastContainer } from 'react-toastify'
-import { useEffect } from 'react'
+import { memo, useEffect } from 'react'
 import { useBlackModalStore } from 'store/modal'
 
 //          component: 관리자 컴포넌트              //
@@ -22,7 +22,6 @@ const Manager = () => {
             openModal();
             setWhiteModal("핀")
         }
-
     }, [cookies.managerToken === undefined]);
 
     //          render: 관리자 렌더링              //
@@ -31,10 +30,7 @@ const Manager = () => {
             {cookies.managerToken !== undefined &&
                 <>
                     <Header />
-                    <Container>
-                        <ToastContainer style={{ fontSize: "18px" }} />
-                        <Outlet />
-                    </Container>
+                    <ContainerE />
                     <Footer />
                     <WebSocket />
                 </>
@@ -43,8 +39,20 @@ const Manager = () => {
         </ManagerE>
     )
 }
+export default memo(Manager);
 
-export default Manager
+//          component: 관리자 컨테이너 컴포넌트              //
+const ContainerE = memo(() => {
+    //          render: 관리자 컨테이너 렌더링              //
+    return (
+        <Container>
+            <ToastContainer style={{ fontSize: "18px" }} />
+            <Outlet />
+        </Container>
+    )
+})
+
+
 
 const ManagerE = styled.div`
     position: fixed;

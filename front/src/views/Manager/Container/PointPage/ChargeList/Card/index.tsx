@@ -31,14 +31,12 @@ const Card = ({ chargeDetail }: { chargeDetail: PointChargeDetail }) => {
 
 export default memo(Card, (prevProps, nextProps) => isEqual(prevProps.chargeDetail.pointChargeId, nextProps.chargeDetail.pointChargeId));
 
-
-
 const CardE = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding: 12px;
+    padding: 8px;
     box-sizing: border-box;
     border-radius: 8px;
     border: 1px solid #EABEAB;

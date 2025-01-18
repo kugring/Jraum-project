@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import OrderPageHeader from './OrderPageHeader';
 import PointPageHeader from './PointPageHeader';
 import useManagerStore from 'store/manager/manager.store';
@@ -34,6 +34,7 @@ const Header = () => {
         setWhiteModal("현금결제승인")
     };
 
+    const navigate = useNavigate(); // useNavigate는 항상 새로 생성되지 않음
 
 
     //          render: 관리자 헤더 렌더링              //
@@ -47,7 +48,7 @@ const Header = () => {
                     <PointPageHeader />
                 }
                 {isUser &&
-                    <div>회원 관리</div>
+                    <div onClick={() => navigate("/jraum")}>회원 관리</div>
                 }
                 {isMenu &&
                     <MenuPageHeader/>
