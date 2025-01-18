@@ -1,12 +1,13 @@
 import Header from './Header'
 import Footer from './Footer'
 import styled from 'styled-components'
-import PinCheck from './PinCheck'
 import WebSocket from './WebSocket'
 import BlackModal from './BlackModal'
 import { Outlet } from 'react-router-dom'
 import { useCookies } from 'react-cookie'
 import { ToastContainer } from 'react-toastify'
+import { useEffect } from 'react'
+import { useBlackModalStore } from 'store/modal'
 
 //          component: 관리자 컴포넌트              //
 const Manager = () => {
@@ -14,26 +15,31 @@ const Manager = () => {
     //          state: 쿠키 상태            //
     const [cookies,] = useCookies(['managerToken']);
 
+    //          effect: 관리자 토큰 확인 이펙트             //
+    useEffect(() => {
+        if (cookies.managerToken === undefined) {
+            const { openModal, setWhiteModal } = useBlackModalStore.getState();
+            openModal();
+            setWhiteModal("핀")
+        }
+
+    }, [cookies.managerToken === undefined]);
+
     //          render: 관리자 렌더링              //
     return (
         <ManagerE>
-            {cookies.managerToken === undefined ?
+            {cookies.managerToken !== undefined &&
                 <>
-                    <PinCheck />
-                    {/* <TTSComponent /> 25/01/10 아직은 안쓸꺼임 */}
-                </>
-                :
-                <>
-                    <WebSocket />
                     <Header />
                     <Container>
-                        <ToastContainer style={{ fontSize: "18px" }}/>
+                        <ToastContainer style={{ fontSize: "18px" }} />
                         <Outlet />
                     </Container>
                     <Footer />
-                    <BlackModal />
+                    <WebSocket />
                 </>
             }
+            <BlackModal />
         </ManagerE>
     )
 }
@@ -52,8 +58,7 @@ const ManagerE = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-
-    background-color: rgba(0,0,0,0.6);
+    background-color: var(--seashell);
 `
 
 const Container = styled.div`

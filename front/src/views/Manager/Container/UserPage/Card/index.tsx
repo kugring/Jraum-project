@@ -95,7 +95,7 @@ const Card = ({ user }: { user: SortedUser }) => {
     )
 }
 
-export default memo(Card, (prevProps, nextProps) => isEqual(prevProps.user.userId, nextProps.user.userId));
+export default memo(Card, (prevProps, nextProps) => isEqual(prevProps.user.name, nextProps.user.name));
 
 
 const CardE = styled.div`

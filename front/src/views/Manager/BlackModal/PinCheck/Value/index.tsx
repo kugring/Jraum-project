@@ -7,6 +7,7 @@ import { postPinCheckManagerRequest } from 'apis';
 import { PostPinCheckManagerResponseDto } from 'apis/response/manager';
 import { useNavigate } from 'react-router-dom';
 import useManagerStore from 'store/manager/manager.store';
+import { useBlackModalStore } from 'store/modal';
 
 
 //          component: 입력 n번째 문자 컴포넌트             //
@@ -25,7 +26,8 @@ const Value = ({ index }: { index: number }) => {
     //          state: 쿠키 상태            //
     const [, setCookie] = useCookies(['managerToken']);
 
-
+    //          function: 블랙 모달 닫는 함수               //
+    const closeModal = useBlackModalStore.getState().closeModal;
     //          function: 핀회원 저장하는 함수            //
     const setManager = useManagerStore.getState().setManager;
     //          function: 메세지 문장 변경하는 함수수          //
@@ -55,13 +57,15 @@ const Value = ({ index }: { index: number }) => {
 
         // 핀 토근을 저장하고 /jraum안에서만 사용이 가능한 토큰이다.
         const now = new Date().getTime();
-        const expires = new Date(now + expirationTime * 1000)
+        const expires = new Date(now + expirationTime * 24 * 30 * 6 * 1000) // 24시간 * 30일 * 6개월 * 1초
+        // const expires = new Date(now + expirationTime - 1000)
 
         // 블랙 모달이 다 내려가고 토큰 값을 저장하기! 그레야 리렌더링이 발생하지 않는다.
-        setCookie('managerToken', token, { expires, path: "/jraum/manager/" })
+        setCookie('managerToken', token, { expires, path: "/" })
         // 주문 확인 페이지로 이동
         // navigate('/jraum/manager/order');
         navigate('order'); // 상대 경로로 이동
+        closeModal();
     }
 
 

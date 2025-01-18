@@ -25,9 +25,9 @@ const NumberBoard = () => {
             <NumberButton onClick={() => pushPin("7")}>{7}</NumberButton>
             <NumberButton onClick={() => pushPin("8")}>{8}</NumberButton>
             <NumberButton onClick={() => pushPin("9")}>{9}</NumberButton>
-            <Reset size={42} color='var(--copperOrange)' onClick={() => setPin('')} />
+            <Reset color='var(--copperOrange)' onClick={() => setPin('')} />
             <NumberButton onClick={() => pushPin("0")}>{0}</NumberButton>
-            <Delete size={42} color='var(--copperOrange)' onClick={popPin} />
+            <Delete color='var(--copperOrange)' onClick={popPin} />
         </NumberBoardE>
     )
 }
@@ -42,22 +42,24 @@ const NumberBoardE = styled.div`
 `;
 
 const NumberButton = styled.div`
-  padding: 16px 0;
+  padding: 14px 0;
   text-align: center;
   font-size: 36px;
   border-radius: 5px;
   cursor: pointer;
   color: var(--copperOrange);
 `;
+
 const Reset = styled(GrPowerReset)`
-  padding: 16px 0;    
+  padding: 14px 0;
   width: 100%;
-  font-size: 32px;
+  font-size: 36px;
   border-radius: 5px;
   cursor: pointer;
 `;
+
 const Delete = styled(FaDeleteLeft)`
-  padding: 16px 0;    
+  padding: 14px 0;
   width: 100%;
   font-size: 32px;
   border-radius: 5px;

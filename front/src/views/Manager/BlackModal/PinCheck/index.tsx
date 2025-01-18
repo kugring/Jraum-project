@@ -29,6 +29,7 @@ const PinCheck = () => {
                 <svg width="100%" height="5"> <line x1="0" y1="5" x2="100%" y2="5" stroke="var(--copperOrange)" strokeWidth="4" strokeDasharray="12, 10" strokeLinecap="round" /> </svg>
                 <NumberBoard />
             </Body>
+            <Prevent/>
         </PinCheckE>
     )
 }
@@ -36,19 +37,26 @@ const PinCheck = () => {
 export default PinCheck
 
 const PinCheckE = styled.div`
-
     display: flex;
     flex-direction: column;
-    width: 100%;
-    max-width: 420px;
-
+    min-width: 340px;
+    width: 340px;
     padding: 28px 28px 12px;
-    gap: 18px;
+    gap: 12px;
     border: 12px solid var(--goldenOrange);
     box-sizing: border-box;
     border-radius: 26px;
-
     background-color: var(--seashell);
+`
+
+const Prevent = styled.div`
+    position: absolute;
+    inset: 0; /* top: 0; right: 0; bottom: 0; left: 0; 와 동일 */
+    width: 200vw;
+    height: 200vh;
+    transform: translate(-50%, -50%);
+    
+    z-index: -1; /* 다른 요소 위에 나타나도록 z-index 설정 */
 `
 
 const Header = styled.div`
@@ -83,7 +91,7 @@ const InputValue = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 48px;
+    font-size: 38px;
     aspect-ratio: 1 / 1;
     color: var(--copperOrange);
     border-radius: 10px;

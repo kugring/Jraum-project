@@ -3,6 +3,7 @@ import useUserPageStore from "./user-page.store";
 import useMenuPageStore from "./menu-page.store";
 import useOrderPageStore from "./order-page.store";
 import usePointPageStore from "./point-page.store";
+import useMenuPageModalStore from "./menu-page-modal.store";
 import useUserPageModalStore from "./user-page-modal.store";
 import useOrderListPageStore from "./order-list.store";
 import useOrderManagementStore from "./order-management.store";
@@ -17,6 +18,7 @@ export {
     useMenuPageStore,
     useOrderPageStore,
     usePointPageStore,
+    useMenuPageModalStore,
     useUserPageModalStore,
     useOrderListPageStore,
     useOrderManagementStore,

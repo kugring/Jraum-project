@@ -4,9 +4,10 @@ import { CiEdit } from "react-icons/ci";
 import { ResponseDto } from 'apis/response';
 import { FaCaretDown } from "react-icons/fa";
 import { useCookies } from 'react-cookie';
+import { useQueryClient } from '@tanstack/react-query';
 import { useBlackModalStore } from 'store/modal';
-import { useUserPageModalStore } from 'store/manager';
 import { defaultUserImage, formattedPoint } from 'constant';
+import { useUserPageModalStore, useUserPageStore } from 'store/manager';
 import { ChangeEvent, forwardRef, memo, useEffect, useRef } from 'react';
 import { JraumSignUpRequestDto, NicknameDpCheckRequestDto, PinDpCheckRequestDto } from 'apis/request/auth';
 import { JraumSignUpResponseDto, NicknameDpcheckResponseDto, PinDpcheckResponseDto } from 'apis/response/auth';
@@ -18,30 +19,30 @@ const UserAdd = () => {
 
     //          state: 쿠키 상태                //
     const [cookies,] = useCookies();
+    //          state: 리액트 쿼리 상태            //
+    const queryClient = useQueryClient();
 
     //          function: 블랙모달 열고 닫는 함수               //
     const closeModal = useBlackModalStore.getState().closeModal;
 
-    // 상태 가져오기
-    const {
-        pin,
-        name,
-        canPin,
-        nickname,
-        initialName,
-        phoneNumber,
-        canNickname,
-        directPoint,
-        selectedValues,
-        profileImage,
-        resetState, // 상태 초기화 함수
-    } = useUserPageModalStore.getState();
 
     //          event handler: 회원 등록 버튼 클릭 이벤트 함수         //
     const onUserAddClickHandler = () => {
         if (!cookies.managerToken) return;
 
-
+        // 상태 가져오기
+        const {
+            pin,
+            name,
+            canPin,
+            nickname,
+            initialName,
+            phoneNumber,
+            canNickname,
+            directPoint,
+            selectedValues,
+            profileImage,
+        } = useUserPageModalStore.getState();
 
         // 유효성 검사 함수
         const validateInput = () => {
@@ -86,15 +87,25 @@ const UserAdd = () => {
         if (code === 'DP') alert('회원번호가 중복되었습니다.');
         if (code !== 'SU') return;
         toast.success('정상적으로 회원이 등록되었습니다.', {
-            autoClose: 1500,
+            autoClose: 500,
             position: "top-center",
             closeOnClick: true, // 클릭 시 바로 사라짐
+            pauseOnHover: false
         });
+
+        const { page, limited, name, sort } = useUserPageStore.getState();
+        const limit = limited;
+        // 데이터 업데이트 후, 다시 리페치
+        queryClient.invalidateQueries({
+            queryKey: ['usersQ', page, limit, name, sort], // queryKey를 명시적으로 전달
+        });
+
         closeModal();
     }
 
     // 컴포넌트 언마운트 시 상태 리셋
     useEffect(() => {
+        const resetState = useUserPageModalStore.getState().resetState;
         return () => resetState(null); // 언마운트 시 상태 초기화
     }, []);
 

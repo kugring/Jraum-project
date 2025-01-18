@@ -7,6 +7,7 @@ import UserAdd from '../Container/UserPage/UserModal/UserAdd';
 import UserEdit from '../Container/UserPage/UserModal/UserEdit';
 import CashPayModal from './CashPayModal';
 import AlertModal from './AlertModal';
+import PinCheck from './PinCheck';
 
 
 //        component: 모달 모음 컴포넌트       //
@@ -77,6 +78,8 @@ const BlackModal = () => {
                                 return <CashPayModal />;
                             case '안내창':
                                 return <AlertModal />;
+                            case '핀':
+                                return <PinCheck />;
                             default:
                                 return null; // 조건에 맞는 값이 없을 때는 아무것도 렌더링하지 않음
                         }

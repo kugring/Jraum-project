@@ -21,14 +21,20 @@ export class WebSocketManager {
   connect(onConnect?: () => void, onDisconnect?: () => void) {
     const socket = new SockJS(this.url); // WebSocket 연결 생성
     this.client = new Client({
-      webSocketFactory: () => socket, // SockJS를 통해 WebSocket 연결 설정
+      webSocketFactory: () => socket,
       onConnect: () => {
         console.log('WebSocket connected');
-        if (onConnect) onConnect(); // 연결 성공 시 사용자 정의 콜백 실행
+        if (onConnect) onConnect();
       },
       onDisconnect: () => {
         console.log('WebSocket disconnected');
-        if (onDisconnect) onDisconnect(); // 연결 종료 시 사용자 정의 콜백 실행
+        if (onDisconnect) onDisconnect();
+        // 재연결 시도
+        setTimeout(() => this.connect(onConnect, onDisconnect), 5000); // 5초 후 재연결 시도
+      },
+      onStompError: (frame) => {
+        console.error(`STOMP error: ${frame.body}`);
+        // STOMP 연결 실패 시 처리
       },
     });
     this.client.activate(); // WebSocket 연결 활성화

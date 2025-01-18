@@ -92,7 +92,7 @@ const InputValue = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-    font-size: 38px;
+  font-size: 38px;
   aspect-ratio: 1 / 1;
   color: var(--copperOrange);
   border-radius: 10px;

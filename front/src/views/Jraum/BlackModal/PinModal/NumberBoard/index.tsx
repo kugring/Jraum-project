@@ -43,22 +43,24 @@ const NumberBoardE = styled.div`
 `;
 
 const NumberButton = styled.div`
-  padding: 12px 0;
+  padding: 14px 0;
   text-align: center;
-  font-size: 34px;
+  font-size: 36px;
   border-radius: 5px;
   cursor: pointer;
   color: var(--copperOrange);
 `;
+
 const Reset = styled(GrPowerReset)`
-  padding: 12px 0;
+  padding: 14px 0;
   width: 100%;
   font-size: 36px;
   border-radius: 5px;
   cursor: pointer;
 `;
+
 const Delete = styled(FaDeleteLeft)`
-  padding: 12px 0;
+  padding: 14px 0;
   width: 100%;
   font-size: 36px;
   border-radius: 5px;

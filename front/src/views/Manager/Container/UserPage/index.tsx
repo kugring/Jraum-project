@@ -93,14 +93,14 @@ const CardBoxE = () => {
     const setEnd = useUserPageStore.getState().setEnd;
     const setPage = useUserPageStore.getState().setPage;
     const setSort = useUserPageStore.getState().setSort;
-    const setUsers = useUserPageStore.getState().setUsers;
+    const addUsers = useUserPageStore.getState().addUsers;
     const resetUsers = useUserPageStore.getState().resetUsers;
     const setIsLoading = useUserPageStore.getState().setIsLoading;
 
 
     //          function: 회원 목록 불러오는 함수            //
     const { data: usersQ, isSuccess } = useQuery<GetSortedUserResponseDto>({
-        queryKey: ['usuersQ', page, limit, name, sort],  // 의존성 배열에 상태를 추가하여 쿼리 실행
+        queryKey: ['usersQ', page, limit, name, sort],  // 의존성 배열에 상태를 추가하여 쿼리 실행
         queryFn: () => {
             const SORT_MAPPING: Record<string, string> = {
                 "최근": "updatedAt",
@@ -111,7 +111,7 @@ const CardBoxE = () => {
             const sorted = SORT_MAPPING[sort] || "";
             return getSortedUserRequest(cookies.managerToken, page, limit, name, sorted);
         },
-        staleTime: 1000 * 3, // 3초
+        staleTime: 1000 * 60 * 5, // 3초
     });
 
 
@@ -124,7 +124,9 @@ const CardBoxE = () => {
         if (code !== 'SU') return;
 
         const { users } = responseBody as GetSortedUserResponseDto;
-        setUsers(users);
+        // console.log("새로운 users: "+ JSON.stringify(users));
+        
+        addUsers(users);
 
         if (users.length !== 0) {
             setIsLoading(false);
@@ -151,6 +153,12 @@ const CardBoxE = () => {
             getSortedUserResponse(usersQ);
         }
     }, [isSuccess, usersQ]);
+
+    //          effect: 데이터 불러오기 성공 시 처리          //
+    useEffect(() => {
+            console.log(users);
+    }, [users]);
+
 
 
 

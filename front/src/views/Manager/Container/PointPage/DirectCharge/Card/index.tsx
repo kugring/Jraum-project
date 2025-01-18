@@ -48,9 +48,10 @@ const Card = ({ user }: { user: SortedUser }) => {
         setDirectPoint("0")
         setShow(false)
         toast.success('정상적으로 충전되었습니다.', {
-            autoClose: 1500,
+            autoClose: 500,
             position: "top-center",
             closeOnClick: true, // 클릭 시 바로 사라짐
+            pauseOnHover: false
         });
     }
     //          event handler: 직접 충전을 진행하는 함수           //

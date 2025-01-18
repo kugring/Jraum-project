@@ -1,5 +1,5 @@
 import { TEST_DOMAIN } from 'constant';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import useManagerStore from 'store/manager/manager.store';
 import useOrderManagementStore from 'store/manager/order-management.store';
 import usePointChargeRequestStore from 'store/manager/point-charge-request.store';
@@ -21,12 +21,15 @@ const WebSocket = () => {
     //              state: 웹소켓 매니저 상태               //
     const { manager } = useWebSocketStore.getState();
 
+    //              state: 웹소켓 초기 연결 상태                //
+    const connectRef = useRef<boolean>(false);
+
     //              function: 사용자 주문 웹소켓 구독 핸들러               // 
     const OrderSubscribe = () => {
         const addOrder = useOrderManagementStore.getState().addOrder;
         manager?.subscribe('/receive/manager/order', (order) => {
             addOrder(order);
-            console.log("order: "+ order);
+            // console.log("order: "+ order);
         });
     };
 
@@ -36,7 +39,6 @@ const WebSocket = () => {
         const setCashPayWaiting = useManagerStore.getState().setCashPayWaiting;
         manager?.subscribe('/receive/manager/cashPay/info', (data) => {
             const { totalPrice, waiting } = data;
-            console.log(totalPrice, waiting );
             setCashPayWaiting(waiting);
             setCashPrice(totalPrice);
         });
@@ -64,7 +66,6 @@ const WebSocket = () => {
     useEffect(() => {
         initialize(wsUrl); // WebSocketManager 초기화
         connect(); // WebSocket 연결
-
         return () => {
             disconnect(); // 컴포넌트 언마운트 시 연결 해제
         };
@@ -72,7 +73,9 @@ const WebSocket = () => {
 
     //              effect: 웹소켓이 연결되면 이후에 구독하는 이펙트                //
     useEffect(() => {
-        if (connected) {
+        if (connected && !connectRef.current) {
+            connectRef.current = true;
+        } else if (connected) {
             OrderSubscribe();
             CashPaySubscribe();
             handleSendMessage();

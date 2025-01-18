@@ -4,14 +4,15 @@ import { CiEdit } from 'react-icons/ci'
 import { useCookies } from 'react-cookie'
 import { FaCaretDown } from 'react-icons/fa'
 import { ResponseDto } from 'apis/response'
+import { useQueryClient } from '@tanstack/react-query'
 import { useUserPageStore } from 'store/manager'
 import { defaultUserImage } from 'constant'
 import { useBlackModalStore } from 'store/modal'
 import { useUserPageModalStore } from 'store/manager'
 import { PatchUserEditRequestDto } from 'apis/request/user'
 import { PatchUserEditResponseDto } from 'apis/response/user'
-import { ChangeEvent, forwardRef, memo, useEffect, useRef } from 'react'
 import { NicknameDpCheckRequestDto, PinDpCheckRequestDto } from 'apis/request/auth'
+import { ChangeEvent, forwardRef, memo, useEffect, useRef } from 'react'
 import { NicknameDpcheckResponseDto, PinDpcheckResponseDto } from 'apis/response/auth'
 import { fileUploadRequest, nicknameDpCheckRequest, patchUserEditRequest, pinDpCheckRequest } from 'apis'
 
@@ -20,35 +21,36 @@ const UserEdit = () => {
 
     //          state: 쿠키 상태                //
     const [cookies,] = useCookies();
-
     //          state: 상태 가져오기            //
     const user = useUserPageStore.getState().editUser;
-    const {
-        pin,
-        name,
-        canPin,
-        userId,
-        nickname,
-        initialName,
-        phoneNumber,
-        canNickname,
-        selectedValues,
-        profileImage,
-        resetState, // 상태 초기화 함수
-    } = useUserPageModalStore.getState();
-
+    //          state: 리액트 쿼리 상태            //
+    const queryClient = useQueryClient();
+    
     //          function: 블랙모달 열고 닫는 함수               //
     const closeModal = useBlackModalStore.getState().closeModal;
-
     //          event handler: 회원 수정 버튼 클릭 이벤트 함수         //
-    const onUserAddClickHandler = () => {
+    const onUserEditClickHandler = () => {
         if (!cookies.managerToken) return;
-        if (selectedValues.position === "선택") return alert("부서를 선택해주세요");
-        if (selectedValues.office === "선택") return alert("직책을 선택해주세요");
-        if (pin.length !== 4) return alert("회원번호 4자리를 입력해주세요");
+
+        const {
+            pin,
+            name,
+            canPin,
+            userId,
+            nickname,
+            initialName,
+            phoneNumber,
+            canNickname,
+            selectedValues,
+            profileImage,
+        } = useUserPageModalStore.getState();
+
         if (!canPin) return alert("회원번호의 중복을 주의해주세요.");
-        if (name.length < 2) return alert("이름을 두자리 이상 작성해주세요");
         if (!canNickname) return alert("닉네임의 중복을 주의해주세요.");
+        if (name.length < 2) return alert("이름을 두자리 이상 작성해주세요");
+        if (pin.length !== 4) return alert("회원번호 4자리를 입력해주세요");
+        if (selectedValues.office === "선택") return alert("직책을 선택해주세요");
+        if (selectedValues.position === "선택") return alert("부서를 선택해주세요");
         const requestBody: PatchUserEditRequestDto = {
             pin: pin,
             name: name,
@@ -62,7 +64,7 @@ const UserEdit = () => {
         }
         patchUserEditRequest(requestBody, cookies.managerToken).then(patchUserEditResponse)
     };
-    //          function: 회원 등록 처리 함수          //
+    //          function: 회원 수정 처리 함수          //
     const patchUserEditResponse = (responseBody: PatchUserEditResponseDto | ResponseDto | null) => {
         if (!responseBody) return;
         const { code } = responseBody;
@@ -71,16 +73,29 @@ const UserEdit = () => {
         if (code === 'DN') alert('닉네임이 중복되었습니다.');
         if (code === 'DP') alert('회원번호가 중복되었습니다.');
         if (code !== 'SU') return;
+
         toast.success('회원정보가 수정되었습니다.', {
-            autoClose: 1500,
+            autoClose: 500,
             position: "top-center",
             closeOnClick: true, // 클릭 시 바로 사라짐
+            pauseOnHover: false
         });
+
+        const { page, limited, name, sort } = useUserPageStore.getState();
+        const limit = limited;
+        // 데이터 업데이트 후, 다시 리페치
+        queryClient.invalidateQueries({
+            queryKey: ['usersQ', page, limit, name, sort], // queryKey를 명시적으로 전달
+        });
+
         closeModal();
+
+
     }
 
-    // 컴포넌트 언마운트 시 상태 리셋
+    //              effect: 컴포넌트 언마운트 시 상태 리셋                  //
     useEffect(() => {
+        const resetState = useUserPageModalStore.getState().resetState;
         resetState(user); // user 데이터를 초기값으로 설정
         return () => resetState(null); // 언마운트 시 상태 초기화
     }, [user]);
@@ -101,7 +116,7 @@ const UserEdit = () => {
                 <PhoneNumberInputBoxE />
                 <Buttons>
                     <Cancel onClick={closeModal}>취소</Cancel>
-                    <AddComplete onClick={onUserAddClickHandler}>회원 등록</AddComplete>
+                    <AddComplete onClick={onUserEditClickHandler}>회원 수정</AddComplete>
                 </Buttons>
             </InputContainer>
         </UserEditE>
@@ -305,6 +320,8 @@ const PinInputValueE = () => {
     const handlePinChange = (inputValue: string) => {
         if (inputValue.length > 4) return;
         setPin(inputValue); // 상태에 숫자 값 저장
+        const pin = useUserPageStore.getState().editUser?.pin;
+        if (inputValue === pin) { return setCanPin(true) }
         if (!cookies.managerToken) return;
         if (inputValue.length === 4) {
             const requestBody: PinDpCheckRequestDto = { pin: inputValue }

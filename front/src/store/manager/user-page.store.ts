@@ -17,7 +17,7 @@ interface UserPageStore {
   setName: (name: string) => void;
   setSort: (sort: string) => void;
   setPage: (page: number) => void;
-  setUsers: (users: SortedUser[]) => void;
+  addUsers: (users: SortedUser[]) => void;
   resetUsers: () => void;
   setLimited: (limited: number) => void;
   setEditUser: (user: SortedUser | null) => void;
@@ -42,15 +42,18 @@ const useUserPageStore = create<UserPageStore>()(
     setName: (name) => set({ name: name }),
     setSort: (sort) => set({ sort: sort }),
     setPage: (page: number) => set({ page }),
-    setUsers: (newUsers: SortedUser[]) =>
+    addUsers: (newUsers: SortedUser[]) =>
       set((state) => {
-        // 기존 users와 newUsers를 합친 후 중복 제거
-        const updatedUsers = [...state.users, ...newUsers];
+        // 기존 users를 복사
+        const existingUsersMap = new Map(state.users.map((user) => [user.userId, user]));
 
-        // 중복된 userId를 제거 (userId가 고유하다고 가정)
-        const uniqueUsers = Array.from(new Set(updatedUsers.map(user => user.userId)))
-          .map(id => updatedUsers.find(user => user.userId === id))
-          .filter((user): user is SortedUser => user !== undefined); // undefined를 필터링
+        // 새로운 users를 기존 users에 병합
+        newUsers.forEach((user) => {
+          existingUsersMap.set(user.userId, user); // 기존 userId가 있으면 덮어씌움
+        });
+
+        // Map에서 고유한 users 배열 생성
+        const uniqueUsers = Array.from(existingUsersMap.values());
 
         return { users: uniqueUsers };
       }),

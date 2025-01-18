@@ -40,9 +40,10 @@ const Card = ({ request }: { request: ChargeRequestListItem }) => {
 
         manager?.sendMessage('/send/pointCharge/requestOk', { pointChargeId: request.pointChargeId, status: "승인" }); // 메시지 전송
         toast.success('충전이 승인되었습니다.', {
-            autoClose: 1500,
+            autoClose: 500,
             position: "top-center",
             closeOnClick: true, // 클릭 시 바로 사라짐
+            pauseOnHover: false
           });
         removeChargeRequest(request);
     }
@@ -64,9 +65,10 @@ const Card = ({ request }: { request: ChargeRequestListItem }) => {
 
         manager?.sendMessage('/send/pointCharge/requestOk', { pointChargeId: request.pointChargeId, status: "거절" }); // 메시지 전송
         toast.warn('충전이 거절되었습니다.', {
-            autoClose: 1500,
+            autoClose: 500,
             position: "top-center",
             closeOnClick: true, // 클릭 시 바로 사라짐
+            pauseOnHover: false
           });
         removeChargeRequest(request);
     }
