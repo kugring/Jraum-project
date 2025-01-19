@@ -1,7 +1,7 @@
 import Header from './Header'
 import Footer from './Footer'
 import styled from 'styled-components'
-import WebSocket from './WebSocket'
+import WSSubscription from './WSSubscription'
 import BlackModal from './BlackModal'
 import { Outlet } from 'react-router-dom'
 import { useCookies } from 'react-cookie'
@@ -32,7 +32,7 @@ const Manager = () => {
                     <Header />
                     <ContainerE />
                     <Footer />
-                    <WebSocket />
+                    <WSSubscription />
                 </>
             }
             <BlackModal />

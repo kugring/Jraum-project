@@ -1,6 +1,7 @@
 import Header from 'layouts/Header'
 import { Outlet, useLocation } from 'react-router-dom'
 import styled from 'styled-components';
+import WebSocket from 'views/Jraum/WebSocket';
 
 //          component: 레이어웃            //
 export default function Container() {
@@ -10,6 +11,7 @@ export default function Container() {
   //          render: 레이어웃 렌더링           //
   return (
     <ContainerE>
+      <WebSocket/>
       {!pathname.startsWith('/jraum/manager') && <Header />}
       <Outlet />
     </ContainerE>

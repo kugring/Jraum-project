@@ -157,27 +157,30 @@ public class FileServiceImplement implements FileService {
         }
     }
 
-    
-
-
-        // SSML 텍스트 생성
+    // SSML 텍스트 생성
     public String generateSsml(Order order) {
         StringBuilder ssmlText = new StringBuilder();
-        
+
         // SSML 기본 구조
         ssmlText.append("<speak>");
-        
+
         // 주문자 이름 강조
         ssmlText.append("<emphasis level=\"strong\">")
-                .append(order.getUser().getName())
-                .append("님,</emphasis>")
-                .append("<break time=\"500ms\"/>");
+                .append(order.getUser().getName());
+
+        if (order.getUser().getOffice().equals("단체")) {
+            ssmlText.append(",</emphasis>");
+        } else {
+            ssmlText.append("님,</emphasis>");
+        }
+
+        ssmlText.append("<break time=\"500ms\"/>");
 
         // 주문 항목 반복
         for (OrderDetail orderDetail : order.getOrderDetails()) {
-            String menuName = orderDetail.getMenu().getName();  // 메뉴 이름
-            int quantity = orderDetail.getQuantity();  // 수량
-            
+            String menuName = orderDetail.getMenu().getName(); // 메뉴 이름
+            int quantity = orderDetail.getQuantity(); // 수량
+
             // 각 메뉴와 수량에 대한 SSML 태그 생성
             ssmlText.append("<emphasis level=\"strong\">")
                     .append(menuName)
@@ -185,7 +188,7 @@ public class FileServiceImplement implements FileService {
                     .append(quantity)
                     .append("잔,</emphasis>");
         }
-        
+
         // SSML 끝 태그
         ssmlText.append("<prosody level=\"strong\" pitch=\"+10%\">나왔습니닿아~</prosody>");
         ssmlText.append("</speak>");

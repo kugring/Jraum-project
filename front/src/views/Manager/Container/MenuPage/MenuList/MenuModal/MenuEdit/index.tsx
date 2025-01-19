@@ -59,7 +59,7 @@ const MenuEdit = () => {
             name: name,
             image: image,
             price: parseInt(price, 10),
-            status: status ? 0 : 1,
+            status: status ? 1 : 0,
             options: options,
             category: selectedValues.category,
             temperature: selectedValues.temperature,
