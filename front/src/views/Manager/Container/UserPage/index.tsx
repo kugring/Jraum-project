@@ -125,7 +125,7 @@ const CardBoxE = () => {
 
         const { users } = responseBody as GetSortedUserResponseDto;
         // console.log("새로운 users: "+ JSON.stringify(users));
-        
+
         addUsers(users);
 
         if (users.length !== 0) {
@@ -153,13 +153,6 @@ const CardBoxE = () => {
             getSortedUserResponse(usersQ);
         }
     }, [isSuccess, usersQ]);
-
-    //          effect: 데이터 불러오기 성공 시 처리          //
-    useEffect(() => {
-            console.log(users);
-    }, [users]);
-
-
 
 
     //          function: 스크롤 이벤트 핸들러          //

@@ -69,10 +69,7 @@ const WSSubscription = () => {
 
     //              render: 웹소켓 렌더링              //
     return (
-        <div>
-            <h1>WebSocket with Zustand</h1>
-            <button onClick={handleSendMessage}>Send Order Message</button>
-        </div>
+        <></>
     );
 };
 

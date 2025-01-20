@@ -81,16 +81,8 @@ const UserEdit = () => {
             pauseOnHover: false
         });
 
-        const { page, limited, name, sort } = useUserPageStore.getState();
-        const limit = limited;
-        // 데이터 업데이트 후, 다시 리페치
-        queryClient.invalidateQueries({
-            queryKey: ['usersQ', page, limit, name, sort], // queryKey를 명시적으로 전달
-        });
-
+        queryClient.removeQueries({ queryKey: ['usersQ'], exact: false });
         closeModal();
-
-
     }
 
     //              effect: 컴포넌트 언마운트 시 상태 리셋                  //

@@ -5,43 +5,51 @@ import { IoCheckbox } from "react-icons/io5";
 import { useCookies } from 'react-cookie';
 import { ResponseDto } from 'apis/response';
 import { FaCaretDown } from "react-icons/fa";
+import { useQueryClient } from '@tanstack/react-query';
 import { useBlackModalStore } from 'store/modal';
 import { PostMenuRequestDto } from 'apis/request/menu';
 import { PostMenuResponseDto } from 'apis/response/menu';
+import { useMenuPageModalStore, useMenuPageStore } from 'store/manager';
 import { MdOutlineCheckBoxOutlineBlank } from "react-icons/md";
 import { fileUploadRequest, postMenuRequest } from 'apis';
 import { ChangeEvent, forwardRef, memo, useEffect, useRef } from 'react';
 import { defaultMenuImage, formattedPoint, optionSelectList } from 'constant';
-import useMenuPageModalStore from 'store/manager/menu-page-modal.store';
 
 //              component: 메뉴 추가 컴포넌트               //
 const MenuAdd = () => {
 
+    //              state: 리액트 쿼리 상태             //
+    const queryClient = useQueryClient(); // React Query 클라이언트 가져오기
     //              state: 쿠키 상태                //
     const [cookies,] = useCookies();
 
     //              function: 블랙모달 열고 닫는 함수               //
     const closeModal = useBlackModalStore.getState().closeModal;
 
-    // 상태 가져오기
-    const {
-        name,
-        image,
-        price,
-        status,
-        options,
-        selectedValues,
-        resetState, // 상태 초기화 함수
-    } = useMenuPageModalStore.getState();
 
     //              function: 메뉴를 추가하는 함수              //
     const menuAdd = () => {
+
+
+        // 상태 가져오기
+        const {
+            name,
+            image,
+            price,
+            status,
+            options,
+            selectedValues,
+        } = useMenuPageModalStore.getState();
+
+
         // 유효성 검사 함수
         const validateInput = () => {
             if (name === "") return "메뉴 이름을 작성해주세요.";
             if (image === "") return "이미지를 업로드 해주세요.";
             if (price === "") return "가격을 작성해주세요.";
             if (options.length < 1) return "옵션을 선택해주세요.";
+            if (selectedValues.category === "") return "카테고리 항목을 선택해주세요.";
+            if (selectedValues.temperature === "") return "음료의 온도를 선택해주세요.";
             if (selectedValues.espressoShot === "") return "샷이 필요한 수를 작성해주세요.";
             return null;
         };
@@ -82,10 +90,19 @@ const MenuAdd = () => {
             closeOnClick: true, // 클릭 시 바로 사라짐
             pauseOnHover: false
         });
+
+        // 쿼리 무효화
+        const filterCategory = useMenuPageStore.getState().category;
+        const modalCategory = useMenuPageModalStore.getState().selectedValues.category;
+        queryClient.invalidateQueries({queryKey: ['menuListQ', filterCategory]});
+        queryClient.invalidateQueries({queryKey: ['menuListQ', modalCategory]});
     };
 
     //              effect: 컴포넌트 언마운트 시 상태 리셋              //
     useEffect(() => {
+
+        const resetState = useMenuPageModalStore.getState().resetState;
+
         return () => resetState(null); // 언마운트 시 상태 초기화
     }, []);
 

@@ -22,13 +22,11 @@ const MenuPageHeader = () => {
             setCookie('managerToken', '', { expires: new Date(0), path: MAIN_PATH() });
         }
         return (
-            <>
-                <SubPage
-                    $select={useMenuPageStore(state => state.subPage === subPageText)}
-                    onClick={() => { useMenuPageStore.getState().setSubPage(subPageText); resetToken(); }}>
-                    {subPage}
-                </SubPage>
-            </>
+            <SubPage
+                $select={useMenuPageStore(state => state.subPage === subPageText)}
+                onClick={() => { useMenuPageStore.getState().setSubPage(subPageText); resetToken(); }}>
+                {subPage}
+            </SubPage>
         )
     }
 

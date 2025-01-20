@@ -20,7 +20,7 @@ public class JwtProvider {
   private String secretKey;
 
   public String create(String userId) {
-    Date expiredDate = Date.from(Instant.now().plus(1, ChronoUnit.HOURS)); // 이코드가 해당 토큰을 1시간으로 지정하는 듯하다!
+    Date expiredDate = Date.from(Instant.now().plus(3, ChronoUnit.MONTHS));  // 3개월 후
     Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)); // 이 코드는 application.properties의
                                                                               // secretKey를 가져다 무언가를 하는듯하다!
     String jwt = Jwts

@@ -78,7 +78,7 @@ const UserAdd = () => {
     };
 
     //          function: 회원 등록 처리 함수          //
-    const jraumSignUpResponse = (responseBody: JraumSignUpResponseDto | ResponseDto | null) => {
+    const jraumSignUpResponse = async (responseBody: JraumSignUpResponseDto | ResponseDto | null) => {
         if (!responseBody) return;
         const { code } = responseBody;
         if (code === 'DBE') alert('데이터베이스 오류입니다.');
@@ -93,17 +93,13 @@ const UserAdd = () => {
             pauseOnHover: false
         });
 
-        const { page, limited, name, sort } = useUserPageStore.getState();
-        const limit = limited;
-        // 데이터 업데이트 후, 다시 리페치
-        queryClient.invalidateQueries({
-            queryKey: ['usersQ', page, limit, name, sort], // queryKey를 명시적으로 전달
-        });
+        useUserPageStore.getState().setSort('최근');
+        queryClient.removeQueries({ queryKey: ['usersQ'], exact: false });
 
         closeModal();
     }
 
-    // 컴포넌트 언마운트 시 상태 리셋
+    //              effect: 컴포넌트 언마운트 시 상태 리셋              //
     useEffect(() => {
         const resetState = useUserPageModalStore.getState().resetState;
         return () => resetState(null); // 언마운트 시 상태 초기화

@@ -13,10 +13,13 @@ import { fileUploadRequest, patchMenuRequest } from "apis";
 import { useMenuPageStore, useMenuPageModalStore } from "store/manager";
 import { ChangeEvent, forwardRef, memo, useEffect, useRef } from "react";
 import { defaultMenuImage, formattedPoint, optionSelectList } from "constant";
+import { useQueryClient } from "@tanstack/react-query";
 
 //          component: 메뉴 수정 모달 컴포넌트              //
 const MenuEdit = () => {
 
+    //              state: 리액트 쿼리 상태             //
+    const queryClient = useQueryClient(); // React Query 클라이언트 가져오기
     //              state: 쿠키 상태                //
     const [cookies,] = useCookies();
     //              state: 수정할 메뉴 상태             //
@@ -44,6 +47,8 @@ const MenuEdit = () => {
             if (image === "") return "이미지를 업로드 해주세요.";
             if (price === "") return "가격을 작성해주세요.";
             if (options.length < 1) return "옵션을 선택해주세요.";
+            if (selectedValues.category === "") return "카테고리 항목을 선택해주세요.";
+            if (selectedValues.temperature === "") return "음료의 온도를 선택해주세요.";
             if (selectedValues.espressoShot === "") return "샷이 필요한 수를 작성해주세요.";
             return null;
         };
@@ -51,8 +56,6 @@ const MenuEdit = () => {
         // 유효성 검사 실행
         const errorMessage = validateInput();
         if (errorMessage) return alert(errorMessage);
-
-
 
         const requestBody: PatchMenuRequestDto = {
             menuId: menuId,
@@ -65,8 +68,6 @@ const MenuEdit = () => {
             temperature: selectedValues.temperature,
             espressoShot: parseInt(selectedValues.espressoShot, 10),
         };
-        // console.log(selectedValues.espressoShot);
-        // console.log(parseInt(selectedValues.espressoShot, 10));
 
         patchMenuRequest(requestBody, cookies.managerToken).then(patchMenuResponse)
     }
@@ -86,6 +87,13 @@ const MenuEdit = () => {
             closeOnClick: true, // 클릭 시 바로 사라짐
             pauseOnHover: false
         });
+
+
+        const filterCategory = useMenuPageStore.getState().category;
+        const modalCategory = useMenuPageModalStore.getState().selectedValues.category;
+        // 쿼리 무효화
+        queryClient.invalidateQueries({queryKey: ['menuListQ', filterCategory]});
+        queryClient.invalidateQueries({queryKey: ['menuListQ', modalCategory]});
 
     }
 
