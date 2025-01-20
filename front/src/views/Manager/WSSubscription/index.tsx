@@ -9,24 +9,16 @@ import { useManagerStore, useOrderManagementStore, usePointChargeRequestStore } 
 //          component: 웹소켓 컴포넌트              //
 const WSSubscription = () => {
 
-    // //              state: 웹소켓 스토어 상태               //
-    // const { initialize, connect, disconnect } = useWebSocketStore();
-    // //              state: 웹소켓 서버 주소                 //
-    // const wsUrl = TEST_DOMAIN + '/ws'; // WebSocket 서버 주소
     //              state: 웹소켓 연결 상태                 //
     const connected = useWebSocketStore(state => state.connected);
     //              state: 웹소켓 매니저 상태               //
     const { manager } = useWebSocketStore.getState();
-
-    //              state: 웹소켓 초기 연결 상태                //
-    // const connectRef = useRef<boolean>(false);
 
     //              function: 사용자 주문 웹소켓 구독 핸들러               // 
     const OrderSubscribe = () => {
         const addOrder = useOrderManagementStore.getState().addOrder;
         manager?.subscribe('/receive/manager/order', (order) => {
             addOrder(order);
-            // console.log("order: "+ order);
         });
     };
 
@@ -41,8 +33,7 @@ const WSSubscription = () => {
         });
     };
 
-
-    //              function: 현금 결제 웹소켓 구독               // 
+    //              function: 포인트 충전 요청 웹소켓 구독               // 
     const PointChargeRequestSubscribe = () => {
         const setChargeRequests = usePointChargeRequestStore.getState().setChargeRequests;
         const chargeRequests = usePointChargeRequestStore.getState().chargeRequests;
@@ -51,43 +42,30 @@ const WSSubscription = () => {
         });
     };
 
-
     //              function: 웹소켓 현재 현금결제 요청 상태 요구               // 
     const handleSendMessage = () => {
         const { manager } = useWebSocketStore.getState();
         manager?.sendMessage('/send/current/cashPay/info', {  }); // 메시지 전송
     };
 
-
-    // //              effect: 웹소켓 연결 이펙트              //
-    // useEffect(() => {
-    //     initialize(wsUrl); // WebSocketManager 초기화
-    //     connect(); // WebSocket 연결
-    //     return () => {
-    //         disconnect(); // 컴포넌트 언마운트 시 연결 해제
-    //     };
-    // }, [initialize, connect, disconnect]);
-
     //              effect: 웹소켓이 연결되면 이후에 구독하는 이펙트                //
-    // useEffect(() => {
-    //     if (connected && !connectRef.current) {
-    //         connectRef.current = true;
-    //     } else if (connected) {
-    //         OrderSubscribe();
-    //         CashPaySubscribe();
-    //         handleSendMessage();
-    //         PointChargeRequestSubscribe();
-    //     }
-    // }, [connected])
-
     useEffect(() => {
-        if(connected) {
+        if (connected) {
             OrderSubscribe();
             CashPaySubscribe();
             handleSendMessage();
             PointChargeRequestSubscribe();
         }
-    }, [connected])
+
+        // Cleanup function: 언마운트 시 구독 해제
+        return () => {
+            if (manager) {
+                manager.unsubscribe('/receive/manager/order');
+                manager.unsubscribe('/receive/manager/cashPay/info');
+                manager.unsubscribe('/receive/manager/pointCharge/request');
+            }
+        };
+    }, [connected]);
 
     //              render: 웹소켓 렌더링              //
     return (
@@ -98,4 +76,4 @@ const WSSubscription = () => {
     );
 };
 
-export default WSSubscription
+export default WSSubscription;

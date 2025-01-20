@@ -8,7 +8,7 @@ const OrderPageHeader = () => {
     //          state: 주문 데이터 상태         //
     // const waitingNum = useOrderManagementStore(state => state.orders?.length);
     //          state: TTS 음성 듣기 상태         //
-    // const openTTS = useOrderManagementStore(state => state.openTTS);
+    const openTTS = useOrderManagementStore(state => state.openTTS);
     //          state: 서브 페이지 상태               //
     // const subPage = useOrderPageStore(state => state.subPage);
     //          function: 서브 페이지를 설정하는 함수               //
@@ -36,9 +36,9 @@ const OrderPageHeader = () => {
                 <SubPageE subPage="주문 목록" />
             </SubPageBox>
             <RightE>
-                <WaitingNum><WaitingNumE/></WaitingNum>
-                <OpenTTS onClick={() => useOrderManagementStore.getState().toggleOpenTTS()}>
-                    {useOrderManagementStore.getState().openTTS ? <ImCheckboxChecked size={14} /> : <ImCheckboxUnchecked size={14} />}음성
+                <WaitingNum><WaitingNumE /></WaitingNum>
+                <OpenTTS $active={openTTS} onClick={() => useOrderManagementStore.getState().toggleOpenTTS()}>
+                    {openTTS ? <ImCheckboxChecked size={14} /> : <ImCheckboxUnchecked size={14} />}음성
                 </OpenTTS>
             </RightE>
         </Header>
@@ -53,7 +53,7 @@ const Header = styled.div`
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding: 0 8px;
+    padding: 0 16px 0 8px;
 `
 
 const SubPageBox = styled.div`
@@ -86,17 +86,21 @@ const SubPage = styled.div<{ $select: boolean }>`
 `
 
 const RightE = styled.div`
-    flex: 1;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
+    gap: 16px;
+        
+    @media (max-width: 768px) {
     row-gap: 4px;
+    }
 `
 
-const OpenTTS = styled.div`
+const OpenTTS = styled.div<{$active: boolean}>`
     display: flex;
     font-size: 14px;
     justify-content: center;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
+    opacity: ${({$active}) => $active ? "1" : "0.7"};
 `

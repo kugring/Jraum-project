@@ -673,7 +673,7 @@
       "240b534e-f621-4389-9e4e-773bb9bbea47": {
         "id": "240b534e-f621-4389-9e4e-773bb9bbea47",
         "tableId": "a9bdf60f-6d0a-44ea-86e2-432adc07af19",
-        "name": "office",
+        "name": "division",
         "comment": "직책",
         "dataType": "VARCHAR(50)",
         "default": "",

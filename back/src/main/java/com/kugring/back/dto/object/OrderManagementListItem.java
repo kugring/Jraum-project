@@ -20,7 +20,7 @@ public class OrderManagementListItem {
     private int totalQuantity;
     private Long orderId;
     private String name;
-    private String office;
+    private String division;
     private String position;
     private String payMethod;
     private String profileImage;
@@ -28,7 +28,7 @@ public class OrderManagementListItem {
 
     public OrderManagementListItem(GetOrderManageMentResultSet resultSet){
         this.name = resultSet.getName();
-        this.office = resultSet.getOffice();
+        this.division = resultSet.getDivision();
         this.orderId = resultSet.getOrderId();
         this.hotCount = resultSet.getHotCount();
         this.position = resultSet.getPosition();

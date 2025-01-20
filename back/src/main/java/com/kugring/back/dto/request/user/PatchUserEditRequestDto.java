@@ -12,7 +12,7 @@ public class PatchUserEditRequestDto {
   private String userId;
   private String pin;
   private String name;
-  private String office;
+  private String division;
   private String position;
   private String nickname;
   private String phoneNumber;

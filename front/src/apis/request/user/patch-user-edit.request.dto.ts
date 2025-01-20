@@ -2,7 +2,7 @@ export default interface PatchUserEditRequestDto{
     
     pin:string;
     name:string;
-    office:string;
+    division:string;
     userId: string;
     position:string;
     nickname:string;

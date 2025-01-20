@@ -20,7 +20,8 @@ const Card = ({ order }: { order: OrderList }) => {
     const [cookies] = useCookies(['managerToken'])
     //          state: 주문 상태            //
     const [status, setStatus] = useState(order.status);
-
+    //          state: 포지션 상태          //
+    const position = [order.division, order.position].filter(Boolean).join(' / ') || '';
 
     //          function: 블랙 모달과 알림창 모달을 위한 함수               //
     const setWhiteModal = useBlackModalStore.getInitialState().setWhiteModal;
@@ -93,7 +94,7 @@ const Card = ({ order }: { order: OrderList }) => {
         setMessage("주문 음성 알리기")
         setCallback(() => orderSendTTS(orderId));
     }
-    
+
 
     //          render: 주문 목록 카드 렌더링            //
     return (
@@ -103,7 +104,7 @@ const Card = ({ order }: { order: OrderList }) => {
                     <ProfileImage src={order.profileImage || defaultUserImage}></ProfileImage>
                     <Info>
                         <UserName>{order.name}</UserName>
-                        <Position>{order.office === null ? "" : `${order.position} / ${order.office}`}</Position>
+                        <Position>{position}</Position>
                     </Info>
                 </UserInfo>
                 <CardTopRight>

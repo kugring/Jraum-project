@@ -13,6 +13,8 @@ const Card = ({ user }: { user: SortedUser }) => {
     const [show, setShow] = useState<boolean>(false);
     //          state: 정렬 기준            //
     const sort = useUserPageStore.getState().sort;
+    //          state: 포지션 상태          //
+    const position = [user.division, user.position].filter(Boolean).join(' / ') || '';
     //              function: 블랙 모달 여는 함수               //
     const openModal = useBlackModalStore.getState().openModal;
     //              function: 화이트 모달 설정하는 함수               //
@@ -34,11 +36,11 @@ const Card = ({ user }: { user: SortedUser }) => {
                     <ProfileImage src={user.profileImage ? user.profileImage : defaultUserImage}></ProfileImage>
                     <Info>
                         <UserName>{user.name}</UserName>
-                        <Position>{user.position} / {user.office}</Position>
+                        <Position>{position}</Position>
                     </Info>
                 </UserInfo>
                 <CardTopRight>
-                    <UserType>{user.office !== "단체" ? "개인 회원" : "단체 회원"}</UserType>
+                    <UserType>{user.division !== "단체" ? "개인 회원" : "단체 회원"}</UserType>
                     <CurrentPoint>
                         {sort === "번호순" ? `핀: ${user.pin}` : `${formattedPoint(user.point)}원`}
                     </CurrentPoint>

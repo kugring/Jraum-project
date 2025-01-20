@@ -168,7 +168,7 @@ public class FileServiceImplement implements FileService {
         ssmlText.append("<emphasis level=\"strong\">")
                 .append(order.getUser().getName());
 
-        if (order.getUser().getOffice().equals("단체")) {
+        if (order.getUser().getDivision().equals("단체")) {
             ssmlText.append(",</emphasis>");
         } else {
             ssmlText.append("님,</emphasis>");

@@ -5,7 +5,7 @@ export default interface OrderList {
     name: string;
     point: number;
     status: string;
-    office: string;
+    division: string;
     position: string;
     payMethod: string;
     createdAt: Date;  // Date 객체로 변경

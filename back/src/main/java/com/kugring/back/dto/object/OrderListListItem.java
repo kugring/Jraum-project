@@ -17,7 +17,7 @@ public class OrderListListItem {
     private Long orderId;
     private String name;
     private String status;
-    private String office;
+    private String division;
     private String position;
     private String payMethod;
     private LocalDateTime createdAt;
@@ -32,7 +32,7 @@ public class OrderListListItem {
         this.name = resultSet.getName();
         this.point = resultSet.getPoint();
         this.status = resultSet.getStatus();
-        this.office = resultSet.getOffice();
+        this.division = resultSet.getDivision();
         this.orderId = resultSet.getOrderId();
         this.position = resultSet.getPosition();
         this.payMethod = resultSet.getPayMethod();

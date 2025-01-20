@@ -23,7 +23,7 @@ public class PinCheckResponseDto extends ResponseDto {
         this.expirationTime = 60 * 60 * 24 * 30 * 3;
         this.user.setName(user.getName());
         this.user.setPoint(user.getPoint());
-        this.user.setOffice(user.getOffice());
+        this.user.setDivision(user.getDivision());
         this.user.setNickname(user.getNickname());
         this.user.setPosition(user.getPosition());
         this.user.setProfileImage(user.getProfileImage());

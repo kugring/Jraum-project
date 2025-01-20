@@ -10,6 +10,6 @@ public interface GetOrderManageMentResultSet {
     String getName();
     String getPosition();
     String getProfileImage();
-    String getOffice();
+    String getDivision();
     Order getOrder();
 }

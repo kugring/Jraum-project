@@ -51,7 +51,7 @@ const UserAdd = () => {
             if (name.length < 2) return "이름을 두자리 이상 작성해주세요";
             if (pin.length !== 4) return "회원번호 4자리를 입력해주세요";
             if (directPoint === "") return "포인트를 작성해주세요";
-            if (selectedValues.office === "선택") return "직책을 선택해주세요";
+            if (selectedValues.division === "선택") return "직책을 선택해주세요";
             if (selectedValues.position === "선택") return "부서를 선택해주세요";
             return null;
         };
@@ -65,7 +65,7 @@ const UserAdd = () => {
             pin,
             name,
             point: parseInt(directPoint, 10),
-            office: selectedValues.office,
+            division: selectedValues.division,
             position: selectedValues.position,
             nickname,
             phoneNumber,
@@ -117,7 +117,7 @@ const UserAdd = () => {
             <InputContainer>
                 <HeaderInputBox>
                     <DropdownE title={"부서*"} dropdown='position' list={["기타", "유치부", "아동부", "중고등부", "청년부", "남전도", "여전도", "교역자"]} />
-                    <DropdownE title={"직책*"} dropdown='office' list={["성도", "집사", "안수집사", "권사", "장로", "단체", "기타"]} />
+                    <DropdownE title={"직책*"} dropdown='division' list={["성도", "집사", "안수집사", "권사", "장로", "단체", "기타"]} />
                     <PinInputBoxE />
                 </HeaderInputBox>
                 <NameInputBoxE />
@@ -173,13 +173,13 @@ const ProfileImageBoxE = () => {
     )
 }
 //                  component: 드롭다운 박스 컴포넌트                  //
-const DropdownE = memo((({ title, dropdown, list }: { title: string; dropdown: "office" | "position"; list: string[] }) => {
+const DropdownE = memo((({ title, dropdown, list }: { title: string; dropdown: "division" | "position"; list: string[] }) => {
 
     //          state: 드롭박스 참조 상태               //
     const dropdownBoxRef = useRef<HTMLDivElement | null>(null)
 
     //          function: 토글을 열고 닫는 함수             //
-    const toggleDropdown = (dropdown: "office" | "position") => {
+    const toggleDropdown = (dropdown: "division" | "position") => {
         const setOpenDropdowns = useUserPageModalStore.getState().setOpenDropdowns;
         setOpenDropdowns((prevState) => ({
             ...prevState, // 기존 상태를 유지
@@ -200,7 +200,7 @@ const DropdownE = memo((({ title, dropdown, list }: { title: string; dropdown: "
     );
 }));
 //                  component: 드롭다운 옵션값 컴포넌트                     //
-const DropDownValue = ({ dropdown }: { dropdown: "office" | "position" }) => {
+const DropDownValue = ({ dropdown }: { dropdown: "division" | "position" }) => {
 
     //          state: 드롭다운 옵션값 상태               //
     const selectedValues = useUserPageModalStore((state) => state.selectedValues[dropdown]);
@@ -212,7 +212,7 @@ const DropDownValue = ({ dropdown }: { dropdown: "office" | "position" }) => {
 }
 //                  component: 드롭다운 옵션들 박스 컴포넌트                  //
 const OptionBoxE = memo(
-    forwardRef<HTMLDivElement, { dropdown: "office" | "position"; list: string[] }>(
+    forwardRef<HTMLDivElement, { dropdown: "division" | "position"; list: string[] }>(
         ({ dropdown, list }, ref) => {
 
             //          state: 드랍다운 열림 상태              //
@@ -250,7 +250,7 @@ const OptionBoxE = memo(
     )
 );
 //                  component: 드롭다운 옵션 컴포넌트                  //
-const OptionE = memo(({ item, dropdown }: { item: string, dropdown: "office" | "position", }) => {
+const OptionE = memo(({ item, dropdown }: { item: string, dropdown: "division" | "position", }) => {
 
     //          state: 드롭다운의 값 상태               //
     const selectedValues = useUserPageModalStore(state => state.selectedValues[dropdown])

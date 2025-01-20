@@ -25,7 +25,6 @@ const Header = () => {
                     <StyledLink title={"주문내역"} to={"/jraum/manager/order"} />
                 </LinkGroup>
             </HeaderRight>
-
             <UserInfoBoxStyled $show={!isMenuOpen}>
                 <UserInfoBox />
             </UserInfoBoxStyled>

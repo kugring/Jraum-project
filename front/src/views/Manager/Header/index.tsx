@@ -1,10 +1,10 @@
 import styled from 'styled-components'
-import { useLocation, useNavigate } from 'react-router-dom';
+import MenuPageHeader from './MenuPageHeader';
 import OrderPageHeader from './OrderPageHeader';
 import PointPageHeader from './PointPageHeader';
-import useManagerStore from 'store/manager/manager.store';
-import useBlackModalStore from 'store/modal/black-modal.store';
-import MenuPageHeader from './MenuPageHeader';
+import { useManagerStore } from 'store/manager';
+import { useBlackModalStore } from 'store/modal';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 //          component: 관리자 헤더 컴포넌트              //
 const Header = () => {
@@ -33,7 +33,6 @@ const Header = () => {
         openModal()
         setWhiteModal("현금결제승인")
     };
-
     const navigate = useNavigate(); // useNavigate는 항상 새로 생성되지 않음
 
 

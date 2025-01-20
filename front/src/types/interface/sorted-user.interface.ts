@@ -3,7 +3,7 @@ export default interface SortedUser {
     name: string;
     point: number;
     userId: string;
-    office: string | null;
+    division: string | null;
     position: string;
     nickname: string | null;
     createdAt: Date;

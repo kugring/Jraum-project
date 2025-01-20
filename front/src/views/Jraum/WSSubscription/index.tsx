@@ -31,10 +31,8 @@ const WSSubscription = () => {
         });
     };
 
-
     //          state: 웹소켓에서 받아올 음성을 저장할 객체 상태                //
     const audioRef = useRef<HTMLAudioElement | null>(null);
-
 
     //          function: 주문 음성 듣기 함수               //
     const actionTTS = async (orderId: number) => {
@@ -80,7 +78,6 @@ const WSSubscription = () => {
         }
     };
 
-
     //              function: 사용자 주문 웹소켓 구독 핸들러               // 
     const OrderTTSSubscribe = () => {
         manager?.subscribe('/receive/user/orderTTS', (orderId) => {
@@ -95,6 +92,14 @@ const WSSubscription = () => {
             PointChargeRequestSubscribe();
             OrderTTSSubscribe();
         }
+
+        // Cleanup function: 언마운트 시 구독 해제
+        return () => {
+            if (manager) {
+                manager.unsubscribe('/receive/user/pointCharge/requestOk');
+                manager.unsubscribe('/receive/user/orderTTS');
+            }
+        };
     }, [connected]);
 
     //              effect: TTS를 위해서 처음 렌더링시 Audio객체를 만듬               //
@@ -103,17 +108,14 @@ const WSSubscription = () => {
         if (!audioRef.current) {
             audioRef.current = new Audio();
         }
-        
+
         audioRef.current.oncanplaythrough = () => {
             console.log('Audio is ready');
         };
-
         audioRef.current.onerror = (error) => {
             console.error('Audio loading error:', error);
         };
-
     }, []);
-
 
     //              render: 키오스크 웹소켓 렌더링              //
     return (

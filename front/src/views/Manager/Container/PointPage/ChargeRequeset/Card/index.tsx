@@ -3,7 +3,7 @@ import { fromNow } from 'helpers/dayjs'
 import { useCookies } from 'react-cookie'
 import { ResponseDto } from 'apis/response'
 import { useWebSocketStore } from 'store';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { ChargeRequestListItem } from 'types/interface'
 import { usePointChargeRequestStore } from 'store/manager';
 import { defaultUserImage, formattedPoint } from 'constant'
@@ -21,6 +21,8 @@ const Card = ({ request }: { request: ChargeRequestListItem }) => {
     const { manager } = useWebSocketStore.getState();
     //            state: 포인트 요청 목록             //
     const removeChargeRequest = usePointChargeRequestStore.getState().removeChargeRequest;
+    //          state: 포지션 상태          //
+    const position = [request.division, request.position].filter(Boolean).join(' / ') || '';
 
     //          function: 포인트 충전 승인하는 함수             //
     const pointChargeApproval = () => {
@@ -73,7 +75,6 @@ const Card = ({ request }: { request: ChargeRequestListItem }) => {
         removeChargeRequest(request);
     }
 
-
     //              render: 포인트 충전 요청 렌더링                 //
     return (
         <CardE>
@@ -82,7 +83,7 @@ const Card = ({ request }: { request: ChargeRequestListItem }) => {
                     <ProfileImage src={defaultUserImage ? defaultUserImage : request.profileImage}></ProfileImage>
                     <UserInfoRight>
                         <UserName>{request.name}</UserName>
-                        <UserPosition>{request.office === "단체" ? "단체" : request.position + "/" + request.office}</UserPosition>
+                        <UserPosition>{position}</UserPosition>
                     </UserInfoRight>
                 </UserInfo>
                 <CardRight>

@@ -36,7 +36,7 @@ public class User {
   private String name;
   private String email;
   private String userId;
-  private String office;
+  private String division;
   private String position;
   private String nickname;
   private String password;
@@ -61,7 +61,7 @@ public class User {
   public User(JraumSignUpRequestDto dto) {
     this.pin = dto.getPin();
     this.name = dto.getName();
-    this.office = dto.getOffice();
+    this.division = dto.getDivision();
     this.position = dto.getPosition();
     this.nickname = dto.getNickname();
     this.phoneNumber = dto.getPhoneNumber();
@@ -70,7 +70,7 @@ public class User {
     this.agreement = 1;
     this.userId = UUID.randomUUID().toString(); // UUID를 생성하여 userId에 할당
     this.point = dto.getPoint();
-    this.type = "단체".equals(dto.getOffice()) ? 2 : 1;
+    this.type = "단체".equals(dto.getDivision()) ? 2 : 1;
     this.role = "ROLE_USER";
   }
 

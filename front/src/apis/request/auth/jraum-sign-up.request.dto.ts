@@ -3,7 +3,7 @@ export default interface JraumSignUpRequestDto{
     point: number;
     pin:string;
     name:string;
-    office:string;
+    division:string;
     position:string;
     nickname:string;
     phoneNumber:string;

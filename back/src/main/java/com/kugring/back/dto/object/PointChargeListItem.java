@@ -18,7 +18,7 @@ public class PointChargeListItem {
     private int chargePoint;
     private Long pointChargeId;
     private String name;
-    private String office;
+    private String division;
     private String status;
     private String position;
     private String profileImage;
@@ -26,7 +26,7 @@ public class PointChargeListItem {
 
     public PointChargeListItem(PointCharge reusltSet) {
         this.name = reusltSet.getUser().getName();
-        this.office = reusltSet.getUser().getOffice();
+        this.division = reusltSet.getUser().getDivision();
         this.position = reusltSet.getUser().getPosition();
         this.profileImage = reusltSet.getUser().getProfileImage();
         this.pointChargeId = reusltSet.getPointChargeId();

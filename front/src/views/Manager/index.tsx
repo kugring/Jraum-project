@@ -17,17 +17,17 @@ const Manager = () => {
 
     //          effect: 관리자 토큰 확인 이펙트             //
     useEffect(() => {
-        if (cookies.managerToken === undefined) {
+        // managerToken이 없을 때 모달을 열도록 처리
+        if (!cookies.managerToken) {
             const { openModal, setWhiteModal } = useBlackModalStore.getState();
             openModal();
-            setWhiteModal("핀")
+            setWhiteModal("핀");
         }
-    }, [cookies.managerToken === undefined]);
-
+    }, [cookies.managerToken]); // 의존성 배열에 cookies.managerToken 추가
     //          render: 관리자 렌더링              //
     return (
         <ManagerE>
-            {cookies.managerToken !== undefined &&
+            {cookies.managerToken &&
                 <>
                     <Header />
                     <ContainerE />

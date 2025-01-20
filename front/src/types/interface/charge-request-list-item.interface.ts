@@ -1,7 +1,7 @@
 export default interface ChargeRequestListItem {
 
     name: string;
-    office: string;
+    division: string;
     position: string;
     chargePoint: number;
     profileImage: string;

@@ -2,6 +2,7 @@ import styled from "styled-components";
 import SequenceSave from "./SequenceSave";
 import { useMenuPageStore } from "store/manager";
 import { useCookies } from "react-cookie";
+import { MAIN_PATH } from "constant";
 
 
 //              component: 관리자 메뉴 페이지 헤더 컴포넌트               //
@@ -15,16 +16,16 @@ const MenuPageHeader = () => {
 
         //              state: 서브 페이지 상태             //
         const subPageText = subPage.replace(" ", "");
-        const [,removeCookie] = useCookies();
+        const [, setCookie] = useCookies(['managerToken']);
         //          event handler: 토큰 리셋 핸들러             //
         const resetToken = () => {
-            removeCookie('managerToken', { path: '/' });
+            setCookie('managerToken', '', { expires: new Date(0), path: MAIN_PATH() });
         }
         return (
             <>
                 <SubPage
                     $select={useMenuPageStore(state => state.subPage === subPageText)}
-                    onClick={() => {useMenuPageStore.getState().setSubPage(subPageText); resetToken();}}>
+                    onClick={() => { useMenuPageStore.getState().setSubPage(subPageText); resetToken(); }}>
                     {subPage}
                 </SubPage>
             </>

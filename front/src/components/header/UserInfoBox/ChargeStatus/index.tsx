@@ -15,8 +15,7 @@ const ChargeStatus = () => {
 
     //              state: 쿠키 상태              //
     const [cookies] = useCookies();
-    //              state: 포인트 충전 ID 상태              //
-    const pointChargeId = usePointChargeStore.getState().pointChargeId;
+
     //              state: 포인트 충전 진행 상태              //
     const charging = usePointChargeStore(state => state.charging);
     //              state: 화이트 모달 상태             //
@@ -24,17 +23,7 @@ const ChargeStatus = () => {
     // 혹시 몰라서 주석은 해놓았는데 문제 생기면 이놈 때문임
     //              state: 충전 취소 질문 상태              //
     const [cancelAlert, setCancelAlert] = useState<boolean>(false);
-    //              state: 충전 메세지 상태              //
-    const message = usePointChargeStore(state => state.message);
-    //              state: 회원 현재 포인트 상태            //
-    const currentPoint = usePinUserStore.getState().pinUser?.point!;
-    //          state: 주문의 최종 결제 금액 상태            //
-    const canPay = useOrderStore(state => state.getTotalPrice() <= currentPoint)
 
-    //              function: 블랙 모달 여는 함수               //
-    const openModal = useBlackModalStore.getState().openModal;
-    //              function: 화이트 모달 설정 함수               //
-    const setWhiteModal = useBlackModalStore.getState().setWhiteModal;
     //              function: 포인트 충전 진행 상태              //
     const setCharging = usePointChargeStore.getState().setCharging
     //              function: 포인트 충전 ID 설정 함수              //
@@ -51,6 +40,8 @@ const ChargeStatus = () => {
         if (code === 'NMN') alert('존재하지 않는 메뉴입니다.');
         if (code !== 'SU') return;
         const { status, pointChargeId } = responseBody as GetPointChargeStatusResponseDto;
+        console.log("상태: " + status);
+        console.log("토큰: " + cookies);
         if (status) {
             // 요청 상태 확인
             if (status === "미승인") {
@@ -69,9 +60,10 @@ const ChargeStatus = () => {
         }
     };
 
-    //              function: 승인 상태에 대한 요청을 확인하는 함수              //
+    //              function: 충전 요청 삭제하는 함수              //
     const deletePointCharge = () => {
         if (!cookies.pinToken) return;
+        const pointChargeId = usePointChargeStore.getState().pointChargeId;
         deletePointChargeRequest(pointChargeId, cookies.pinToken).then(deletePointChargeResponse);
     };
 
@@ -90,32 +82,33 @@ const ChargeStatus = () => {
         setTimeout(() => setMessage("포인트 충전"), 2000)
     };
 
-    //              function: 포인트 모달을 여는 함수               //
-    const pointChargeModal = () => {
-        openModal();
-        setWhiteModal('포인트충전')
-    }
 
-
-    //              effect: pointChargeId가 0보다 클 때 1초마다 approveCheck 실행              //
+    //              effect: 처음 렌더링시 이전 충전 요청을 찾아봄              //
     useEffect(() => {
         if (!charging) {
             getPointChargeStatus();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pointChargeId, cookies.pinToken]);
+        return () => {
+            setCharging(false);
+            setCancelAlert(false);
+        };
+    }, [cookies.pinToken]);
 
 
-
+    // useEffect(() => {
+    //     return () => {
+    //         setCharging(false);
+    //         setCancelAlert(false);
+    //     };
+    // }, []);
 
     //              render: 충전 상태 렌더링                //
     return (
         <>
 
             {!charging &&
-                <PointCharge $canPay={canPay && message === "포인트 충전"} onClick={pointChargeModal}>{message}</PointCharge> // 템플릿 리터럴 제거
+                <MessageE />
             }
-
             {charging && !cancelAlert &&
                 <WaitCharge onClick={() => setCancelAlert(true)}>
                     {`충전 대기`}
@@ -135,15 +128,43 @@ const ChargeStatus = () => {
                 </>
             }
 
-
         </>
 
     );
 };
-
 export default memo(ChargeStatus);
 
-const PointCharge = styled.div<{ $canPay: boolean }>`
+
+
+//                  component: 포인트 충전 메세지 컴포넌트                      //
+const MessageE = () => {
+
+    //              state: 충전 메세지 상태              //
+    const message = usePointChargeStore(state => state.message);
+    //              state: 회원 현재 포인트 상태            //
+    const currentPoint = usePinUserStore.getState().pinUser!.point!;
+    //          state: 주문의 최종 결제 금액 상태            //
+    const canPay = useOrderStore(state => state.getTotalPrice() <= currentPoint!)
+
+
+    //              function: 블랙 모달 여는 함수               //
+    const openModal = useBlackModalStore.getState().openModal;
+    //              function: 화이트 모달 설정 함수               //
+    const setWhiteModal = useBlackModalStore.getState().setWhiteModal;
+    //              function: 포인트 모달을 여는 함수               //
+    const pointChargeModal = () => {
+        openModal();
+        setWhiteModal('포인트충전')
+    }
+
+    //                  render: 포인트 충전 메세지 렌더링                      //
+    return (
+        <Message $canPay={canPay && message === "포인트 충전"} onClick={pointChargeModal}>{message}</Message> // 템플릿 리터럴 제거
+    )
+}
+
+
+const Message = styled.div<{ $canPay: boolean }>`
                 display: flex;
                 flex-direction: column;
                 align-items: center;

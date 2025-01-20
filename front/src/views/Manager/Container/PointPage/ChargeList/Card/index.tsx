@@ -8,6 +8,9 @@ import PointChargeDetail from 'types/interface/point-charge-detail.interface'
 //              component: 포인트 충전 내역 카트 컴포넌트                 //
 const Card = ({ chargeDetail }: { chargeDetail: PointChargeDetail }) => {
 
+    //          state: 포지션 상태          //
+    const position = [chargeDetail.division, chargeDetail.position].filter(Boolean).join(' / ') || '';
+
     //              render: 포인트 충전 내역 카드 렌더링                    //
     return (
         <CardE>
@@ -15,7 +18,7 @@ const Card = ({ chargeDetail }: { chargeDetail: PointChargeDetail }) => {
                 <ProfileImage src={defaultUserImage} />
                 <UserInfo>
                     <Name>{chargeDetail.name}</Name>
-                    <Position>{chargeDetail.office === null ? "" : `${chargeDetail.position} / ${chargeDetail.office}`}</Position>
+                    <Position>{position}</Position>
                 </UserInfo>
             </CardLeft>
             <ChargeInfo>

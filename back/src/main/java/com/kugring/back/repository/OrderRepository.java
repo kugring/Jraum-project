@@ -48,7 +48,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
                         "o.user.name as name, " +
                         "o.user.profileImage as profileImage, " +
                         "o.user.position as position, " +
-                        "o.user.office as office, " +
+                        "o.user.division as division, " +
                         "SUM(oi.quantity) as totalQuantity, " +
                         "SUM(CASE WHEN m.temperature = 'HOT' THEN oi.quantity ELSE 0 END) as hotCount, " +
                         "SUM(CASE WHEN m.temperature = 'COLD' THEN oi.quantity ELSE 0 END) as coldCount " +
@@ -56,7 +56,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
                         "JOIN o.orderDetails oi " +
                         "JOIN oi.menu m " +
                         "WHERE o.status = :status " +
-                        "GROUP BY o.user.name, o.user.position, o.user.office, o.orderId")
+                        "GROUP BY o.user.name, o.user.position, o.user.division, o.orderId")
         List<GetOrderManageMentResultSet> findOrderDetailsWithTemperatureCount(@Param("status") String status);
 
         @Query("SELECT " +
@@ -65,7 +65,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
                         "o.user.name as name, " +
                         "o.user.profileImage as profileImage, " +
                         "o.user.position as position, " +
-                        "o.user.office as office, " +
+                        "o.user.division as division, " +
                         "SUM(oi.quantity) as totalQuantity, " +
                         "SUM(CASE WHEN m.temperature = 'HOT' THEN oi.quantity ELSE 0 END) as hotCount, " +
                         "SUM(CASE WHEN m.temperature = 'COLD' THEN oi.quantity ELSE 0 END) as coldCount " +
@@ -73,7 +73,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
                         "JOIN o.orderDetails oi " +
                         "JOIN oi.menu m " +
                         "WHERE o.status = '대기' AND o.orderId = :orderId " +
-                        "GROUP BY o.orderId, o.user.name, o.user.position, o.user.office")
+                        "GROUP BY o.orderId, o.user.name, o.user.position, o.user.division")
         GetOrderManageMentResultSet findOrderDetailsByOrderId(@Param("orderId") Long orderId);
 
         @Query("SELECT " +
@@ -82,7 +82,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
                         "o.user.name as name, " +
                         "o.user.point as point, " +
                         "o.status as status, " +
-                        "o.user.office as office, " +
+                        "o.user.division as division, " +
                         "o.user.position as position, " +
                         "o.payMethod as payMethod, " +
                         "o.createdAt as createdAt, " +
@@ -105,7 +105,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
                         "AND (:pin IS NULL OR o.user.pin LIKE CONCAT('%', :pin, '%')) " +
                         "AND (:startOfDay IS NULL OR " +
                         "     (o.createdAt >= :startOfDay AND o.createdAt <= :endOfDay)) " +
-                        "GROUP BY o.orderId, o.user.name, o.status, o.user.office, o.user.position, " +
+                        "GROUP BY o.orderId, o.user.name, o.status, o.user.division, o.user.position, " +
                         "         o.payMethod, o.createdAt, o.updatedAt, o.user.profileImage " +
                         "ORDER BY o.createdAt DESC")
         List<GetOrderListResultSet> findOrderList(

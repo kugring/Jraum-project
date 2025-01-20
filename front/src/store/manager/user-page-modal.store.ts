@@ -14,8 +14,8 @@ interface UserPageModalStore {
   phoneNumber: string;
   directPoint: string;
   profileImage: string;
-  openDropdowns: { office: boolean; position: boolean };
-  selectedValues: { office: string; position: string };
+  openDropdowns: { division: boolean; position: boolean };
+  selectedValues: { division: string; position: string };
   
   // 상태 업데이트 함수들
   setPin: (pin: string) => void;
@@ -28,8 +28,8 @@ interface UserPageModalStore {
   setPhoneNumber: (phoneNumber: string) => void;
   setDirectPoint: (directPoint: string) => void;
   setProfileImage: (profileImage: string) => void;
-  setOpenDropdowns: (update: (prevState: { office: boolean; position: boolean }) => { office: boolean; position: boolean }) => void;
-  setSelectedValues: (update: (prevState: { office: string; position: string }) => { office: string; position: string }) => void;
+  setOpenDropdowns: (update: (prevState: { division: boolean; position: boolean }) => { division: boolean; position: boolean }) => void;
+  setSelectedValues: (update: (prevState: { division: string; position: string }) => { division: string; position: string }) => void;
   resetState: (user: SortedUser | null) => void;
 }
 
@@ -47,8 +47,8 @@ const useUserPageModalStore = create<UserPageModalStore>()(
     phoneNumber: '',
     directPoint: '0',
     profileImage: '',
-    openDropdowns: { office: false, position: false },
-    selectedValues: { office: '선택', position: '선택' },
+    openDropdowns: { division: false, position: false },
+    selectedValues: { division: '선택', position: '선택' },
 
     // 상태 업데이트 함수들
     setPin: (pin) => set({ pin }),
@@ -75,7 +75,7 @@ const useUserPageModalStore = create<UserPageModalStore>()(
         canNickname: !!user?.nickname,
         selectedValues: {
           position: user?.position || "선택",
-          office: user?.office || "선택",
+          division: user?.division || "선택",
         },
         profileImage: user?.profileImage || undefined, // null 대신 undefined 사용
       }),

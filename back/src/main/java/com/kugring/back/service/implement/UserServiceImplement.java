@@ -95,13 +95,13 @@ public class UserServiceImplement implements UserService {
 
             user.setPin(dto.getPin());
             user.setName(dto.getName());
-            user.setOffice(dto.getOffice());
+            user.setDivision(dto.getDivision());
             user.setPosition(dto.getPosition());
             user.setNickname(dto.getNickname());
             user.setPhoneNumber(dto.getPhoneNumber());
             user.setInitialName(dto.getInitialName());
             user.setProfileImage(dto.getProfileImage());
-            user.setType("단체".equals(dto.getOffice()) ? 2 : 1);
+            user.setType("단체".equals(dto.getDivision()) ? 2 : 1);
             userRepository.save(user);
 
         } catch (Exception exception) {

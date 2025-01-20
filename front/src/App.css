@@ -40,10 +40,10 @@
   --font-size-large: 18px;
   --hot: #E7727A;
   --cold: #5C76D1;
-  letter-spacing: 1px;
   -webkit-user-select: none;
   user-select: none;
-  --SE_menu_card: 172px;
+  white-space: nowrap;
+  letter-spacing: 1px;
 }
 #EFB866
 #FFC4AE

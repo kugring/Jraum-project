@@ -18,7 +18,7 @@ public class SortedUserListItem {
     private String pin;
     private String name;
     private String userId;
-    private String office;
+    private String division;
     private String position;
     private String nickname;
     private String initialName;
@@ -33,7 +33,7 @@ public class SortedUserListItem {
         this.name = reusltSet.getUser().getName();
         this.point = reusltSet.getUser().getPoint();
         this.userId = reusltSet.getUser().getUserId();
-        this.office = reusltSet.getUser().getOffice();
+        this.division = reusltSet.getUser().getDivision();
         this.position = reusltSet.getUser().getPosition();
         this.nickname = reusltSet.getUser().getNickname();
         this.createdAt = reusltSet.getUser().getCreatedAt();

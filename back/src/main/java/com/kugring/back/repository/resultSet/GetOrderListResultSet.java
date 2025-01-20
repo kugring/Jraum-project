@@ -8,7 +8,7 @@ public interface GetOrderListResultSet {
     Long getOrderId();
     String getName();
     String getStatus();
-    String getOffice();
+    String getDivision();
     String getPosition();
     String getPayMethod();
     String getProfileImage();

@@ -2,7 +2,7 @@ export default interface PointChargeDetail {
 
     name: string;
     status: string;
-    office: string;
+    division: string;
     position: string;
     chargePoint: number;
     profileImage: string;

@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { isEqual } from "lodash";
+import { useQuery } from "@tanstack/react-query";
 import { useCookies } from "react-cookie";
 import { ResponseDto } from "apis/response";
 import { defaultUserImage } from "constant";
@@ -11,7 +12,6 @@ import { PatchOrderApproveRequestDto } from "apis/request/order";
 import { OrderDetail, OrderManagement } from "types/interface";
 import { getOrderManagementRequest, patchOrderApproveRequest } from "apis";
 import { GetOrderManagementResponseDto, PatchOrderApproveResponseDto } from "apis/response/order";
-import { useQuery } from "@tanstack/react-query";
 
 //          component: 주문 페이지 컴포넌트             //
 const OrderManageMent = () => {
@@ -31,8 +31,6 @@ const BadgeBox = memo(() => {
 
     //          state: 쿠키 상태                //
     const [cookies,] = useCookies();
-    //          state: 주문 데이터 갯수 상태         //
-    const length = useOrderManagementStore(state => state.orders?.length);
     //          state: 주문 데이터 갯수 상태         //
     const orders = useOrderManagementStore(state => state.orders);
     //          state: 보여질 주문 데이터 설정 상태         //
@@ -57,7 +55,7 @@ const BadgeBox = memo(() => {
         }
     }
     //          function: 주문 뱃지 데이터 가져오는 함수           //
-    const { data: ordersQ, isFetching, isSuccess } = useQuery<GetOrderManagementResponseDto>({
+    const { data: ordersQ, isSuccess } = useQuery<GetOrderManagementResponseDto>({
         queryKey: ['orderManagement', orders],
         queryFn: () => getOrderManagementRequest(cookies.managerToken),
         staleTime: 1000 * 3, // 3초
@@ -100,15 +98,7 @@ const Badge = memo(({ order }: { order: OrderManagement }) => {
     const profileImage = order.profileImage !== null ? order.profileImage : defaultUserImage;
 
     //          state: 포지션 상태          //
-    const position = () => {
-        if (order.position === null && order.office === null) {
-            return '';
-        } else if (order.position === null && order.office !== null) {
-            return '단체';
-        } else {
-            return `${order.position} / ${order.office}`;
-        }
-    };
+    const position = [order.division, order.position].filter(Boolean).join(' / ') || '';
 
     //          function: 보여질 주문 데이터 설정 상태         //
     const setShowOrder = useOrderManagementStore(state => state.setShowOrder);
@@ -138,7 +128,7 @@ const Badge = memo(({ order }: { order: OrderManagement }) => {
             <BadgeLeftE
                 profileImage={profileImage}
                 name={order.name}
-                position={position()}
+                position={position}
             />
             <BadgeRightE
                 payMethod={order.payMethod}
@@ -241,21 +231,14 @@ const OrderSummaryBox = memo(() => {
     }
     //          subComponent: 주문 데이터 상태         //
     const Position = () => {
+
         //          state: 보여지는 주문 상태           //
-        const office = useOrderManagementStore(state => state.showOrder?.office || null);
-        //          state: 보여지는 주문 상태           //
-        const position = useOrderManagementStore(state => state.showOrder?.position || null);
-        //          function: 포지션 상태 계산          //
-        const positionInfo = () => {
-            if (position === null && office === null) {
-                return '';
-            } else if (position === null && office !== null) {
-                return '단체';
-            } else {
-                return `${position} / ${office}`;
-            }
-        };
-        return <>{position && positionInfo()}</>
+        const division = useOrderManagementStore(state => state.showOrder?.division || null);
+        const positionValue = useOrderManagementStore(state => state.showOrder?.position || null);
+        //          state: 포지션 상태          //
+        const position = [division, positionValue].filter(Boolean).join(' / ') || '';
+
+        return <>{position}</>
     }
     //          render: 주문 요약 박스 렌더링               //
     return (
@@ -490,7 +473,7 @@ const OrderBoardE = styled.div<{ $show: boolean }>`
     }
 
 
-    ${({ $show }) => $show ? ``:`
+    ${({ $show }) => $show ? `` : `
     background-image: url(https://i.pinimg.com/originals/8c/5c/cb/8c5ccb49470c3344e48f18315fa568a6.gif);
     &::after {
     content: '';

@@ -16,12 +16,60 @@ import { defaultUserImage, formattedPoint } from 'constant'
 //              component: 포인트 직접 충전 컴포넌트                  //
 const Card = ({ user }: { user: SortedUser }) => {
 
-    //              state: 쿠키 상태                //
-    const [cookies] = useCookies();
     //              state: 하단 정보 공개 상태                  //
     const [show, setShow] = useState<boolean>(false);
     //              state: 충전 금액 상태                  //
     const [chargePoint, setChargePoint] = useState<number>(0);
+
+    //              render: 포인트 직접 충전 렌더링                 //
+    return (
+        <CardE>
+            <CardBody onClick={() => setShow(!show)}>
+                <UserInfoE user={user} chargePoint={chargePoint} />
+            </CardBody>
+            <Direct $show={show}>
+                <DirectE user={user} chargePoint={chargePoint} setShow={setShow} setChargePoint={setChargePoint} />
+            </Direct>
+        </CardE>
+    )
+}
+export default memo(Card, (prevProps, nextProps) => isEqual(prevProps.user.userId, nextProps.user.userId));
+
+//              component: 회원 정보 컴포넌트                  //
+const UserInfoE = memo(({ user, chargePoint }: { user: SortedUser; chargePoint: number }) => {
+
+    //          state: 포지션 상태          //
+    const position = [user.division, user.position].filter(Boolean).join(' / ') || '';
+    
+    //              render: 회원 정보 렌더링                  //
+    return (
+        <>
+            <CardLeft>
+                <ProfileImage src={user.profileImage ? user.profileImage : defaultUserImage} />
+                <UserInfo>
+                    <Name>{user.name}</Name>
+                    <Position>{position}</Position>
+                </UserInfo>
+            </CardLeft>
+            <PointInfo>
+                <Balance>잔액</Balance>
+                <CurrentPoint>{formattedPoint(user.point + chargePoint)}원</CurrentPoint>
+            </PointInfo>
+        </>
+    );
+});
+
+//              component: 회원 정보 컴포넌트                  //
+const DirectE = memo(({ user, chargePoint, setShow, setChargePoint }: {
+    user: SortedUser;
+    chargePoint: number;
+    setShow: (show: boolean) => void;
+    setChargePoint: (chargePoint: number) => void;
+}) => {
+
+    //              state: 쿠키 상태                //
+    const [cookies] = useCookies();
+
     //              state: 원하는 충전 포인트트 상태                  //
     const directPoint = usePointDirectChargeStore(state => state.directPoint);
     const setDirectPoint = usePointDirectChargeStore(state => state.setDirectPoint);
@@ -74,36 +122,19 @@ const Card = ({ user }: { user: SortedUser }) => {
     }
 
 
-    //              render: 포인트 직접 충전 렌더링                 //
+    //              render: 회원 정보 렌더링                  //
     return (
-        <CardE>
-            <CardBody onClick={() => setShow(!show)}>
-                <CardLeft>
-                    <ProfileImage src={user.profileImage ? user.profileImage : defaultUserImage} />
-                    <UserInfo>
-                        <Name>{user.name}</Name>
-                        <Position>{user.office === "" ? "" : `${user.position} / ${user.office}`}</Position>
-                    </UserInfo>
-                </CardLeft>
-                <PointInfo>
-                    <Balance>잔액</Balance>
-                    <CurrentPoint>{formattedPoint(user.point + chargePoint)}원</CurrentPoint>
-                </PointInfo>
-            </CardBody>
-            <Direct $show={show}>
-                <IoCaretDownOutline color='gray' />
-                <DirectInputBox>
-                    <InputBox>
-                        <DirectPoint value={`${directPoint === "" ? "" : formattedPoint(parseInt(directPoint, 10))}`} onChange={(e) => handlePointChange(e.target.value)} placeholder='포인트를 입력해주세요' />
-                        <DirectChargeButton onClick={onDirectChargeAlertModalOpen}>충전</DirectChargeButton>
-                    </InputBox>
-                </DirectInputBox>
-            </Direct>
-        </CardE>
+        <>
+            <IoCaretDownOutline color='gray' />
+            <DirectInputBox>
+                <InputBox>
+                    <DirectPoint value={`${directPoint === "" ? "" : formattedPoint(parseInt(directPoint, 10))}`} onChange={(e) => handlePointChange(e.target.value)} placeholder='포인트를 입력해주세요' />
+                    <DirectChargeButton onClick={onDirectChargeAlertModalOpen}>충전</DirectChargeButton>
+                </InputBox>
+            </DirectInputBox>
+        </>
     )
-}
-
-export default  memo(Card, (prevProps, nextProps) => isEqual(prevProps.user.userId, nextProps.user.userId));
+});
 
 const CardE = styled.div`
     display: flex;
