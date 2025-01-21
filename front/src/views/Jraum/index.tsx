@@ -4,6 +4,7 @@ import MenuBoard from 'views/Jraum/MenuBoard';
 import OrderBoard from 'views/Jraum/OrderBorad';
 import StandbySceen from './StandbySceen';
 import WSSubscription from './WSSubscription';
+import YouTubePlayer from 'components/Youtube';
 
 //          component: 제이라움 화면 컴포넌트           //
 const Jraum = () => {
@@ -11,6 +12,7 @@ const Jraum = () => {
   //            render: 제이라움 화면 컴포넌트           //
   return (
     <Container>
+      <YouTubePlayer videoId="e2B0f04mq7w" />
       <WSSubscription />
       <StandbySceen />
       <MenuBoard />

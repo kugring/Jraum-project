@@ -20,9 +20,11 @@ public class JwtProvider {
   private String secretKey;
 
   public String create(String userId) {
-    Date expiredDate = Date.from(Instant.now().plus(3, ChronoUnit.MONTHS));  // 3개월 후
-    Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)); // 이 코드는 application.properties의
-                                                                              // secretKey를 가져다 무언가를 하는듯하다!
+    Instant now = Instant.now();
+    Instant expirationInstant = now.plus(3 * 30L * 24 * 60 * 60, ChronoUnit.SECONDS); // 3개월을 90일로 간주
+    Date expiredDate = Date.from(expirationInstant);
+
+    Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     String jwt = Jwts
         .builder()
         .signWith(key, SignatureAlgorithm.HS256)
@@ -30,9 +32,9 @@ public class JwtProvider {
         .setIssuedAt(new Date())
         .setExpiration(expiredDate)
         .compact();
-    return jwt;
 
-  }
+    return jwt;
+}
 
   // Bearer 토큰의 7번째 단어로부의 값을 파라미터로 받아서 해당 token이 가지고 있는 데이터를 확인한다.
   public String validate(String jwt) {
