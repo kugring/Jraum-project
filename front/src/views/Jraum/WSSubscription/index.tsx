@@ -34,6 +34,8 @@ const WSSubscription = () => {
     //          state: 웹소켓에서 받아올 음성을 저장할 객체 상태                //
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
+    const audioContext = new (window.AudioContext)();
+
     //          function: 주문 음성 듣기 함수               //
     const actionTTS = async (orderId: number) => {
         try {
@@ -46,12 +48,20 @@ const WSSubscription = () => {
             console.log("이건 audioRef", audioRef.current);
             // 먼저 dingdong.mp3를 재생
             if (audioRef.current) {
-                console.log("scr를 dingdong.mp3로 바꿈");
-                audioRef.current.src = '/dingdong.mp3';  // public 디렉토리에 있는 dingdong.mp3 파일을 로드
-                console.log("플레이 하기 전");
-                audioRef.current.play();
-                console.log("플레이 후");
-                // dingdong 소리가 끝난 후에 TTS를 재생
+                const source = audioContext.createMediaElementSource(audioRef.current);
+                source.connect(audioContext.destination);
+
+                // 사용자 상호작용으로 오디오 컨텍스트를 활성화
+                if (audioContext.state === 'suspended') {
+                    await audioContext.resume();
+                }
+
+                // 기존 dingdong.mp3를 재생
+                audioRef.current.src = '/dingdong.mp3';
+                await audioRef.current.play().catch((error) => {
+                    console.error("Dingdong playback error:", error);
+                });
+
                 audioRef.current.onended = async () => {
                     console.log('Dingdong sound finished. Now playing TTS.');
 
@@ -62,22 +72,22 @@ const WSSubscription = () => {
 
                     if (audioRef.current) {
                         audioRef.current.src = audioUrl;
+
+                        // 처음에는 무음으로 설정
+                        audioRef.current.muted = true;
+
                         audioRef.current.oncanplaythrough = () => {
                             console.log('TTS loaded successfully');
-                            audioRef.current?.play().catch((error) => {
-                                console.error('TTS playback error:', error);
-                            });
-                        };
-
-                        audioRef.current.onended = () => {
-                            console.log('TTS finished, resuming previous audio.');
-                            existingMediaElements.forEach((mediaElement) => {
-                                if (mediaElement.dataset.wasPlaying === 'true') {
-                                    mediaElement.play().catch((error) => {
-                                        console.error('Error resuming playback:', error);
-                                    });
-                                }
-                            });
+                            // 재생 시작
+                            audioRef.current!
+                                .play()
+                                .then(() => {
+                                    // 재생이 성공하면 음소거 해제
+                                    audioRef.current!.muted = false;
+                                })
+                                .catch((error) => {
+                                    console.error('TTS playback error:', error);
+                                });
                         };
 
                         audioRef.current.onerror = (error) => {
