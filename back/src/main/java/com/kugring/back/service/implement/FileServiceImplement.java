@@ -123,34 +123,34 @@ public class FileServiceImplement implements FileService {
         }
     }
 
-    @Override
+    // SSML을 기반으로 TTS 오디오를 생성하고, 효과음과 합치는 로직
     public byte[] generateSsmlOrderAudio(Long orderId) {
         try (TextToSpeechClient textToSpeechClient = TextToSpeechClient.create()) {
-
+            // 주문 정보 가져오기
             Order order = orderRepository.findByOrderId(orderId);
             String ssmlText = generateSsml(order);
 
-            // SSML 입력을 생성
+            // SSML 입력 생성
             SynthesisInput input = SynthesisInput.newBuilder()
-                    .setSsml(ssmlText) // SSML 형식으로 설정
+                    .setSsml(ssmlText)
                     .build();
 
             VoiceSelectionParams voice = VoiceSelectionParams.newBuilder()
-                    .setLanguageCode("ko-KR") // 한국어
-                    .setName("ko-KR-Wavenet-D") // 스타일 음성
-                    .setSsmlGender(SsmlVoiceGender.MALE) // 음성 성별
+                    .setLanguageCode("ko-KR")
+                    .setName("ko-KR-Neural2-A")
+                    .setSsmlGender(SsmlVoiceGender.FEMALE)
                     .build();
 
+            // 음정(Pitch)을 2로 설정
             AudioConfig audioConfig = AudioConfig.newBuilder()
-                    // .setAudioEncoding(AudioEncoding.MP3) // MP3 포맷
-                    .setAudioEncoding(AudioEncoding.LINEAR16) // WAV 형식으로 설정
+                    .setAudioEncoding(AudioEncoding.MP3)
+                    .setPitch(1.5) // 음정을 2로 설정
                     .build();
-
             // Google TTS 호출
             SynthesizeSpeechResponse response = textToSpeechClient.synthesizeSpeech(input, voice, audioConfig);
-            ByteString audioContents = response.getAudioContent();
+            byte[] ttsAudio = response.getAudioContent().toByteArray();
+            return ttsAudio;
 
-            return audioContents.toByteArray();
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("TTS 처리 중 오류 발생", e);
@@ -165,16 +165,19 @@ public class FileServiceImplement implements FileService {
         ssmlText.append("<speak>");
 
         // 주문자 이름 강조
-        ssmlText.append("<emphasis level=\"strong\">")
-                .append(order.getUser().getName());
+        ssmlText.append(order.getUser().getNickname() + " ");
 
-        if (order.getUser().getDivision().equals("단체")) {
-            ssmlText.append(",</emphasis>");
+        // 단체 주문인 경우 "님" 생략
+        if (order.getUser().getPosition().equals("단체")) {
+            ssmlText.append(",");
+        } else if (order.getUser().getPosition() != null) {
+            ssmlText.append(order.getUser().getPosition());
+            ssmlText.append("님,");
         } else {
-            ssmlText.append("님,</emphasis>");
+            ssmlText.append("님,");
         }
 
-        ssmlText.append("<break time=\"500ms\"/>");
+        ssmlText.append(" 주문하신 ");
 
         // 주문 항목 반복
         for (OrderDetail orderDetail : order.getOrderDetails()) {
@@ -182,15 +185,16 @@ public class FileServiceImplement implements FileService {
             int quantity = orderDetail.getQuantity(); // 수량
 
             // 각 메뉴와 수량에 대한 SSML 태그 생성
-            ssmlText.append("<emphasis level=\"strong\">")
-                    .append(menuName)
+            ssmlText.append(menuName)
                     .append(" ")
                     .append(quantity)
-                    .append("잔,</emphasis>");
+                    .append("잔, ");
         }
 
+        // SSML 끝 문구
+        ssmlText.append("나왔습니다.");
+
         // SSML 끝 태그
-        ssmlText.append("<prosody level=\"strong\" pitch=\"+10%\">나왔습니닿아~</prosody>");
         ssmlText.append("</speak>");
 
         return ssmlText.toString();

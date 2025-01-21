@@ -12,7 +12,7 @@ interface YoutubeSoundStore {
 // Zustand 상태 생성
 const useYoutubeSoundStore = create<YoutubeSoundStore>()(
     devtools((set) => ({
-        videoId: 'e2B0f04mq7w',
+        videoId: 'PmqJZHWm7JA',
         isPlaying: false,
         setVideoId: (videoId) => set({ videoId: videoId }),
         setIsPlaying: (play) => set({ isPlaying: play }),

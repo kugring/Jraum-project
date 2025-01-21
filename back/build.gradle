@@ -34,6 +34,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf' // 구글 클라우드 TTS를 쓰기 위해서 설정
     implementation 'com.google.cloud:google-cloud-texttospeech:2.9.0'  // Google Cloud TTS 의존성 추가
+    implementation 'com.mpatric:mp3agic:0.9.1'  // mp3agic 라이브러리 의존성 추가
+
 
     implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
     implementation group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
@@ -45,6 +47,10 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+
+
+
 }
 
 // 
