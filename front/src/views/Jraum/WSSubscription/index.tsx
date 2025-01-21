@@ -132,10 +132,7 @@ const WSSubscription = () => {
 
     //              render: 키오스크 웹소켓 렌더링              //
     return (
-        // <></>
-        <div onClick={() => actionTTS(67)}>
-            제발 되라...
-        </div>
+        <></>
     );
 };
 
