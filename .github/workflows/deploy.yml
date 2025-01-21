@@ -71,8 +71,9 @@ jobs:
       - name: Run backend on EC2
         run: |
           ssh ubuntu@${{ secrets.EC2_HOST }} << EOF
-          pkill -f 'java -jar' || true
-          nohup java -jar /home/ubuntu/build/libs/jraum-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+          source ~/.bashrc  # .bashrc 로드
+          pkill -f 'java -jar' || true  # 이전 프로세스 종료
+          nohup java -jar /home/ubuntu/build/libs/jraum-0.0.1-SNAPSHOT.jar > app.log 2>&1 &  # 새로운 JAR 파일 실행
           EOF
 
 
