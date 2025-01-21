@@ -43,21 +43,23 @@ const WSSubscription = () => {
                     mediaElement.pause();
                 }
             });
-    
+            console.log("이건 audioRef", audioRef.current);
             // 먼저 dingdong.mp3를 재생
             if (audioRef.current) {
+                console.log("scr를 dingdong.mp3로 바꿈");
                 audioRef.current.src = '/dingdong.mp3';  // public 디렉토리에 있는 dingdong.mp3 파일을 로드
+                console.log("플레이 하기 전");
                 audioRef.current.play();
-    
+                console.log("플레이 후");
                 // dingdong 소리가 끝난 후에 TTS를 재생
                 audioRef.current.onended = async () => {
                     console.log('Dingdong sound finished. Now playing TTS.');
-    
+
                     // TTS 음성을 불러옵니다.
                     const response = await fetch(`${TEST_DOMAIN}/api/v1/order/${orderId}/audio`);
                     const audioBlob = await response.blob();
                     const audioUrl = URL.createObjectURL(audioBlob);
-    
+
                     if (audioRef.current) {
                         audioRef.current.src = audioUrl;
                         audioRef.current.oncanplaythrough = () => {
@@ -66,7 +68,7 @@ const WSSubscription = () => {
                                 console.error('TTS playback error:', error);
                             });
                         };
-    
+
                         audioRef.current.onended = () => {
                             console.log('TTS finished, resuming previous audio.');
                             existingMediaElements.forEach((mediaElement) => {
@@ -77,7 +79,7 @@ const WSSubscription = () => {
                                 }
                             });
                         };
-    
+
                         audioRef.current.onerror = (error) => {
                             console.error('Audio playback error:', error);
                         };
