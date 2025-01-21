@@ -1,12 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
+import useYoutubeSoundStore from "store/youtube-sound.store";
 
-interface YouTubePlayerProps {
-    videoId: string;
-}
 
-const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
-    const playerRef = useRef<YT.Player | null>(null);
-    const [isPlaying, setIsPlaying] = useState(false);
+const YouTubePlayer = () => {
+
+    const videoID = useYoutubeSoundStore(state => state.videoId)
+    const isPlaying = useYoutubeSoundStore(state => state.isPlaying)
+    const setIsPlaying = useYoutubeSoundStore(state => state.setIsPlaying)
+
+
+    const playerRef = useRef<YT.Player | null>(null); // YouTube Player의 참조를 저장
+
 
     useEffect(() => {
         const loadYouTubeAPI = () => {
@@ -16,18 +20,17 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
 
             window.onYouTubeIframeAPIReady = () => {
                 playerRef.current = new window.YT.Player("youtube-player", {
-                    videoId: videoId,
+                    videoId: videoID,
                     playerVars: {
-                        autoplay: 1, // 자동 재생 활성화
-                        mute: 1, // 음소거 활성화
+                        autoplay: 1,
                         controls: 0,
                         loop: 1,
                         modestbranding: 1,
-                        playlist: videoId,
+                        playlist: videoID, // 반복 재생 설정
                     },
                     events: {
                         onReady: () => {
-                            setIsPlaying(true); // 준비 완료 후 상태 업데이트
+                            setIsPlaying(true); // 플레이어 준비 완료 후 상태 업데이트
                         },
                     },
                 });
@@ -37,30 +40,34 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId }) => {
         };
 
         if (!window.YT) {
-            loadYouTubeAPI();
+            loadYouTubeAPI(); // API가 없으면 로드
         } else if (window.YT && window.YT.Player) {
-            window.onYouTubeIframeAPIReady?.();
+            window.onYouTubeIframeAPIReady?.(); // API가 이미 로드된 경우 초기화
         }
 
         return () => {
             if (playerRef.current) {
-                playerRef.current.destroy();
+                playerRef.current.destroy(); // 컴포넌트 언마운트 시 YouTube Player 정리
             }
         };
-    }, [videoId]);
+    }, [videoID]);
 
-    const handleUnmute = () => {
+
+
+    useEffect(() => {
         if (playerRef.current) {
-            playerRef.current.unMute();
-            setIsPlaying(true);
-        }
-    };
+            if (isPlaying) {
+                playerRef.current.pauseVideo();
+            } else {
+                playerRef.current.playVideo();
+            }
+        };
+    }, [isPlaying]);
 
     return (
-        <>
+        <div>
             <div id="youtube-player" style={{ display: "none" }} /> {/* 숨김 처리 */}
-            {!isPlaying && <button onClick={handleUnmute}>음소거 해제</button>}
-        </>
+        </div>
     );
 };
 

@@ -12,7 +12,7 @@ const Jraum = () => {
   //            render: 제이라움 화면 컴포넌트           //
   return (
     <Container>
-      <YouTubePlayer videoId="e2B0f04mq7w" />
+      <YouTubePlayer />
       <WSSubscription />
       <StandbySceen />
       <MenuBoard />
