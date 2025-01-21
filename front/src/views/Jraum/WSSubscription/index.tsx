@@ -37,7 +37,6 @@ const WSSubscription = () => {
     //          function: 주문 음성 듣기 함수               //
     const actionTTS = async (orderId: number) => {
         try {
-            // 현재 재생 중인 오디오 세션을 멈춤
             const existingMediaElements = document.querySelectorAll<HTMLMediaElement>('audio, video');
             existingMediaElements.forEach((mediaElement) => {
                 if (!mediaElement.paused) {
@@ -46,43 +45,45 @@ const WSSubscription = () => {
             });
     
             // 먼저 dingdong.mp3를 재생
-            const dingdongAudio = new Audio('/dingdong.mp3');  // public 디렉토리에 있는 dingdong.mp3 파일을 로드
-            dingdongAudio.play();
+            if (audioRef.current) {
+                audioRef.current.src = '/dingdong.mp3';  // public 디렉토리에 있는 dingdong.mp3 파일을 로드
+                audioRef.current.play();
     
-            // dingdong 소리가 끝난 후에 TTS를 재생
-            dingdongAudio.onended = async () => {
-                console.log('Dingdong sound finished. Now playing TTS.');
+                // dingdong 소리가 끝난 후에 TTS를 재생
+                audioRef.current.onended = async () => {
+                    console.log('Dingdong sound finished. Now playing TTS.');
     
-                // TTS 음성을 불러옵니다.
-                const response = await fetch(`${TEST_DOMAIN}/api/v1/order/${orderId}/audio`);
-                const audioBlob = await response.blob();
-                const audioUrl = URL.createObjectURL(audioBlob);
+                    // TTS 음성을 불러옵니다.
+                    const response = await fetch(`${TEST_DOMAIN}/api/v1/order/${orderId}/audio`);
+                    const audioBlob = await response.blob();
+                    const audioUrl = URL.createObjectURL(audioBlob);
     
-                if (audioRef.current) {
-                    audioRef.current.src = audioUrl;
-                    audioRef.current.oncanplaythrough = () => {
-                        console.log('Audio loaded successfully');
-                        audioRef.current?.play().catch((error) => {
+                    if (audioRef.current) {
+                        audioRef.current.src = audioUrl;
+                        audioRef.current.oncanplaythrough = () => {
+                            console.log('TTS loaded successfully');
+                            audioRef.current?.play().catch((error) => {
+                                console.error('TTS playback error:', error);
+                            });
+                        };
+    
+                        audioRef.current.onended = () => {
+                            console.log('TTS finished, resuming previous audio.');
+                            existingMediaElements.forEach((mediaElement) => {
+                                if (mediaElement.dataset.wasPlaying === 'true') {
+                                    mediaElement.play().catch((error) => {
+                                        console.error('Error resuming playback:', error);
+                                    });
+                                }
+                            });
+                        };
+    
+                        audioRef.current.onerror = (error) => {
                             console.error('Audio playback error:', error);
-                        });
-                    };
-    
-                    audioRef.current.onended = () => {
-                        console.log('TTS finished, resuming previous audio.');
-                        existingMediaElements.forEach((mediaElement) => {
-                            if (mediaElement.dataset.wasPlaying === 'true') {
-                                mediaElement.play().catch((error) => {
-                                    console.error('Error resuming playback:', error);
-                                });
-                            }
-                        });
-                    };
-    
-                    audioRef.current.onerror = (error) => {
-                        console.error('Audio playback error:', error);
-                    };
-                }
-            };
+                        };
+                    }
+                };
+            }
         } catch (error) {
             console.error('Error fetching or playing audio:', error);
         }
