@@ -22,8 +22,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(@NonNull StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-        .setAllowedOrigins("https://hyunam.site", "https://www.hyunam.site")  // 두 도메인을 모두 명시적으로 설정
-        // .setAllowedOrigins( "http://localhost:3000")  // 두 도메인을 모두 명시적으로 설정 프론트의 기준으로 생각해야한다.
+        // .setAllowedOrigins("https://hyunam.site", "https://www.hyunam.site")  // 두 도메인을 모두 명시적으로 설정
+        .setAllowedOrigins( "http://localhost:3000")  // 두 도메인을 모두 명시적으로 설정 프론트의 기준으로 생각해야한다.
         // .setAllowedOrigins( "http://172.30.1.75:3000")  // 두 도메인을 모두 명시적으로 설정 프론트의 기준으로 생각해야한다.
         .withSockJS();
     }

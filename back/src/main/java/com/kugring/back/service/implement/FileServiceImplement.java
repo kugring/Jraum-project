@@ -108,8 +108,11 @@ public class FileServiceImplement implements FileService {
                     .setSsmlGender(SsmlVoiceGender.MALE) // 음성 성별
                     .build();
 
+            // 음정(Pitch)과 볼륨 조정
             AudioConfig audioConfig = AudioConfig.newBuilder()
-                    .setAudioEncoding(AudioEncoding.MP3) // MP3 포맷
+                    .setAudioEncoding(AudioEncoding.MP3)
+                    .setPitch(1.5) // 음정 조정
+                    .setVolumeGainDb(16.0) // 음량을 10dB 키움 (최대 16까지 가능)
                     .build();
 
             // Google TTS 호출
@@ -161,14 +164,25 @@ public class FileServiceImplement implements FileService {
     public String generateSsml(Order order) {
         StringBuilder ssmlText = new StringBuilder();
 
-        // SSML 기본 구조
+        // 출력되는 주문자의 이름, 닉네임을 결정
+        String primaryName = (order.getUser().getNickname() != null && !order.getUser().getNickname().isEmpty())
+                ? order.getUser().getNickname()
+                : order.getUser().getName();
+
+        // SSML 시작 태그
         ssmlText.append("<speak>");
 
-        // 주문자 이름 강조
-        ssmlText.append(order.getUser().getNickname() + " ");
+        // 전체 SSML을 큰 소리로 감싸기
+        ssmlText.append("<prosody volume=\"x-loud\">");
+        ssmlText.append("<emphasis level=\"strong\">"); // 전체 강조 추가
+
+        // 주문자 이름 추가
+        ssmlText.append(primaryName);
+        // 공백추가로 발음 정확도 올림 (잘못된 예시: '임재혁썽도님')
+        ssmlText.append(" ");
 
         // 단체 주문인 경우 "님" 생략
-        if (order.getUser().getPosition().equals("단체")) {
+        if ("단체".equals(order.getUser().getPosition())) {
             ssmlText.append(",");
         } else if (order.getUser().getPosition() != null) {
             ssmlText.append(order.getUser().getPosition());
@@ -184,7 +198,7 @@ public class FileServiceImplement implements FileService {
             String menuName = orderDetail.getMenu().getName(); // 메뉴 이름
             int quantity = orderDetail.getQuantity(); // 수량
 
-            // 각 메뉴와 수량에 대한 SSML 태그 생성
+            // 메뉴와 수량 추가
             ssmlText.append(menuName)
                     .append(" ")
                     .append(quantity)
@@ -193,6 +207,10 @@ public class FileServiceImplement implements FileService {
 
         // SSML 끝 문구
         ssmlText.append("나왔습니다.");
+
+        // SSML 강조 및 큰 소리 태그 닫기
+        ssmlText.append("</emphasis>");
+        ssmlText.append("</prosody>");
 
         // SSML 끝 태그
         ssmlText.append("</speak>");

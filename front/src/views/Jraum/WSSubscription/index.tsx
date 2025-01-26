@@ -33,9 +33,10 @@ const WSSubscription = () => {
 
 
     //          state: 웹소켓에서 받아올 음성을 저장할 객체 상태                //
-    const audioRef = useRef<HTMLAudioElement | null>(null);
     const [audioSrc, setAudioSrc] = useState<string | null>(null);
-
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+    const audioContextRef = useRef<AudioContext | null>(null);
+    const gainNodeRef = useRef<GainNode | null>(null);
 
     // 추가
     const playFakeAudio = useCallback(() => {
@@ -55,22 +56,51 @@ const WSSubscription = () => {
         }
     }, []);
 
-
+    //          function: 주문 음성 듣기 함수               //
     const fetchAudioSrc = useCallback((orderId: number) => {
         playFakeAudio(); // 추가
+
         setTimeout(async () => {
-            // TTS 음성을 불러옵니다.
+            // TTS 음성을 즉시 불러옵니다.
             const response = await fetch(`${TEST_DOMAIN}/api/v1/order/${orderId}/audio`);
             const audioBlob = await response.blob();
             const audioUrl = URL.createObjectURL(audioBlob);
-            setAudioSrc(audioUrl);
-        }, 2000);
+
+            // setAudioSrc를 2초 후에 실행합니다.
+            setTimeout(() => {
+                setAudioSrc(audioUrl);
+            }, 2000);
+        }, 0);
+
     }, []);
 
+    //          effect: TTS 음성이 바뀌면 Audio 객체에 새로운 src를 넣어줌               //
     useEffect(() => {
         if (audioRef.current && audioSrc) {
+            // 기존 AudioContext가 없으면 생성
+            if (!audioContextRef.current) {
+                const audioContext = new (window.AudioContext)();
+                const gainNode = audioContext.createGain();
+                const sourceNode = audioContext.createMediaElementSource(audioRef.current);
+
+                // 노드 연결: Audio > GainNode > Destination
+                sourceNode.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                // GainNode와 AudioContext 저장
+                audioContextRef.current = audioContext;
+                gainNodeRef.current = gainNode;
+            }
+
+            // GainNode의 gain 값을 조정 (2배로 설정)
+            if (gainNodeRef.current) {
+                gainNodeRef.current.gain.value = 20.0; // 음량을 2배로 증폭
+            }
+
+            // 새로운 src 설정
             audioRef.current.src = audioSrc;
-            audioRef.current.muted = false; // 추가
+            audioRef.current.muted = false;
+
             audioRef.current.onplay = () => {
                 console.log('Audio playback started');
             };
@@ -80,63 +110,6 @@ const WSSubscription = () => {
         }
     }, [audioSrc]);
 
-
-    //          function: 주문 음성 듣기 함수               //
-    // const actionTTS = async (orderId: number) => {
-    //     try {
-    //         const existingMediaElements = document.querySelectorAll<HTMLMediaElement>('audio, video');
-    //         existingMediaElements.forEach((mediaElement) => {
-    //             if (!mediaElement.paused) {
-    //                 mediaElement.pause();
-    //             }
-    //         });
-    //         console.log("이건 audioRef", audioRef.current);
-    //         // 먼저 dingdong.mp3를 재생
-    //         if (audioRef.current) {
-    //             console.log("scr를 dingdong.mp3로 바꿈");
-    //             audioRef.current.src = '/dingdong.mp3';  // public 디렉토리에 있는 dingdong.mp3 파일을 로드
-    //             console.log("플레이 하기 전");
-    //             audioRef.current.play();
-    //             console.log("플레이 후");
-    //             // dingdong 소리가 끝난 후에 TTS를 재생
-    //             audioRef.current.onended = async () => {
-    //                 console.log('Dingdong sound finished. Now playing TTS.');
-
-    //                 // TTS 음성을 불러옵니다.
-    //                 const response = await fetch(`${TEST_DOMAIN}/api/v1/order/${orderId}/audio`);
-    //                 const audioBlob = await response.blob();
-    //                 const audioUrl = URL.createObjectURL(audioBlob);
-
-    //                 if (audioRef.current) {
-    //                     audioRef.current.src = audioUrl;
-    //                     audioRef.current.oncanplaythrough = () => {
-    //                         console.log('TTS loaded successfully');
-    //                         audioRef.current?.play().catch((error) => {
-    //                             console.error('TTS playback error:', error);
-    //                         });
-    //                     };
-
-    //                     audioRef.current.onended = () => {
-    //                         console.log('TTS finished, resuming previous audio.');
-    //                         existingMediaElements.forEach((mediaElement) => {
-    //                             if (mediaElement.dataset.wasPlaying === 'true') {
-    //                                 mediaElement.play().catch((error) => {
-    //                                     console.error('Error resuming playback:', error);
-    //                                 });
-    //                             }
-    //                         });
-    //                     };
-
-    //                     audioRef.current.onerror = (error) => {
-    //                         console.error('Audio playback error:', error);
-    //                     };
-    //                 }
-    //             };
-    //         }
-    //     } catch (error) {
-    //         console.error('Error fetching or playing audio:', error);
-    //     }
-    // };
 
     //              function: 사용자 주문 웹소켓 구독 핸들러               // 
     const OrderTTSSubscribe = () => {
@@ -161,21 +134,6 @@ const WSSubscription = () => {
             }
         };
     }, [connected]);
-
-    //              effect: TTS를 위해서 처음 렌더링시 Audio객체를 만듬               //
-    useEffect(() => {
-        // 오디오 객체 초기화
-        if (!audioRef.current) {
-            audioRef.current = new Audio();
-        }
-
-        audioRef.current.oncanplaythrough = () => {
-            console.log('Audio is ready');
-        };
-        audioRef.current.onerror = (error) => {
-            console.error('Audio loading error:', error);
-        };
-    }, []);
 
     //              render: 키오스크 웹소켓 렌더링              //
     return (
