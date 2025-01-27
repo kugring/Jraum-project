@@ -148,6 +148,7 @@ public class FileServiceImplement implements FileService {
             AudioConfig audioConfig = AudioConfig.newBuilder()
                     .setAudioEncoding(AudioEncoding.MP3)
                     .setPitch(1.5) // 음정을 2로 설정
+                    .setVolumeGainDb(16.0) // 음량을 10dB 키움 (최대 16까지 가능)
                     .build();
             // Google TTS 호출
             SynthesizeSpeechResponse response = textToSpeechClient.synthesizeSpeech(input, voice, audioConfig);
@@ -176,6 +177,8 @@ public class FileServiceImplement implements FileService {
         ssmlText.append("<prosody volume=\"x-loud\">");
         ssmlText.append("<emphasis level=\"strong\">"); // 전체 강조 추가
 
+        // 앞부분에 무음 추가 (0.2초 정도 -> 뮤트상태에서 볼륨이 증가됨에 따라 텍스트 첫글자 작게 들리는 문제를 해결하기 위함)
+        ssmlText.append("<break time=\"200ms\"/>");
         // 주문자 이름 추가
         ssmlText.append(primaryName);
         // 공백추가로 발음 정확도 올림 (잘못된 예시: '임재혁썽도님')

@@ -52,13 +52,20 @@ const WSSubscription = () => {
             setTimeout(() => {
                 audioRef.current!.muted = true;
                 audioRef.current!.onplay = null;
-            }, 1800);
+            }, 1700);
         }
     }, []);
 
     //          function: 주문 음성 듣기 함수               //
     const fetchAudioSrc = useCallback((orderId: number) => {
         playFakeAudio(); // 추가
+
+        setTimeout(() => {
+            audioRef.current!.muted = false;
+        }, 100);
+        setTimeout(() => {
+            audioRef.current!.muted = false;
+        }, 1800);
 
         setTimeout(async () => {
             // TTS 음성을 즉시 불러옵니다.
@@ -99,7 +106,6 @@ const WSSubscription = () => {
 
             // 새로운 src 설정
             audioRef.current.src = audioSrc;
-            audioRef.current.muted = false;
 
             audioRef.current.onplay = () => {
                 console.log('Audio playback started');
