@@ -1,10 +1,9 @@
-import { useEffect, useState } from 'react';
-import usePinUserStore from 'store/pin-user.store';
 import styled from 'styled-components'
-import PaymentMethodBox from './PaymentMethodBox';
+import YouTubePlayer from 'components/Youtube';
+import usePinUserStore from 'store/pin-user.store';
 import BackgroundImage from 'assets/image/background-img.jpg'
-import useYoutubeSoundStore from 'store/youtube-sound.store';
-import { ImCheckboxChecked, ImCheckboxUnchecked } from 'react-icons/im';
+import PaymentMethodBox from './PaymentMethodBox';
+import { useEffect, useState } from 'react';
 
 
 //          component: 대기 화면 컴포넌트               //
@@ -18,14 +17,7 @@ const StandbySceen = () => {
     const payment = usePinUserStore(state => state.payment !== '');
 
 
-    const isPlaying = useYoutubeSoundStore(state => state.isPlaying);
 
-
-    //              function: 유튜브 음악 재생 버튼 함수          //
-    const onCLickPlay = () => {
-        const onCLickPlay = useYoutubeSoundStore.getState().togglePlaying;
-        onCLickPlay()
-    }
 
 
     //      effect: 대기화면 애니메이션 적용 효과        //
@@ -46,10 +38,8 @@ const StandbySceen = () => {
     //          render: 대기 화면 렌더링            //
     return (
         <StandbySceenE $show={show} $action={action}>
+            <YouTubePlayer />
             <PaymentMethodBox />
-            <MusicButton $active={isPlaying}  onClick={onCLickPlay}>
-                {!isPlaying ? <ImCheckboxChecked size={14} /> : <ImCheckboxUnchecked size={14} />}음악 재생
-            </MusicButton>
         </StandbySceenE>
     )
 }
@@ -91,17 +81,4 @@ const StandbySceenE = styled.div<{ $show: boolean, $action: boolean }>`
         transition: background-color 0.5s ease-in-out;
         z-index: -1; /* 자식 요소 위로 올리지 않도록 */
     }
-`
-
-const MusicButton = styled.div<{ $active: boolean }>`
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    font-size: 14px;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-    color: var(--copperBrown);
-    opacity: ${({ $active }) => $active ? "1" : "0.7"};
 `
