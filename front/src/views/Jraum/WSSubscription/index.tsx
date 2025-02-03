@@ -1,5 +1,6 @@
 import { TEST_DOMAIN } from 'constant';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useYoutubeSoundStore } from 'store';
 import usePointChargeStore from 'store/modal/point-charge-modal.store';
 import useWebSocketStore from 'store/web-socket.store';
 
@@ -37,6 +38,8 @@ const WSSubscription = () => {
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const audioContextRef = useRef<AudioContext | null>(null);
     const gainNodeRef = useRef<GainNode | null>(null);
+    const ttsGain = useYoutubeSoundStore(state => state.ttsGain)
+
 
     // 추가
     const playFakeAudio = useCallback(() => {
@@ -101,7 +104,7 @@ const WSSubscription = () => {
 
             // GainNode의 gain 값을 조정 (2배로 설정)
             if (gainNodeRef.current) {
-                gainNodeRef.current.gain.value = 20.0; // 음량을 2배로 증폭
+                gainNodeRef.current.gain.value = ttsGain / 100 * 15; // 음량을 2배로 증폭
             }
 
             // 새로운 src 설정
