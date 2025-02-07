@@ -16,22 +16,30 @@ import { defaultUserImage, formattedPoint } from 'constant'
 //              component: 포인트 직접 충전 컴포넌트                  //
 const Card = ({ user }: { user: SortedUser }) => {
 
-    //              state: 하단 정보 공개 상태                  //
-    const [show, setShow] = useState<boolean>(false);
     //              state: 충전 금액 상태                  //
     const [chargePoint, setChargePoint] = useState<number>(0);
+    //              state: 보여질 card ID 상태                  //
+    const show = usePointDirectChargeStore(state => state.showCard === user.userId);
+    //              state: 보여질 card ID 상태                  //
+    const setShowCard = usePointDirectChargeStore.getState().setShowCard;
 
+    //              function 함수: 현재 카드를 클릭하면 열리고, 다른 카드 클릭하면 닫힘                  //
+    const toggleShow = () => {
+        const showCard = usePointDirectChargeStore.getState().showCard;
+        setShowCard(showCard === user.userId ? "" : user.userId);
+    };
+    
     //              render: 포인트 직접 충전 렌더링                 //
     return (
         <CardE>
-            <CardBody onClick={() => setShow(!show)}>
+            <CardBody onClick={toggleShow}>
                 <UserInfoE user={user} chargePoint={chargePoint} />
             </CardBody>
             <Direct $show={show}>
-                <DirectE user={user} chargePoint={chargePoint} setShow={setShow} setChargePoint={setChargePoint} />
+                <DirectE user={user} chargePoint={chargePoint} setShow={toggleShow} setChargePoint={setChargePoint} />
             </Direct>
         </CardE>
-    )
+    );
 }
 export default memo(Card, (prevProps, nextProps) => isEqual(prevProps.user.userId, nextProps.user.userId));
 
@@ -40,7 +48,7 @@ const UserInfoE = memo(({ user, chargePoint }: { user: SortedUser; chargePoint: 
 
     //          state: 포지션 상태          //
     const position = [user.division, user.position].filter(Boolean).join(' / ') || '';
-    
+
     //              render: 회원 정보 렌더링                  //
     return (
         <>
@@ -83,9 +91,14 @@ const DirectE = memo(({ user, chargePoint, setShow, setChargePoint }: {
     //          function: 가격 입력시 중간에 form처리 하는 함수         //
     const handlePointChange = (inputValue: string) => {
         if (inputValue.length > 8) return;
-        const numericValue = inputValue.replace(/[^0-9]/g, ""); // 숫자 외 제거
+        // 첫 글자가 '-'인 경우 유지, 이후 문자에서 숫자만 남김
+        const numericValue = inputValue.startsWith('-')
+            ? '-' + inputValue.slice(1).replace(/[^0-9]/g, "")
+            : inputValue.replace(/[^0-9]/g, "");
+
         setDirectPoint(numericValue); // 상태에 숫자 값 저장
     };
+
     //          function:  정렬된 회원 목록 처리 하는는 함수            //
     const postPointDirectChargeResponse = (responseBody: PostPointDirectChargeResponseDto | ResponseDto | null) => {
         if (!responseBody) return;
@@ -93,7 +106,7 @@ const DirectE = memo(({ user, chargePoint, setShow, setChargePoint }: {
         if (code === 'DBE') alert('데이터베이스 오류입니다.');
         if (code === 'NMG') alert('존재하지 않는 관리자입니다.');
         if (code !== 'SU') return;
-        setDirectPoint("0")
+        setDirectPoint("")
         setShow(false)
         toast.success('정상적으로 충전되었습니다.', {
             autoClose: 500,
@@ -128,7 +141,11 @@ const DirectE = memo(({ user, chargePoint, setShow, setChargePoint }: {
             <IoCaretDownOutline color='gray' />
             <DirectInputBox>
                 <InputBox>
-                    <DirectPoint value={`${directPoint === "" ? "" : formattedPoint(parseInt(directPoint, 10))}`} onChange={(e) => handlePointChange(e.target.value)} placeholder='포인트를 입력해주세요' />
+                    <DirectPoint
+                        value={directPoint === "" || directPoint === "-" ? directPoint : formattedPoint(parseInt(directPoint, 10))}
+                        onChange={(e) => handlePointChange(e.target.value)}
+                        placeholder="포인트를 입력해주세요"
+                    />
                     <DirectChargeButton onClick={onDirectChargeAlertModalOpen}>충전</DirectChargeButton>
                 </InputBox>
             </DirectInputBox>
@@ -170,7 +187,7 @@ const Direct = styled.div<{ $show: boolean }>`
     ${({ $show }) => $show ?
         ` max-height: 150px; opacity: 1; `
         :
-        ` max-height: 0; opacity: 0.1;`}
+        ` max-height: 0; opacity: 0;`}
 `
 
 const DirectInputBox = styled.div`

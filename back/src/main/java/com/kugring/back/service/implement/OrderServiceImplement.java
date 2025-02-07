@@ -3,7 +3,6 @@ package com.kugring.back.service.implement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -177,8 +176,6 @@ public class OrderServiceImplement implements OrderService {
 
 
             String[] excludeNames = orderRepository.findUserNamesByUnapprovedAndCashPayment();
-            System.out.println("이건 현금결제 사용된 성경인물: " + Arrays.toString(excludeNames));
-            
             String remainingBiblePeople = BiblePeople.getRandomBiblePerson(excludeNames);
 
             if (remainingBiblePeople != "다 소모됨") {

@@ -8,12 +8,14 @@ interface PointDirectChargeStore {
   sort: string;
   page: number,
   limited: number;
+  showCard: string;
   isLoading: boolean;
   users: SortedUser[];
   directPoint: string;
   setEnd: (boolean: boolean) => void;
   setName: (name: string) => void;
   setSort: (sort: string) => void;
+  setShowCard: (showCard: string) => void;
   setUsers: (users: SortedUser[]) => void;
   setDirectPoint: (directPoint: string) => void;
 
@@ -34,10 +36,12 @@ const usePointDirectChargeStore = create<PointDirectChargeStore>()(
     limited: 15,
     isLoading: false,
     users: [],
+    showCard: '',
     directPoint: '',
     setEnd: (boolean) => set({ end: boolean }),
     setName: (name) => set({ name: name }),
     setSort: (sort) => set({ sort: sort }),
+    setShowCard: (userId: string) => set({ showCard: userId }),
     setDirectPoint: (directPoint) => set({ directPoint: directPoint }),
     setPage: (page: number) => set({ page }),
     setUsers: (newUsers: SortedUser[]) =>

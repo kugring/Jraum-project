@@ -213,7 +213,6 @@ public class PointServiceImplement implements PointService {
       // 스크롤 이벤트로 인한 데이터 가져오게 도와주는것
       Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
-
       // 상태에 정의
       String status = Objects.isNull(Status) ? null : "모두".equals(Status) ? null : Status;
 
@@ -222,7 +221,7 @@ public class PointServiceImplement implements PointService {
 
       // 회원이름 정의
       String name = Objects.isNull(Name) ? null : "".equals(Name) ? null : Name;
-      
+
       // Name이 숫자로 된 4자리인지 확인
       if (name != null && name.matches("\\d+")) {
         pin = name; // 숫자로 된 4자리라면 pin에 저장
@@ -274,10 +273,11 @@ public class PointServiceImplement implements PointService {
 
       // 회원 현재_포인트 + 포인트 관련 예외처리
       int currentPoint = user.getPoint();
-      if (chargePoint < 0)
+      int newPoint = currentPoint + chargePoint; // 포인트 충전 후 예상 값 계산
+
+      if (newPoint < 0) { // 충전 후 포인트가 0 미만이면 예외 처리
         return PostPointChargeResponseDto.pointChargeFail();
-      if (currentPoint < 0)
-        return PostPointChargeResponseDto.pointChargeFail();
+      }
 
       // 포인트 엔터티 생성
       PointCharge pointCharge = new PointCharge();

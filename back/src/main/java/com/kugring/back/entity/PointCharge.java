@@ -31,7 +31,6 @@ public class PointCharge {
   private Long pointChargeId;
 
   @NotNull
-  @Min(0)
   private int chargePoint;
 
   @NotNull
