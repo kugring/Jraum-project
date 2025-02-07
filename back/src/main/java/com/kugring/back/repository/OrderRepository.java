@@ -36,9 +36,9 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
         @Query("SELECT COUNT(o) FROM Order o WHERE o.status = :status")
         long countByStatus(@Param("status") String status);
 
-        // status가 '미승인'이면서 payMethod가 '현금결제'인 주문에 해당하는 사용자 이름 목록 반환
+        // status가 '대기'이면서 payMethod가 '현금결제'인 주문에 해당하는 사용자 이름 목록 반환
         @Query("SELECT o.user.name FROM Order o " +
-                        "WHERE o.status = '미승인' " +
+                        "WHERE o.status = '대기' " +
                         "AND o.payMethod = '현금결제'")
         String[] findUserNamesByUnapprovedAndCashPayment();
 

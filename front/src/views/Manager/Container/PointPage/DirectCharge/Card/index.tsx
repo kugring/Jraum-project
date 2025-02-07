@@ -144,7 +144,7 @@ const CardE = styled.div`
     width: 100%;
     padding: 8px;
     box-sizing: border-box;
-    border-radius: 8px;
+    border-radius: 6px;
     border: 1px solid #EABEAB;
     background: #FFF;
 `
@@ -228,7 +228,7 @@ const CardLeft = styled.div`
 const ProfileImage = styled.img`
     width: 42px;
     height: 42px;
-    border-radius: 6px;
+    border-radius: 4px;
 `
 const UserInfo = styled.div`
     display: flex;

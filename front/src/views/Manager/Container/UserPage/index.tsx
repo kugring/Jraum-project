@@ -244,7 +244,7 @@ const CardBox = styled.div`
     align-items: center;
     width: 100%;
     height: 100%;
-    gap: 4px;
+    gap: 2px;
     overflow: scroll;
     scrollbar-width: none;           /* Firefox */
     -ms-overflow-style: none; 

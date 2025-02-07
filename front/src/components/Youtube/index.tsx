@@ -25,7 +25,7 @@ const YouTubePlayer = () => {
     //              object: 유튜브 음악 리스트          //
     const videoList: { [key: string]: string } = {
         "신나는 재즈CCM": "PmqJZHWm7JA",
-        "조용한 재즈CCM": "xHlRexsWiXo",
+        "조용한 재즈CCM": "VQEXYSZV6hg",
         "신나는 위러브": "fMF3KPJ1CoU",
     };
 

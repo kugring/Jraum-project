@@ -40,9 +40,9 @@ const Card = ({ user }: { user: SortedUser }) => {
                     </Info>
                 </UserInfo>
                 <CardTopRight>
-                    <UserType>{user.division !== "단체" ? "개인 회원" : "단체 회원"}</UserType>
+                    <UserType>{user.division === "단체" ? "단체" : "일반"}</UserType>
                     <CurrentPoint>
-                        {sort === "번호순" ? `핀: ${user.pin}` : `${formattedPoint(user.point)}원`}
+                        {`${formattedPoint(user.point)}원`}
                     </CurrentPoint>
                 </CardTopRight>
             </CardTop>
@@ -104,7 +104,7 @@ const CardE = styled.div`
     display: flex;
     flex-direction: column;
     width: 100%;
-    padding: 16px;
+    padding: 8px;
     box-sizing: border-box;
     border-radius: 6px;
     border: 1px solid #E7D7C7;
@@ -130,18 +130,20 @@ const ProfileImage = styled.img`
 const Info = styled.div`
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 1px;
+    justify-content: space-between;
+    align-items: flex-start;
+    align-self: stretch;
+    padding: 6px 0px 4px 0px;
 `
 
 const UserName = styled.div`
     color: var(--brickOrange);
-    font-size: 18px;
+    font-size: 16px;
 `
 
 const Position = styled.div`
     color: var(--copperBrown);
-    font-size: 12px;
+    font-size: 10px;
 `
 
 const CardTopRight = styled.div`
@@ -155,7 +157,6 @@ const CardTopRight = styled.div`
 const CardBottom = styled.div<{ $show: boolean }>`
   overflow: hidden;
   transition: max-height 0.7s ease-in-out; /* 애니메이션 설정 */
-
   ${({ $show }) =>
         $show
             ? `
@@ -167,18 +168,16 @@ const CardBottom = styled.div<{ $show: boolean }>`
 `;
 
 const UserType = styled.div`
-    display: flex;
-    flex-direction: column;
-    padding: 4px;
+    padding: 2px 4px;
     color: #FFF;
-    font-size: 10px;
+    font-size: 12px;
     border-radius: 2px;
     background: var(--orange);
 `
 
 const CurrentPoint = styled.div`
         color: var(--lightBrown);
-        font-size: 12px;
+        font-size: 16px;
 `
 
 const Pin = styled.div`

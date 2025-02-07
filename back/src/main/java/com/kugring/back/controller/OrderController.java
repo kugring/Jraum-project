@@ -11,21 +11,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-// import org.springframework.http.HttpHeaders;
 
-import com.kugring.back.dto.request.order.PatchOrderApproveRequestDto;
-import com.kugring.back.dto.request.order.PatchOrderRefundRequestDto;
-import com.kugring.back.dto.request.order.PostOrderCashRequestDto;
-import com.kugring.back.dto.request.order.PostPointOrderRequestDto;
-import com.kugring.back.dto.response.order.GetCashNameResponseDto;
-import com.kugring.back.dto.response.order.GetOrderListResponseDto;
-import com.kugring.back.dto.response.order.GetOrderManagementResponseDto;
-import com.kugring.back.dto.response.order.PatchOrderApproveResponseDto;
-import com.kugring.back.dto.response.order.PatchOrderRefundResponseDto;
-import com.kugring.back.dto.response.order.PostOrderCashResponseDto;
-import com.kugring.back.dto.response.order.PostPointOrderResponseDto;
 import com.kugring.back.service.FileService;
 import com.kugring.back.service.OrderService;
+import com.kugring.back.dto.request.order.PostOrderCashRequestDto;
+import com.kugring.back.dto.request.order.PostPointOrderRequestDto;
+import com.kugring.back.dto.response.order.GetOrderListResponseDto;
+import com.kugring.back.dto.response.order.PostOrderCashResponseDto;
+import com.kugring.back.dto.request.order.PatchOrderRefundRequestDto;
+import com.kugring.back.dto.response.order.PostPointOrderResponseDto;
+import com.kugring.back.dto.request.order.PatchOrderApproveRequestDto;
+import com.kugring.back.dto.response.order.PatchOrderRefundResponseDto;
+import com.kugring.back.dto.response.order.PatchOrderApproveResponseDto;
+import com.kugring.back.dto.response.order.GetOrderManagementResponseDto;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,19 +36,10 @@ public class OrderController {
     private final OrderService orderService;
     private final FileService fileService;
 
-    // @PostMapping("/filter")
-    // public ResponseEntity<? super FilterOrderListResponseDto>
-    // getOrderList(@RequestBody @Valid FilterOrderListRequestDto reqeustBody) {
-    // ResponseEntity<? super FilterOrderListResponseDto> resposne =
-    // orderService.filterOrderList(reqeustBody);
-    // return resposne;
-    // }
-
     @PostMapping("/payment/point")
     public ResponseEntity<? super PostPointOrderResponseDto> postOrder(
             @RequestBody @Valid PostPointOrderRequestDto reqeustBody,
             @AuthenticationPrincipal String userId) {
-
         ResponseEntity<? super PostPointOrderResponseDto> resposne = orderService.postPointOrderList(userId,
                 reqeustBody);
         return resposne;
@@ -60,12 +49,6 @@ public class OrderController {
     public ResponseEntity<? super PostOrderCashResponseDto> postOrder(
             @RequestBody @Valid PostOrderCashRequestDto reqeustBody) {
         ResponseEntity<? super PostOrderCashResponseDto> resposne = orderService.postCashOrderList(reqeustBody);
-        return resposne;
-    }
-
-    @GetMapping("/cash/name")
-    public ResponseEntity<? super GetCashNameResponseDto> getCashName() {
-        ResponseEntity<? super GetCashNameResponseDto> resposne = orderService.getCashName();
         return resposne;
     }
 
@@ -120,10 +103,10 @@ public class OrderController {
         // CORS 헤더 추가 및 MIME 타입 설정
         HttpHeaders headers = new HttpHeaders();
 
-        
-        // 이 부분은 Spring Security의 CORS 설정에 포함되므로, 제거해도 동일하게 동작해야 합니다. Spring Security가 헤더를 관리하도록 맡기는 것이 더 좋습니다.
-        // headers.add("Access-Control-Allow-Origin", "https://hyunam.site"); // 모든 도메인에서 접근 허용
-
+        // 이 부분은 Spring Security의 CORS 설정에 포함되므로, 제거해도 동일하게 동작해야 합니다. Spring Security가
+        // 헤더를 관리하도록 맡기는 것이 더 좋습니다.
+        // headers.add("Access-Control-Allow-Origin", "https://hyunam.site"); // 모든
+        // 도메인에서 접근 허용
 
         headers.add("Content-Type", "audio/wav"); // WAV 형식으로 MIME 타입 설정
         headers.add("Content-Disposition", "inline; filename=\"order-audio.wav\""); // 파일 이름 설정
@@ -132,13 +115,4 @@ public class OrderController {
                 .headers(headers) // CORS와 Content-Type 헤더를 포함하여 응답
                 .body(audioData); // 오디오 파일 본문
     }
-
-    // @PutMapping("/{orderListId}")
-    // public ResponseEntity<? super PutOrderListResponseDto>
-    // putOrderList(@RequestBody @Valid PutOrderListRequestDto requestBody,
-    // @PathVariable("orderListId") Integer orderListId) {
-    // ResponseEntity<? super PutOrderListResponseDto> resposne =
-    // orderService.putOrderList(orderListId, requestBody);
-    // return resposne;
-    // }
 }

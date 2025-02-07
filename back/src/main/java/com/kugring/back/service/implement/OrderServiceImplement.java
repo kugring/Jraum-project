@@ -3,6 +3,7 @@ package com.kugring.back.service.implement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -20,7 +21,6 @@ import com.kugring.back.dto.request.order.PostOrderDetailRequestDto;
 import com.kugring.back.dto.request.order.PostPointOrderRequestDto;
 import com.kugring.back.dto.response.ResponseDto;
 import com.kugring.back.dto.response.auth.PinCheckResponseDto;
-import com.kugring.back.dto.response.order.GetCashNameResponseDto;
 import com.kugring.back.dto.response.order.GetOrderListResponseDto;
 import com.kugring.back.dto.response.order.GetOrderManagementResponseDto;
 import com.kugring.back.dto.response.order.PatchOrderApproveResponseDto;
@@ -167,31 +167,6 @@ public class OrderServiceImplement implements OrderService {
     }
 
     @Override
-    public ResponseEntity<? super GetCashNameResponseDto> getCashName() {
-
-        String biblePerson = null;
-        try {
-
-            String[] excludeNames = orderRepository.findUserNamesByUnapprovedAndCashPayment();
-            String remainingBiblePeople = BiblePeople.getRandomBiblePerson(excludeNames);
-
-            if (remainingBiblePeople != "다 소모됨") {
-                biblePerson = remainingBiblePeople;
-            } else {
-                // long number = orderRepository.countByStatus("미승인");
-                // biblePerson = String.valueOf(number);
-                biblePerson = "솔로몬";
-            }
-
-        } catch (Exception exception) {
-            exception.printStackTrace();
-            ResponseDto.databaseError();
-        }
-
-        return GetCashNameResponseDto.success(biblePerson);
-    }
-
-    @Override
     public ResponseEntity<? super PostOrderCashResponseDto> postCashOrderList(PostOrderCashRequestDto dto) {
 
         GetOrderManageMentResultSet result = null;
@@ -200,7 +175,10 @@ public class OrderServiceImplement implements OrderService {
 
         try {
 
+
             String[] excludeNames = orderRepository.findUserNamesByUnapprovedAndCashPayment();
+            System.out.println("이건 현금결제 사용된 성경인물: " + Arrays.toString(excludeNames));
+            
             String remainingBiblePeople = BiblePeople.getRandomBiblePerson(excludeNames);
 
             if (remainingBiblePeople != "다 소모됨") {
