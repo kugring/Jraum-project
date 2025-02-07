@@ -104,7 +104,7 @@ const WSSubscription = () => {
 
             // GainNode의 gain 값을 조정 (2배로 설정)
             if (gainNodeRef.current) {
-                gainNodeRef.current.gain.value = ttsGain / 100 * 15; // 음량을 2배로 증폭
+                gainNodeRef.current.gain.value = ttsGain / 100 * 12; // 음량을 2배로 증폭
             }
 
             // 새로운 src 설정

@@ -1,13 +1,13 @@
 export const MAIN_PATH = () => '/';
 export const AUTH_PATH = () => '/auth';
-export const SEARCH_PATH = (searchWord: string) => `/search/${searchWord}`;
 export const USER_PATH = (userEmail: string) => `/user/${userEmail}`;
+export const JRAUM_PATH = () => '/jraum';
 export const BOARD_PATH = () => '/board';
-export const BOARD_DETAIL_PATH = (boardNumber: string | number) => `detail/${boardNumber}`;
+export const SEARCH_PATH = (searchWord: string) => `/search/${searchWord}`;
+export const MANAGER_PATH = () => '/jraum/manager';
 export const BOARD_WRITE_PATH = () => 'write';
 export const BOARD_UPDATE_PATH = (boardNumber: string | number) => `update/${boardNumber}`;
-export const JRAUM_PATH = () => '/jraum';
-export const MANAGER_PATH = () => '/jraum/manager';
+export const BOARD_DETAIL_PATH = (boardNumber: string | number) => `detail/${boardNumber}`;
 
 // export const TEST_DOMAIN = '125.139.38.74'; // 이건 우리집 고유 IP
 // export const TEST_DOMAIN = '172.30.1.74'; // 이건 내 컴퓨터
