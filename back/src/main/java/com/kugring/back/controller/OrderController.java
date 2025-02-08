@@ -16,13 +16,17 @@ import com.kugring.back.service.FileService;
 import com.kugring.back.service.OrderService;
 import com.kugring.back.dto.request.order.PostOrderCashRequestDto;
 import com.kugring.back.dto.request.order.PostPointOrderRequestDto;
+import com.kugring.back.dto.response.order.DeleteOrderResponseDto;
 import com.kugring.back.dto.response.order.GetOrderListResponseDto;
 import com.kugring.back.dto.response.order.PostOrderCashResponseDto;
 import com.kugring.back.dto.request.order.PatchOrderRefundRequestDto;
 import com.kugring.back.dto.response.order.PostPointOrderResponseDto;
+import com.kugring.back.dto.request.order.DeleteOrderRequestDto;
 import com.kugring.back.dto.request.order.PatchOrderApproveRequestDto;
+import com.kugring.back.dto.request.order.PatchOrderRefundCancelRequestDto;
 import com.kugring.back.dto.response.order.PatchOrderRefundResponseDto;
 import com.kugring.back.dto.response.order.PatchOrderApproveResponseDto;
+import com.kugring.back.dto.response.order.PatchOrderRefundCancelResponseDto;
 import com.kugring.back.dto.response.order.GetOrderManagementResponseDto;
 
 import jakarta.validation.Valid;
@@ -78,7 +82,6 @@ public class OrderController {
             @RequestBody @Valid PatchOrderApproveRequestDto reqeustBody) {
         ResponseEntity<? super PatchOrderApproveResponseDto> response = orderService.patchOrderApprove(userId,
                 reqeustBody);
-
         return response;
     }
 
@@ -88,13 +91,25 @@ public class OrderController {
             @RequestBody @Valid PatchOrderRefundRequestDto requestBody) {
         ResponseEntity<? super PatchOrderRefundResponseDto> response = orderService.patchOrderRefund(userId,
                 requestBody);
-
         return response;
     }
 
-    // orderId를 받아 음성을 생성하여 반환
-    // @GetMapping(value = "/{orderId}/audio", produces =
-    // MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @PatchMapping("/delete")
+    public ResponseEntity<? super DeleteOrderResponseDto> deleteOrder(
+            @AuthenticationPrincipal String userId,
+            @RequestBody DeleteOrderRequestDto requestBody) { // ✅ @RequestBody 추가
+        return orderService.deleteOrder(userId, requestBody);
+    }
+
+    @PatchMapping("/refund/cancel")
+    public ResponseEntity<? super PatchOrderRefundCancelResponseDto> patchOrderRefundCancel(
+            @AuthenticationPrincipal String userId,
+            @RequestBody @Valid PatchOrderRefundCancelRequestDto requestBody) {
+        ResponseEntity<? super PatchOrderRefundCancelResponseDto> response = orderService.patchOrderRefundCancel(userId,
+                requestBody);
+        return response;
+    }
+
     @GetMapping(value = "/{orderId}/audio", produces = "audio/wav") // WAV MIME 타입 지정
     public ResponseEntity<byte[]> getOrderAudio(@PathVariable("orderId") Long orderId) {
         // TTS를 통해 음성 생성
@@ -103,11 +118,8 @@ public class OrderController {
         // CORS 헤더 추가 및 MIME 타입 설정
         HttpHeaders headers = new HttpHeaders();
 
-        // 이 부분은 Spring Security의 CORS 설정에 포함되므로, 제거해도 동일하게 동작해야 합니다. Spring Security가
-        // 헤더를 관리하도록 맡기는 것이 더 좋습니다.
         // headers.add("Access-Control-Allow-Origin", "https://hyunam.site"); // 모든
         // 도메인에서 접근 허용
-
         headers.add("Content-Type", "audio/wav"); // WAV 형식으로 MIME 타입 설정
         headers.add("Content-Disposition", "inline; filename=\"order-audio.wav\""); // 파일 이름 설정
 

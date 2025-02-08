@@ -1,17 +1,18 @@
 import styled from 'styled-components'
+import { isEqual } from 'lodash'
 import { fromNow } from 'helpers/dayjs'
-import { memo, useState } from 'react'
 import { OrderList } from 'types/interface'
 import { useCookies } from 'react-cookie'
 import { ResponseDto } from 'apis/response'
+import { memo, useState } from 'react'
 import { BiSolidBellRing } from "react-icons/bi";
 import { useWebSocketStore } from 'store'
 import { useBlackModalStore } from 'store/modal'
 import { defaultUserImage, formattedDate, formattedPoint } from 'constant'
-import { patchOrderApproveRequest, patchOrderRefundRequest } from 'apis'
-import { PatchOrderApproveRequestDto, PatchOrderRefundRequestDto } from 'apis/request/order'
-import { PatchOrderApproveResponseDto, PatchOrderRefundResponseDto } from 'apis/response/order'
-import { isEqual } from 'lodash'
+import { deleteOrderRequest, patchOrderApproveRequest, patchOrderRefundCancelRequest, patchOrderRefundRequest } from 'apis'
+import { DeleteOrderRequestDto, PatchOrderApproveRequestDto, PatchOrderRefundCancelRequestDto, PatchOrderRefundRequestDto } from 'apis/request/order'
+import { PatchOrderApproveResponseDto, PatchOrderRefundCancelResponseDto, PatchOrderRefundResponseDto } from 'apis/response/order'
+import DeleteOrderResponseDto from 'apis/response/order/delete-order.response.dto'
 
 //          component: 주문 목록 카드 컴포넌트            //
 const Card = ({ order }: { order: OrderList }) => {
@@ -39,19 +40,16 @@ const Card = ({ order }: { order: OrderList }) => {
         if (code !== 'SU') return;
         setStatus('완료')
     }
-    //          function: 주문 완료 처리하는 함수           //
-    const orderCompleted = () => {
-        if (!cookies.managerToken) return;
-        const requestBody: PatchOrderApproveRequestDto = { orderId: order.orderId }
-        patchOrderApproveRequest(requestBody, cookies.managerToken).then(patchOrderApproveResponse)
-    }
 
-    //          function: 주문 완료 안내창 뜨우는 함수              //
-    const orderCompletedAlertModalOpen = () => {
-        openModal();
-        setWhiteModal("안내창");
-        setMessage("주문을 완료하시겠습니까?")
-        setCallback(orderCompleted);
+    //          function: 주문 삭제 처리 이후 함수          //
+    const deleteOrderResponse = (responseBody: DeleteOrderResponseDto | ResponseDto | null) => {
+        if (!responseBody) return;
+        const { code } = responseBody;
+        if (code === 'DBE') alert('데이터베이스 오류입니다.');
+        if (code === 'NMN') alert('존재하지 않는 메뉴입니다.');
+        if (code === 'NMG') alert('관리자 토큰이 만료되었습니다.');
+        if (code !== 'SU') return;
+        setStatus('삭제')
     }
 
     //          function: 주문 환불 처리 이후 함수          //
@@ -64,15 +62,62 @@ const Card = ({ order }: { order: OrderList }) => {
         if (code !== 'SU') return;
         setStatus('환불')
     }
+
+    //          function: 주문 환불 처리 이후 함수          //
+    const patchOrderRefundCancelResponse = (responseBody: PatchOrderRefundCancelResponseDto | ResponseDto | null) => {
+        if (!responseBody) return;
+        const { code } = responseBody;
+        if (code === 'DBE') alert('데이터베이스 오류입니다.');
+        if (code === 'NMN') alert('존재하지 않는 메뉴입니다.');
+        if (code === 'NMG') alert('관리자 토큰이 만료되었습니다.');
+        if (code !== 'SU') return;
+        setStatus('대기')
+    }
+
+    //          function: 주문 완료 처리하는 함수           //
+    const orderCompleted = () => {
+        if (!cookies.managerToken) return;
+        const requestBody: PatchOrderApproveRequestDto = { orderId: order.orderId }
+        patchOrderApproveRequest(requestBody, cookies.managerToken).then(patchOrderApproveResponse)
+    }
+
+    //          function: 주문 삭제 처리하는 함수           //
+    const orderDeleted = () => {
+        if (!cookies.managerToken) return;
+        const requestBody: DeleteOrderRequestDto = { orderId: order.orderId }
+        deleteOrderRequest(requestBody, cookies.managerToken).then(deleteOrderResponse)
+    }
+
     //          function: 주문 환불 처리하는 함수           //
     const orderRefund = () => {
         if (!cookies.managerToken) return;
         const requestBody: PatchOrderRefundRequestDto = { orderId: order.orderId }
         patchOrderRefundRequest(requestBody, cookies.managerToken).then(patchOrderRefundResponse)
     }
-
+    //          function: 주문 환불 취소 처리하는 함수           //
+    const orderRefundCancel = () => {
+        if (!cookies.managerToken) return;
+        const requestBody: PatchOrderRefundCancelRequestDto = { orderId: order.orderId }
+        patchOrderRefundCancelRequest(requestBody, cookies.managerToken).then(patchOrderRefundCancelResponse)
+    }
 
     //          function: 주문 완료 안내창 뜨우는 함수              //
+    const orderCompletedAlertModalOpen = () => {
+        openModal();
+        setWhiteModal("안내창");
+        setMessage("주문을 완료하시겠습니까?")
+        setCallback(orderCompleted);
+    }
+
+    //          function: 주문 삭제 안내창 뜨우는 함수              //
+    const orderDeletedAlertModalOpen = () => {
+        openModal();
+        setWhiteModal("안내창");
+        setMessage("주문을 삭제하시겠습니까?")
+        setCallback(orderDeleted);
+    }
+
+    //          function: 주문 환불 안내창 뜨우는 함수              //
     const orderRefundAlertModalOpen = () => {
         openModal();
         setWhiteModal("안내창");
@@ -80,6 +125,13 @@ const Card = ({ order }: { order: OrderList }) => {
         setCallback(orderRefund);
     }
 
+    //          function: 주문 환불 취소 안내창 뜨우는 함수              //
+    const orderRefundCancelAlertModalOpen = () => {
+        openModal();
+        setWhiteModal("안내창");
+        setMessage("주문을 환불을 취소하시겠습니까?")
+        setCallback(orderRefundCancel);
+    }
 
     //          function: 주문 알림 웹소켓 TTS 함수             //
     const orderSendTTS = (orderId: number) => {
@@ -94,7 +146,6 @@ const Card = ({ order }: { order: OrderList }) => {
         setMessage("주문 음성 알리기")
         setCallback(() => orderSendTTS(orderId));
     }
-
 
     //          render: 주문 목록 카드 렌더링            //
     return (
@@ -142,7 +193,7 @@ const Card = ({ order }: { order: OrderList }) => {
                     switch (status) {
                         case '완료':
                             return (<>
-                                <Cancel onClick={orderRefundAlertModalOpen}>환불</Cancel>
+                                <Cancel onClick={orderRefundAlertModalOpen}>삭제</Cancel>
                                 <Completed onClick={() => orderSendTTSAlertModalOpen(order.orderId)}>
                                     완료됨 &nbsp;
                                     <BiSolidBellRing color='var(--copperBrown)' size={16} />
@@ -150,11 +201,14 @@ const Card = ({ order }: { order: OrderList }) => {
                             </>);
                         case '대기':
                             return (<>
-                                <Cancel onClick={orderRefundAlertModalOpen}>환불</Cancel>
+                                <Cancel onClick={orderDeletedAlertModalOpen}>삭제</Cancel>
                                 <Complete onClick={orderCompletedAlertModalOpen}>주문 완료</Complete>
                             </>)
                         case '환불':
-                            return <Canceled>환불 처리됨</Canceled>
+                            return <Canceled onClick={orderRefundCancelAlertModalOpen}>환불 처리됨</Canceled>
+                                ;
+                        case '삭제':
+                            return <Canceled>삭제됨</Canceled>
                                 ;
                         default:
                             return null; // 조건에 맞는 값이 없을 때는 아무것도 렌더링하지 않음

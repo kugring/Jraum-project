@@ -44,32 +44,40 @@ public class WebSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .httpBasic(basic -> basic.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(request -> request
-                        // WebSocket 엔드포인트 허용, JwtAuthenticationFilter를 거치지 않음
-                        .requestMatchers("/ws/**").permitAll()
 
-                        // 기존 API 경로 설정
+                // ✅ WebSocket 엔드포인트는 인증 없이 접근 가능
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers("/ws/**").permitAll() // WebSocket 허용
+
+                        // ✅ 인증 없이 접근 가능한 API 엔드포인트
                         .requestMatchers(
                                 "/", "/api/v1/auth/**", "/oauth2/**", "/api/v1/board/**",
-                                "/api/v1/point/**", "/api/v1/menu/**", "/api/v1/user/**",
-                                "/api/v1/order/**", "/api/v1/option/**", "/api/v1/manager/**",
+                                "/api/v1/point/**", "/api/v1/menu/**",
                                 "/file/**" // /file 경로와 하위 모든 경로 허용
-                        )
-                        .permitAll()
+                        ).permitAll()
 
-                        // 권한이 필요한 요청 설정
+                        // ✅ 권한이 필요한 API 엔드포인트
                         .requestMatchers("/api/v1/user/**").hasRole("USER")
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 
+                        // ✅ 그 외 모든 요청은 인증 필요
                         .anyRequest().authenticated())
+
+                // ✅ JWT 필터 추가 (UsernamePasswordAuthenticationFilter보다 먼저 실행)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+
+                // ✅ OAuth2 로그인 관련 설정
                 .oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(endpoint -> endpoint.baseUri("/api/v1/auth/oauth2"))
                         .redirectionEndpoint(endpoint -> endpoint.baseUri("/oauth2/callback/*"))
                         .userInfoEndpoint(endpoint -> endpoint.userService(oAuth2UserService))
                         .successHandler(oAuth2SuccessHandler))
+
+                // ✅ 인증 예외 처리
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(new FailedAuthenticationEntryPoint()))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터 적용
+
+                // ✅ 로그아웃 설정
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessHandler(logoutSuccessHandler())
@@ -87,7 +95,6 @@ public class WebSecurityConfig {
     protected CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-       
 
         // 모든 ip에 응답 허용
         corsConfiguration.addAllowedOriginPattern("*");
@@ -98,8 +105,8 @@ public class WebSecurityConfig {
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.setMaxAge(3600L);
 
-         // 반환할 configurationSource이다. UrlBased가 뭘까? 인스턴트 생성이라고 하네?
-         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        // 반환할 configurationSource이다. UrlBased가 뭘까? 인스턴트 생성이라고 하네?
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);
 
         return source;

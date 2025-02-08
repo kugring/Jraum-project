@@ -168,10 +168,8 @@ const CardBoxE = () => {
         }
     };
 
-
     //          function: 캘린더 데이터를 설정하는 함수             //
     const { setDate, setActiveStartDate, setShowCalendar } = useCalendarStore.getState();
-
 
     //          effect: 언마운트 될때만 실행되는 이펙트             //
     useEffect(() => {

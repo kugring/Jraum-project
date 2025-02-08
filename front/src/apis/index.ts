@@ -6,13 +6,14 @@ import { PostPinCheckManagerRequestDto } from './request/manager';
 import { PostPinCheckManagerResponseDto } from './response/manager';
 import { GetSortedUserResponseDto, PatchUserEditResponseDto } from './response/user';
 import { PatchMenuRequestDto, patchMenuSuquenceRequestDto, PostMenuRequestDto } from './request/menu';
-import { PatchOrderApproveRequestDto, PatchOrderRefundRequestDto, PostCashOrderRequestDto, PostPointOrderRequestDto } from './request/order';
+import { DeleteOrderRequestDto, PatchOrderApproveRequestDto, PatchOrderRefundCancelRequestDto, PatchOrderRefundRequestDto, PostCashOrderRequestDto, PostPointOrderRequestDto } from './request/order';
 import { GetActiveMenuListResponseDto, GetMenuPageResponseDto, PatchMenuResponseDto, PatchMenuSequenceResponseDto, PostMenuResponseDto } from './response/menu';
 import { PatchPointChargeApprovalRequestDto, PatchPointChargeDeclineRequestDto, PostPointChargeRequestDto, PostPointDirectChargeRequestDto } from './request/pointCharge';
-import { GetOrderListResponseDto, GetOrderManagementResponseDto, PatchOrderApproveResponseDto, PatchOrderRefundResponseDto, PostCashOrderResponseDto, PostPointOrderResponseDto } from './response/order';
+import { GetOrderListResponseDto, GetOrderManagementResponseDto, PatchOrderApproveResponseDto, PatchOrderRefundCancelResponseDto, PatchOrderRefundResponseDto, PostCashOrderResponseDto, PostPointOrderResponseDto } from './response/order';
 import { CheckCertificationRequestDto, EmailCertificationRequestDto, IdCheckRequestDto, JraumSignUpRequestDto, NicknameDpCheckRequestDto, PinDpCheckRequestDto, PostPinCheckRequestDto, SignInRequestDto, SignUpRequestDto } from './request/auth';
 import { CheckCertificationResponseDto, EmailCertificationResponseDto, IdcheckResponseDto, JraumSignUpResponseDto, NicknameDpcheckResponseDto, PinDpcheckResponseDto, PostPinCheckResponseDto, SignInResponseDto, SignUpResponseDto } from './response/auth';
 import { DeletePointChargeResponseDto, GetPointChargeListResponseDto, GetPointChargeStatusResponseDto, GetPointChargePendingResponseDto, PatchPointChargeApprovalResponseDto, PatchPointChargeDeclineResponseDto, PostPointChargeResponseDto, PostPointDirectChargeResponseDto } from './response/pointCharge';
+import DeleteOrderResponseDto from './response/order/delete-order.response.dto';
 
 
 
@@ -384,15 +385,14 @@ export const deletePointChargeRequest = async (pointChargeId: number, accessToke
 
 
 
-
-
-
 //              state: 주문                  //
+const DELETE_ORDER_URL = () => `${API_DOMAIN}/order/delete`;
 const POST_CASH_ORDER_URL = () => `${API_DOMAIN}/order/payment/cash`;
 const POST_POINT_ORDER_URL = () => `${API_DOMAIN}/order/payment/point`;
-const GET_ORDER_MANAGEMENT_URL = () => `${API_DOMAIN}/order/manager/order-management`;
-const PATCH_ORDER_APPROVE_URL = () => `${API_DOMAIN}/order/approve`;
 const PATCH_ORDER_REFUND_URL = () => `${API_DOMAIN}/order/refund`;
+const PATCH_ORDER_APPROVE_URL = () => `${API_DOMAIN}/order/approve`;
+const GET_ORDER_MANAGEMENT_URL = () => `${API_DOMAIN}/order/manager/order-management`;
+const PATCH_ORDER_REFUND_CANCEL_URL = () => `${API_DOMAIN}/order/refund/cancel`;
 const GET_ORDER_LIST_URL = (page: number, size: number, name?: string, status?: string, date?: string) => {
     let url = `${API_DOMAIN}/order/manager/order-list?page=${page}&size=${size}`;
     if (name) { url += `&name=${name}`; }
@@ -400,6 +400,13 @@ const GET_ORDER_LIST_URL = (page: number, size: number, name?: string, status?: 
     if (date) { url += `&date=${date}`; }
     return url;
 };
+
+export const deleteOrderRequest = async (requestBody: DeleteOrderRequestDto , accessToken: string) => {
+    const result = await axios.patch(DELETE_ORDER_URL(), requestBody, authorization(accessToken))
+        .then(responseHandler<DeleteOrderResponseDto>)
+        .catch(errorHandler)
+    return result;
+}
 
 export const postCashOrderRequest = async (requestBody: PostCashOrderRequestDto) => {
     const result = await axios.post(POST_CASH_ORDER_URL(), requestBody)
@@ -461,6 +468,13 @@ export const patchOrderApproveRequest = async (requestBody: PatchOrderApproveReq
 export const patchOrderRefundRequest = async (requestBody: PatchOrderRefundRequestDto, accessToken: string) => {
     const result = await axios.patch(PATCH_ORDER_REFUND_URL(), requestBody, authorization(accessToken))
         .then(responseHandler<PatchOrderRefundResponseDto>)
+        .catch(errorHandler)
+    return result;
+}
+
+export const patchOrderRefundCancelRequest = async (requestBody: PatchOrderRefundCancelRequestDto, accessToken: string) => {
+    const result = await axios.patch(PATCH_ORDER_REFUND_CANCEL_URL(), requestBody, authorization(accessToken))
+        .then(responseHandler<PatchOrderRefundCancelResponseDto>)
         .catch(errorHandler)
     return result;
 }

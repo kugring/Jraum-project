@@ -73,6 +73,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {  // 해당 �
 
       // 시큐리티콘텍스트를 request에 등록한다?
       SecurityContextHolder.setContext(securityContext);
+      
 
     } catch (Exception exception) {
       exception.printStackTrace();

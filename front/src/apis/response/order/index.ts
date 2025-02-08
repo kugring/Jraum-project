@@ -4,6 +4,7 @@ import PostPointOrderResponseDto from './post-point-order.response.dto'
 import PatchOrderRefundResponseDto from './patch-order-refund.response.dto'
 import PatchOrderApproveResponseDto from './patch-order-approve.response.dto'
 import GetOrderManagementResponseDto from './get-order-management.response.dto'
+import PatchOrderRefundCancelResponseDto from './patch-order-refund-cancel.response.dto'
 
 export type {
     GetOrderListResponseDto,
@@ -11,5 +12,6 @@ export type {
     PostPointOrderResponseDto,
     PatchOrderRefundResponseDto,
     PatchOrderApproveResponseDto,
-    GetOrderManagementResponseDto
+    GetOrderManagementResponseDto,
+    PatchOrderRefundCancelResponseDto,
 }
