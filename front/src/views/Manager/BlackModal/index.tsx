@@ -10,30 +10,33 @@ import AlertModal from './AlertModal';
 import PinCheck from './PinCheck';
 
 
-//        component: 모달 모음 컴포넌트       //
+//              component: 모달 모음 컴포넌트               //
 const BlackModal = () => {
 
-    //    state: 블랙 모달 상태 (전역변수)      //
+    //              state: 블랙 모달 상태 (전역변수)                //
     const isModalOpen = useBlackModalStore(state => state.isModalOpen)
     const closeModal = useBlackModalStore(state => state.closeModal)
-    //    state: 블랙 모달의 애니메이션 상태      //
+    //              state: 블랙 모달의 애니메이션 상태                  //
     const [actionBlack, setActionBlack] = useState(false);
-    //    state: 블랙 모달의 애니메이션 상태      //
+    //              state: 블랙 모달의 애니메이션 상태                /
     const [actionWhite, setActionWhite] = useState(false);
-    //    state: 블랙 모달의 출현 상태      //
+    //              state: 블랙 모달의 출현 상태                  //
     const [show, setShow] = useState(false);
-    //    state: 화이트 모달 전역상태     //
+    //              state: 화이트 모달 전역상태               //
     const whiteModal = useBlackModalStore(state => state.whiteModal)
-    //    state: 화이트 모달 상태     //
+    //              state: 화이트 모달 상태               //
     const [white, setWhite] = useState<string>('');
+    //                state: 클릭 방지 상태 (0.5초 동안 클릭 방지)             //
+    const [isClickable, setIsClickable] = useState(true);
 
-
-    //      effect: 블랙 모달 애니메이션 적용 효과        //
+    //                  effect: 블랙 모달 애니메이션 적용 효과                  //
     useEffect(() => {
         setWhite(whiteModal)
         if (isModalOpen) {
             if (isModalOpen !== show) {
                 setShow(true);
+                setIsClickable(false); // ✅ 클릭 방지 시작
+                setTimeout(() => setIsClickable(true), 500); // ✅ 0.5초 뒤 클릭 가능
                 setTimeout(() => setActionBlack(true), 10)
                 setTimeout(() => setActionWhite(true), 10)
             }
@@ -41,29 +44,37 @@ const BlackModal = () => {
             if (isModalOpen !== show) {
                 setActionBlack(false);
                 setActionWhite(false);
+                setIsClickable(false); // ✅ 클릭 방지 시작
             }
 
             // 요소를 자체를 제거함 
-            setTimeout(() => { setShow(false) }, 500)
+            setTimeout(() => {
+                setShow(false)
+                setIsClickable(true); // ✅ 0.5초 뒤 클릭 가능
+            }, 500)
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isModalOpen, show]);
 
 
-    //        function: 블랙 모달 외 영역 클릭시 모달 종료 함수        //
+    //                  function: 블랙 모달 외 영역 클릭시 모달 종료 함수                   //
     const handleModalClick = (e: React.MouseEvent<HTMLDivElement>) => {
         // 클릭된 대상이 modal 내의 자식 모달이 아니면 closeModal 실행
+        if (!isClickable) return; // 0.5초 동안 클릭 방지
         if (e.target === e.currentTarget) {
             closeModal();
         }
     };
 
-    //        render: 모달 모음 렌더링        //
+    //                  render: 모달 모음 렌더링                    //
     return (
         <>
             {show && ( // 절대 지우지말것! 렌더링 순서를 위해서!!!
-                <BlackModalE $actionBlack={actionBlack} $actionWhite={actionWhite} onClick={handleModalClick}>
+                <BlackModalE
+                    $actionBlack={actionBlack}
+                    $actionWhite={actionWhite}
+                    onClick={handleModalClick}>
                     {(() => {
                         switch (white) {
                             case '메뉴추가':

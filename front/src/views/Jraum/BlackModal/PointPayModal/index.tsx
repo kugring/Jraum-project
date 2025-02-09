@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import Divider from 'components/Divider'
-import { memo } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { ResponseDto } from 'apis/response';
 import { formattedPoint } from 'constant';
@@ -10,21 +10,23 @@ import { PostPointOrderResponseDto } from 'apis/response/order';
 import { usePinUserStore, useWebSocketStore } from 'store';
 import { useOrderStore, useBlackModalStore, usePointChargeStore } from 'store/modal';
 
-//          component: 결제 모달 컴포넌트               //
+//                  component: 결제 모달 컴포넌트               //
 const PointPayModal = () => {
 
-    //          state: 쿠키 상태                //
+    //              state: 쿠키 상태                //
     const [cookies,] = useCookies();
     //              state: 충전 요청 상태              //
     usePointChargeStore(state => state.pointChargeId);
-    //          state: 핀회원 이름              //
+    //              state: 핀회원 이름              //
     const name = usePinUserStore.getState().pinUser?.nickname !== null ? usePinUserStore.getState().pinUser?.nickname : usePinUserStore.getState().pinUser?.name;
-    //          state: 핀회원 현재 포인트              //
+    //              state: 핀회원 현재 포인트              //
     const point = usePinUserStore.getState().pinUser?.point;
-    //          state: 주문의 최종 결제 금액 상태            //
+    //              state: 주문의 최종 결제 금액 상태            //
     const totalPrice = useOrderStore.getState().getTotalPrice();
-    //      state: 핀 회원 정보         //
+    //              state: 핀 회원 정보         //
     const pinUser = usePinUserStore.getState().pinUser;
+    //              state: 중복 요청 방지 상태                   //
+    const [isProcessing, setIsProcessing] = useState(false); // ✅ 중복 클릭 방지 상태
 
     //      function: 핀 회원 정보 수정 함수         //
     const setPinUser = usePinUserStore.getState().setPinUser;
@@ -68,18 +70,26 @@ const PointPayModal = () => {
         setWhiteModal('포인트결제완료')
     }
 
-    //          function: 결제를 진행하는 함수          //
+    //                  function: 결제를 진행하는 함수                  //
     const paymentActive = () => {
-        //      옵션의 수량이 0인것은 제외함
+        if (isProcessing) return; // ✅ 이미 결제 중이면 추가 요청 방지
+        setIsProcessing(true); // ✅ 결제 요청 시작
+
         const filterZeroOptions = useOrderStore.getState().filterZeroOptions();
         const requestBody: PostPointOrderRequestDto = {
             orderList: filterZeroOptions,
         };
 
-        postPointOrderRequest(requestBody, cookies.pinToken).then(postPointOrderResponse)
-    }
+        postPointOrderRequest(requestBody, cookies.pinToken)
+            .then(postPointOrderResponse)
+            .finally(() => setIsProcessing(false)); // ✅ 요청 완료 후 다시 클릭 가능
+    };
 
 
+    //              effect: 컴포넌트 언마운트 시 isProcessing 초기화            //
+    useEffect(() => {
+        return () => setIsProcessing(false);
+    }, []);
 
 
     //          render: 결제 모달 렌더링            //

@@ -3,7 +3,9 @@ package com.kugring.back.service.implement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.WeekFields;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -39,6 +41,7 @@ import com.kugring.back.entity.OrderDetailOption;
 import com.kugring.back.repository.MenuRepository;
 import com.kugring.back.repository.OptionRepository;
 import com.kugring.back.repository.OrderRepository;
+import com.kugring.back.repository.StaffOneFreeOrderRepository;
 import com.kugring.back.repository.UserRepository;
 import com.kugring.back.repository.resultSet.GetOrderListResultSet;
 import com.kugring.back.repository.resultSet.GetOrderManageMentResultSet;
@@ -56,6 +59,18 @@ public class OrderServiceImplement implements OrderService {
     private final UserRepository userRepository;
     private final MenuRepository menuRepository;
     private final OptionRepository optionRepository;
+    private final StaffOneFreeOrderRepository staffOneFreeOrderRepository;
+
+    public boolean hasUserOrderThisWeek(User user) {
+        LocalDate today = LocalDate.now();
+        LocalDate startOfWeek = today.with(WeekFields.of(Locale.getDefault()).dayOfWeek(), 1);
+        LocalDate endOfWeek = startOfWeek.plusDays(7);
+
+        LocalDateTime startDateTime = startOfWeek.atStartOfDay();
+        LocalDateTime endDateTime = endOfWeek.atStartOfDay();
+
+        return staffOneFreeOrderRepository.existsByUserAndCreatedAtBetween(user, startDateTime, endDateTime);
+    }
 
     @Override
     @Transactional
@@ -70,6 +85,10 @@ public class OrderServiceImplement implements OrderService {
 
             // 주문요청자의 회원 존재 여부 확인
             User user = userRepository.findByUserId(userId);
+
+
+            boolean existFreeOrder = hasUserOrderThisWeek(user);
+            System.out.println("existFreeOrder: "+ existFreeOrder);
 
             // 메뉴 ID들 추출 후에 모두 존재하는지 확인
             List<Long> menuIds = dto.getOrderList().stream().map(PostOrderDetailRequestDto::getMenuId)
