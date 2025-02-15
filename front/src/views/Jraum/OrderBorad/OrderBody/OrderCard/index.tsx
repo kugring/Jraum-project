@@ -15,11 +15,12 @@ interface OrderCardProps {
   image: string;
   menuId: number;
   options: OrderOption[];
+  staff: number;
   orderItem: OrderListItem;
 }
 
 //        component: 주문 카드 컴포넌트         //
-const OrderCard = ({ name, image, price, menuId, tem, options, orderItem }: OrderCardProps) => {
+const OrderCard = ({ name, image, price, menuId, tem, options, staff, orderItem }: OrderCardProps) => {
 
 
   //        function: 블랙모달 오픈 함수          //
@@ -48,7 +49,7 @@ const OrderCard = ({ name, image, price, menuId, tem, options, orderItem }: Orde
   //        render: 주문 카드 렌더링        //
   return (
     <Card>
-      <OrderItemBox name={name} image={image} price={price} menuId={menuId} tem={tem} options={options} />
+      <OrderItemBox name={name} image={image} price={price} menuId={menuId} tem={tem} options={options} staff={staff} />
       <Buttons>
         <EditButton onClick={editOrderItem}>변경</EditButton>
         <DeleteButton onClick={() => removeOrderItem(menuId, options)}>삭제</DeleteButton>

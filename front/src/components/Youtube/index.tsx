@@ -1,10 +1,8 @@
 import styled from "styled-components";
-import { MdArrowDropDown } from "react-icons/md";
+import { FaMinus, FaPlus } from "react-icons/fa";
 import { useYoutubeSoundStore } from "store";
 import { useEffect, useRef, useState } from "react";
-import { ImCheckboxChecked, ImCheckboxUnchecked } from "react-icons/im";
-import { FaMinus, FaPlus } from "react-icons/fa";
-
+import { CgPlayButtonR, CgPlayList, CgPlayPauseR } from "react-icons/cg";
 //          component: 유튜브 음악 재생 컴포넌트               //
 const YouTubePlayer = () => {
 
@@ -145,12 +143,13 @@ const YouTubePlayer = () => {
     //              render: 유튜브 음악 재생 컴포넌트          //
     return (
         <YouTubePlayerE $show={readyPlay} >
+            <PlayerTop>
             <DropdownContainer onClick={toggleDropdown} ref={dropdownRef}>
                 <DropdownHeader>
+                    <CgPlayList size={20}/>
                     <SelectCCM>
                         {Object.keys(videoList).find((key) => videoList[key] === videoId) || "음악 선택"}
                     </SelectCCM>
-                    <MdArrowDropDown size={20} />
                 </DropdownHeader>
                 {isDropdownOpen && (
                     <DropdownList>
@@ -162,6 +161,13 @@ const YouTubePlayer = () => {
                     </DropdownList>
                 )}
             </DropdownContainer>
+            <MusicButton $show={readyPlay} $active={isPlaying} onClick={onCLickPlay}>
+                {isPlaying ? 
+                <CgPlayPauseR size={32}/>
+                : 
+                <CgPlayButtonR size={32}/>}
+            </MusicButton>
+            </PlayerTop>
             {/* 유튜브 볼륨 컨트롤 */}
             <VolumeControl>
                 <label>유튜브 볼륨</label>
@@ -183,9 +189,7 @@ const YouTubePlayer = () => {
                     <Plus onClick={() => handleVolumeChange("tts", ttsGain + 10)} $active={ttsGain === 100} />
                 </Bar>
             </TTSControl>
-            <MusicButton $show={readyPlay} $active={isPlaying} onClick={onCLickPlay}>
-                {isPlaying ? <ImCheckboxChecked size={14} /> : <ImCheckboxUnchecked size={14} />} 음악 재생
-            </MusicButton>
+
             <div id="youtube-player" style={{ display: "none" }} />
         </YouTubePlayerE>
     );
@@ -202,23 +206,18 @@ const YouTubePlayerE = styled.div<{ $show: boolean }>`
   color: var(--copperBrown);
   display: ${({ $show }) => ($show ? "flex" : "none")};
   flex-direction: column;
-  align-items: center;
+  align-items: start;
 `;
 const VolumeControl = styled.div`
-  display: flex;
+    display: flex;
     flex-direction: column;
-  align-items: center;
-  gap: 8px;
+    align-items: center;
+    gap: 4px;
 
-  button {
-    background: none;
-    border: 1px solid var(--copperBrown);
-    color: var(--copperBrown);
-    padding: 4px 8px;
-    cursor: pointer;
-    border-radius: 4px;
-    font-size: 14px;
-  }
+    label {
+        font-size: 14px;
+        color: var(--copperBrown);
+    }
 
   input {
     width: 100px;
@@ -252,7 +251,6 @@ const TTSControl = styled(VolumeControl)`
     label {
         font-size: 14px;
         color: var(--copperBrown);
-        margin-right: 8px;
     }
     display: flex;
     flex-direction: column;
@@ -263,39 +261,47 @@ const TTSControl = styled(VolumeControl)`
 const Bar = styled.div`
     display: flex;
     align-items: center;
+    gap:2px;
 `
 
 const Minus = styled(FaMinus) <{ $active: boolean }>`
-    font-size: 16px;
-    padding: 4px;
+    font-size: 10px;
+    padding: 2px;
     border-radius: 4px;
     background-color: #fff;
     opacity: ${props => props.$active ? "0.6" : "1"};
-    border: 1px solid var(--copperBrown);
+    border: 2px solid var(--copperBrown);
 `
 
 const Plus = styled(FaPlus) <{ $active: boolean }>`
-    font-size: 16px;
-    padding: 5px;
+    font-size: 10px;
+    padding: 3px;
     border-radius: 4px;
     background-color: #fff;
     opacity: ${props => props.$active ? "0.6" : "1"};
-    border: 1px solid var(--copperBrown);
+    border: 2px solid var(--copperBrown);
 `
+
+const PlayerTop = styled.div`
+    display: flex;
+    gap: 8px;
+    align-items: center;
+`
+
 
 const DropdownContainer = styled.div`
   position: relative;
-  width: 160px;
 `;
 
 const DropdownHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
-  border: 1px solid #ccc;
+  padding: 2px 8px 2% 6px;
+    border: 3px solid var(--copperBrown);
   border-radius: 4px;
   cursor: pointer;
+  gap: 2px;
 `;
 
 const SelectCCM = styled.div`
@@ -314,7 +320,7 @@ const DropdownList = styled.div`
   z-index: 10;
 `;
 
-const DropdownItem = styled.li`
+const DropdownItem = styled.div`
   padding: 8px 12px;
   cursor: pointer;
   &:hover {

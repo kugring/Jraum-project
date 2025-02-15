@@ -71,7 +71,7 @@ const PointPayModal = () => {
     }
 
     //                  function: 결제를 진행하는 함수                  //
-    const paymentActive = () => {
+    const paymentActive = () => {;
         if (isProcessing) return; // ✅ 이미 결제 중이면 추가 요청 방지
         setIsProcessing(true); // ✅ 결제 요청 시작
 
@@ -79,6 +79,9 @@ const PointPayModal = () => {
         const requestBody: PostPointOrderRequestDto = {
             orderList: filterZeroOptions,
         };
+
+        console.log(requestBody);
+        
 
         postPointOrderRequest(requestBody, cookies.pinToken)
             .then(postPointOrderResponse)

@@ -47,4 +47,6 @@ public class OrderDetail {
   @OneToMany(mappedBy = "orderDetail", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   private List<OrderDetailOption> options; // 옵션 수량들
 
+  private int staff; // 직원 주문인지 여부
+  
 }

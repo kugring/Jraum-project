@@ -24,6 +24,7 @@ const OrderBody = () => {
           tem={orderItem.menuInfo?.temperature!}
           options={orderItem.options}
           menuId={orderItem.menuId}
+          staff={orderItem.staff}
           orderItem={orderItem}
         />
       ))}

@@ -5,20 +5,21 @@ interface OrderStore {
   orderList: OrderListItem[]; // 주문 리스트 상태
   cashName: string;
   waitingNum: number;
-  setCashName: (cashName: string) => void;
-  setWaitingNum: (waitingNum: number) => void;
   incMQty: (menuId: number, options: OrderOption[]) => void;
   decMQty: (menuId: number, options: OrderOption[]) => void;
-  setOrderList: (newOrderList: OrderListItem[]) => void; // 주문 리스트 설정
+  setCashName: (cashName: string) => void;
+  getQuantity: (menuId: number, options: OrderOption[]) => number | 0; // 수량 조회
   addOrderItem: (orderItem: OrderListItem) => void; // 주문 항목 추가
+  setOrderList: (newOrderList: OrderListItem[]) => void; // 주문 리스트 설정
+  getOrderItem: (menuId: number, options: OrderOption[]) => OrderListItem | undefined; // 추가된 함수
+  setWaitingNum: (waitingNum: number) => void;
+  getTotalPrice: () => number;
+  hasStaffOrder: () => boolean;
   resetOrderList: () => void; // 주문 리스트 초기화
   updateOrderItem: (orderItem: OrderListItem, updatedItem: OrderListItem) => void; // 주문 항목 업데이트
   removeOrderItem: (menuId: number, options: OrderOption[]) => void; // 주문 항목 제거
-  getQuantity: (menuId: number, options: OrderOption[]) => number | 0; // 수량 조회
-  getOrderListLength: () => number | 0;
-  getOrderItem: (menuId: number, options: OrderOption[]) => OrderListItem | undefined; // 추가된 함수
-  getTotalPrice: () => number;
   filterZeroOptions: () => OrderListItem[];
+  getOrderListLength: () => number | 0;
 }
 
 const useOrderStore = create<OrderStore>((set, get) => ({
@@ -53,15 +54,19 @@ const useOrderStore = create<OrderStore>((set, get) => ({
   // 주문 리스트 전체 설정
   setOrderList: (newOrderList) => set({ orderList: newOrderList }),
 
-  // 주문 항목 추가 (중복 시 quantity 증가)
+  // 주문 항목 추가 (중복 시 quantity 증가, staff 고려)
   addOrderItem: (orderItem) =>
     set((state) => {
       const existingIndex = state.orderList.findIndex((item) => {
-        // 각 options 배열을 정렬하여 비교  
+        // 각 options 배열을 정렬하여 비교
         const sortedItemOptions = JSON.stringify(item.options.sort((a, b) => a.optionId - b.optionId));
         const sortedOrderItemOptions = JSON.stringify(orderItem.options.sort((a, b) => a.optionId - b.optionId));
 
-        return item.menuId === orderItem.menuId && sortedItemOptions === sortedOrderItemOptions;
+        return (
+          item.menuId === orderItem.menuId &&
+          sortedItemOptions === sortedOrderItemOptions &&
+          item.staff === orderItem.staff // staff 값도 동일한지 비교
+        );
       });
 
       if (existingIndex !== -1) {
@@ -79,6 +84,7 @@ const useOrderStore = create<OrderStore>((set, get) => ({
         orderList: [...state.orderList, orderItem],
       };
     }),
+
 
   // 주문 항목 업데이트 (menuId와 options 조합으로 찾기)
   updateOrderItem: (orderItem, updatedItem) =>
@@ -126,6 +132,10 @@ const useOrderStore = create<OrderStore>((set, get) => ({
   // 총 가격 계산
   getTotalPrice: () => {
     return get().orderList.reduce((total, orderItem) => {
+      
+      // 직원이면 가격을 0원 처리
+      if (orderItem.staff) return total;
+
       // 메뉴 가격과 수량이 undefined일 경우 기본값을 0으로 설정
       const menuPrice = orderItem.menuInfo?.price || 0;
       const menuQuantity = orderItem.quantity || 0;
@@ -162,6 +172,12 @@ const useOrderStore = create<OrderStore>((set, get) => ({
     set({ orderList: updatedOrderList });
     return updatedOrderList;
   },
+
+  // 직원 주문 여부 확인 함수 추가
+  hasStaffOrder: () => {
+    return get().orderList.some((orderItem) => orderItem.staff === 1);
+  },
+  
 
 }));
 

@@ -1,4 +1,4 @@
-// package com.kugring.back.service;
+package com.kugring.back.service;
 
-// public interface StaffOneFreeOrderService {
-// }
+public interface StaffOneFreeOrderService {
+}

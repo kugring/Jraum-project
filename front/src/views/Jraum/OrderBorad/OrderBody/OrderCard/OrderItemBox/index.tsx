@@ -12,11 +12,12 @@ interface OrderItemBoxProps {
   price: number;
   image: string;
   menuId: number;
+  staff: number;
   options: OrderOption[];
 }
 
 //      component: 주문 아이템 박스 컴포넌트          //
-const OrderItemBox = ({ name, image, price, menuId, tem, options }: OrderItemBoxProps) => {
+const OrderItemBox = ({ name, image, price, menuId, tem, staff, options }: OrderItemBoxProps) => {
 
 
 
@@ -32,14 +33,14 @@ const OrderItemBox = ({ name, image, price, menuId, tem, options }: OrderItemBox
         </Info>
       </InfoBox>
       <OrderCardCount menuId={menuId} options={options} />
-      <OptionBadges menuId={menuId} options={options} tem={tem} />
+      <OptionBadges menuId={menuId} options={options} tem={tem} staff={staff} />
     </OrderItemBoxE>
   );
 };
 export default memo(OrderItemBox, (prevProps, nextProps) => { return prevProps.menuId === nextProps.menuId });
 
 //      component: 옵션 뱃지들 컴포넌트       //
-const OptionBadges = ({menuId, options, tem}: {menuId: number, options: OrderOption[], tem: string}) => {
+const OptionBadges = ({ menuId, options, tem, staff }: { menuId: number, options: OrderOption[], tem: string, staff: number }) => {
 
   //      state: 주문 아이템 옵션들 상태        //
   const getOrderItem = useOrderStore(state => state.getOrderItem)
@@ -101,12 +102,13 @@ const OptionBadges = ({menuId, options, tem}: {menuId: number, options: OrderOpt
   return (
     <OptionBadgesE>
       <Badge $category={tem}>{tem}</Badge>
+      {staff === 1 && <Badge $category="STAFF">교역자</Badge>}
       {menuOptions.map((item) => (
         <Badge key={item?.detail} $category={item?.category!}>
-          { buttonOptions.includes(item?.category!) ? 
+          {buttonOptions.includes(item?.category!) ?
             item?.detail
             :
-            item?.detail +' '+ item?.quantity 
+            item?.detail + ' ' + item?.quantity
           }
         </Badge>
       ))}
@@ -130,13 +132,15 @@ const Price = ({ price, menuId, options }: { price: number, menuId: number, opti
     return optionTotal + (optionPrice * option.quantity);
   }, 0);
 
-  //          state: 주문의 최종 결제 금액 상태            //
-  const OrderItemPirce = (price + optionsPrice) * orderItem!.quantity;
+  //          state: 주문의 최종 결제 금액 상태 (교역자 금액제외 추가함)            //
+  const OrderItemPrice = orderItem?.staff
+    ? 0
+    : (price + optionsPrice) * (orderItem?.quantity ?? 0);
 
 
   //      render: 주문 아이템 가격 렌더링       //
   return (
-    <PriceE>{formattedPoint(OrderItemPirce)}원</PriceE>
+    <PriceE>{formattedPoint(OrderItemPrice)}원</PriceE>
   )
 }
 
@@ -211,7 +215,7 @@ const OptionBadgesE = styled.div`
   gap: 4px;
 `;
 
-const Badge = styled.div<{$category: string}>`
+const Badge = styled.div<{ $category: string }>`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -221,19 +225,21 @@ const Badge = styled.div<{$category: string}>`
   color: #FFF;
   border-radius: 5px;
   background-color: ${(props) => {
-  switch (props.$category) {
-    case "HOT":
-      return "var(--hot)";
-    case "COLD":
-      return "var(--cold)";
-    case "온도":
-      return "var(--hot)";
-    case "얼음":
-      return "var(--cold)";
-    case "컵크기":
-      return "var(--orange)";
-    default:
-      return "var(--goldenOrange)";
-  }
-}};
+    switch (props.$category) {
+      case "HOT":
+        return "var(--hot)";
+      case "COLD":
+        return "var(--cold)";
+      case "온도":
+        return "var(--hot)";
+      case "얼음":
+        return "var(--cold)";
+      case "컵크기":
+        return "var(--orange)";
+      case "STAFF":
+        return "var(--deepTeal)";
+      default:
+        return "var(--goldenOrange)";
+    }
+  }};
 `;

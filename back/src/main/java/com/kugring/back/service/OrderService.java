@@ -17,8 +17,8 @@ import com.kugring.back.dto.response.order.PatchOrderApproveResponseDto;
 import com.kugring.back.dto.response.order.GetOrderManagementResponseDto;
 import com.kugring.back.dto.response.order.PatchOrderRefundCancelResponseDto;
 
-
 public interface OrderService {
+
 
   ResponseEntity<? super DeleteOrderResponseDto> deleteOrder(String managerId, DeleteOrderRequestDto dto);
   ResponseEntity<? super GetOrderListResponseDto> getOrderList(String userId, int page, int size, String name, String status, String date);

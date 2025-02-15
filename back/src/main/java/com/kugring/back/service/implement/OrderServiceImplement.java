@@ -9,45 +9,45 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.kugring.back.common.BiblePeople;
-import com.kugring.back.dto.request.order.DeleteOrderRequestDto;
-import com.kugring.back.dto.request.order.PatchOrderApproveRequestDto;
-import com.kugring.back.dto.request.order.PatchOrderRefundCancelRequestDto;
-import com.kugring.back.dto.request.order.PatchOrderRefundRequestDto;
-import com.kugring.back.dto.request.order.PostOrderCashRequestDto;
-import com.kugring.back.dto.request.order.PostOrderDetailOptionRequestDto;
-import com.kugring.back.dto.request.order.PostOrderDetailRequestDto;
-import com.kugring.back.dto.request.order.PostPointOrderRequestDto;
-import com.kugring.back.dto.response.ResponseDto;
-import com.kugring.back.dto.response.auth.PinCheckResponseDto;
-import com.kugring.back.dto.response.order.DeleteOrderResponseDto;
-import com.kugring.back.dto.response.order.GetOrderListResponseDto;
-import com.kugring.back.dto.response.order.GetOrderManagementResponseDto;
-import com.kugring.back.dto.response.order.PatchOrderApproveResponseDto;
-import com.kugring.back.dto.response.order.PatchOrderRefundCancelResponseDto;
-import com.kugring.back.dto.response.order.PatchOrderRefundResponseDto;
-import com.kugring.back.dto.response.order.PostOrderCashResponseDto;
-import com.kugring.back.dto.response.order.PostPointOrderResponseDto;
 import com.kugring.back.entity.User;
 import com.kugring.back.entity.Menu;
 import com.kugring.back.entity.Order;
 import com.kugring.back.entity.MenuOption;
+import com.kugring.back.common.BiblePeople;
 import com.kugring.back.entity.OrderDetail;
-import com.kugring.back.entity.OrderDetailOption;
-import com.kugring.back.repository.MenuRepository;
-import com.kugring.back.repository.OptionRepository;
-import com.kugring.back.repository.OrderRepository;
-// import com.kugring.back.repository.StaffOneFreeOrderRepository;
-import com.kugring.back.repository.UserRepository;
-import com.kugring.back.repository.resultSet.GetOrderListResultSet;
-import com.kugring.back.repository.resultSet.GetOrderManageMentResultSet;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import com.kugring.back.service.OrderService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Pageable;
+import com.kugring.back.entity.OrderDetailOption;
+import com.kugring.back.dto.response.ResponseDto;
+import com.kugring.back.repository.UserRepository;
+import com.kugring.back.repository.MenuRepository;
+import com.kugring.back.repository.OrderRepository;
+import org.springframework.data.domain.PageRequest;
+import com.kugring.back.repository.OptionRepository;
+import com.kugring.back.dto.response.auth.PinCheckResponseDto;
+import com.kugring.back.repository.StaffOneFreeOrderRepository;
+import com.kugring.back.dto.request.order.DeleteOrderRequestDto;
+import com.kugring.back.dto.request.order.PostOrderCashRequestDto;
+import com.kugring.back.dto.response.order.DeleteOrderResponseDto;
+import com.kugring.back.dto.request.order.PostPointOrderRequestDto;
+import com.kugring.back.repository.resultSet.GetOrderListResultSet;
+import com.kugring.back.dto.response.order.GetOrderListResponseDto;
+import com.kugring.back.dto.request.order.PostOrderDetailRequestDto;
+import com.kugring.back.dto.response.order.PostOrderCashResponseDto;
+import com.kugring.back.dto.response.order.PostPointOrderResponseDto;
+import com.kugring.back.dto.request.order.PatchOrderRefundRequestDto;
+import com.kugring.back.dto.request.order.PatchOrderApproveRequestDto;
+import com.kugring.back.dto.response.order.PatchOrderRefundResponseDto;
+import com.kugring.back.dto.response.order.PatchOrderApproveResponseDto;
+import com.kugring.back.repository.resultSet.GetOrderManageMentResultSet;
+import com.kugring.back.dto.response.order.GetOrderManagementResponseDto;
+import com.kugring.back.dto.request.order.PostOrderDetailOptionRequestDto;
+import com.kugring.back.dto.request.order.PatchOrderRefundCancelRequestDto;
+import com.kugring.back.dto.response.order.PatchOrderRefundCancelResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -59,18 +59,18 @@ public class OrderServiceImplement implements OrderService {
     private final UserRepository userRepository;
     private final MenuRepository menuRepository;
     private final OptionRepository optionRepository;
-    // private final StaffOneFreeOrderRepository staffOneFreeOrderRepository;
+    private final StaffOneFreeOrderRepository staffOneFreeOrderRepository;
 
-    // public boolean hasUserOrderThisWeek(User user) {
-    //     LocalDate today = LocalDate.now();
-    //     LocalDate startOfWeek = today.with(WeekFields.of(Locale.getDefault()).dayOfWeek(), 1);
-    //     LocalDate endOfWeek = startOfWeek.plusDays(7);
+    public boolean hasUserOrderThisWeek(User user) {
+        LocalDate today = LocalDate.now();
+        LocalDate startOfWeek = today.with(WeekFields.of(Locale.getDefault()).dayOfWeek(), 1);
+        LocalDate endOfWeek = startOfWeek.plusDays(7);
 
-    //     LocalDateTime startDateTime = startOfWeek.atStartOfDay();
-    //     LocalDateTime endDateTime = endOfWeek.atStartOfDay();
+        LocalDateTime startDateTime = startOfWeek.atStartOfDay();
+        LocalDateTime endDateTime = endOfWeek.atStartOfDay();
 
-    //     return staffOneFreeOrderRepository.existsByUserAndCreatedAtBetween(user, startDateTime, endDateTime);
-    // }
+        return staffOneFreeOrderRepository.existsByUserAndCreatedAtBetween(user, startDateTime, endDateTime);
+    }
 
     @Override
     @Transactional
@@ -81,14 +81,13 @@ public class OrderServiceImplement implements OrderService {
         int balance = 0;
         long waitingNum = 0;
 
-        try {           
+        try {
 
             // 주문요청자의 회원 존재 여부 확인
             User user = userRepository.findByUserId(userId);
 
-
-            // boolean existFreeOrder = hasUserOrderThisWeek(user);    
-            // System.out.println("existFreeOrder: "+ existFreeOrder);
+            boolean existFreeOrder = hasUserOrderThisWeek(user);
+            System.out.println("existFreeOrder: " + existFreeOrder);
 
             // 메뉴 ID들 추출 후에 모두 존재하는지 확인
             List<Long> menuIds = dto.getOrderList().stream().map(PostOrderDetailRequestDto::getMenuId)
@@ -120,6 +119,11 @@ public class OrderServiceImplement implements OrderService {
                 orderDetail.setMenu(Menu);
                 // 아이템 수량
                 orderDetail.setQuantity(detailDto.getQuantity());
+                // 교역자 여부
+                orderDetail.setStaff(detailDto.getStaff());
+                System.out.println("DTO변환 이전"+detailDto.getMenuId());
+                System.out.println("DTO변환 이전"+detailDto.getQuantity());
+                System.out.println("DTO변환 이전"+detailDto.getStaff());
                 // OrderDetailOption 리스트 생성 및 추가
                 List<OrderDetailOption> orderDetailOptions = detailDto.getOptions().stream().map(optionDto -> {
                     // 등록할 아이템의 옵션 생성
@@ -140,8 +144,20 @@ public class OrderServiceImplement implements OrderService {
                 return orderDetail;
             }).collect(Collectors.toList());
 
+            // 직원 주문은 0원, 일반 주문은 정상 가격 계산
             int totalPrice = orderDetails.stream()
                     .mapToInt(orderDetail -> {
+                        PostOrderDetailRequestDto matchingDto = dto.getOrderList().stream()
+                                .filter(d -> d.getMenuId().equals(orderDetail.getMenu().getMenuId()))
+                                .findFirst()
+                                .orElse(null);
+                                System.out.println("DTO변환중"+orderDetail.getStaff());
+
+                        if (matchingDto != null && orderDetail.getStaff() == 1) {
+                            return 0; // 직원 주문이면 0원
+                        }
+
+
                         int menuPrice = orderDetail.getMenu().getPrice();
                         int itemQuantity = orderDetail.getQuantity();
 
@@ -152,6 +168,8 @@ public class OrderServiceImplement implements OrderService {
 
                         return (menuPrice + optionTotalPrice) * itemQuantity;
                     }).sum();
+
+            System.out.println("totalPrice: " + totalPrice);
 
             // 잔액 확인
             balance = user.getPoint() - totalPrice;

@@ -99,8 +99,8 @@ const UserEdit = () => {
             <ProfileImageBoxE />
             <InputContainer>
                 <HeaderInputBox>
-                    <DropdownE title={"부서*"} dropdown='position' list={["기타", "유치부", "아동부", "중고등부", "청년부", "남전도", "여전도", "교역자"]} />
-                    <DropdownE title={"직책*"} dropdown='division' list={["성도", "집사", "안수집사", "권사", "장로", "단체", "기타"]} />
+                    <DropdownE title={"부서*"} dropdown='division' list={["기타", "유치부", "아동부", "중고등부", "청년부", "남전도", "여전도", "교역자"]} />
+                    <DropdownE title={"직책*"} dropdown='position' list={["성도", "집사", "안수집사", "권사", "장로", "단체", "기타"]} />
                     <PinInputBoxE />
                 </HeaderInputBox>
                 <NameInputBoxE />
