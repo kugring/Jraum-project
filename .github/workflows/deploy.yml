@@ -67,14 +67,22 @@ jobs:
         run: |
           scp -r ./back/build/ ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/build
 
-      # 8. EC2에서 JAR 파일 실행 (예: Spring Boot)
+      # 8. EC2 환경 변수 설정
+      - name: Set Environment Variable on EC2
+        run: |
+          ssh ubuntu@${{ secrets.EC2_HOST }} << EOF
+          echo 'GOOGLE_APPLICATION_CREDENTIALS=/home/ubuntu/.google_tts_key.json' | sudo tee -a /etc/environment
+          source /etc/environment
+          EOF
+
+      # 9. EC2에서 JAR 파일 실행 (예: Spring Boot)
       - name: Run backend on EC2
         run: |
           ssh ubuntu@${{ secrets.EC2_HOST }} << EOF
-          source ~/.bashrc  # .bashrc 로드
-          pkill -f 'java -jar' || true  # 이전 프로세스 종료
-          nohup java -jar /home/ubuntu/build/libs/jraum-0.0.1-SNAPSHOT.jar > app.log 2>&1 &  # 새로운 JAR 파일 실행
+          pkill -f 'java -jar' || true  # 기존 프로세스 종료
+          nohup java -jar /home/ubuntu/build/libs/jraum-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
           EOF
+
 
 
   deploy-frontend:
