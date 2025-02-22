@@ -132,8 +132,6 @@ const ChargeButton = () => {
 
     //          state: 충전 포인트 가능 상태             //
     const active = usePointChargeStore(state => state.chargePoint > 0)
-    //          state: 충전 포인트 상태             //
-    const chargePoint = usePointChargeStore.getState().chargePoint;
     //          state: cookie 상태              //
     const [cookies,] = useCookies();
 
@@ -149,6 +147,8 @@ const ChargeButton = () => {
     const setChargePoint = usePointChargeStore.getState().setChargePoint;
     //          function: 포인트 충전을 요청하는 함수           //
     const postPointCharge = () => {
+        //          state: 충전 포인트 상태             //
+        const chargePoint = usePointChargeStore.getState().chargePoint;
         // 포인트 충전이 0이하라면 반환
         if (chargePoint <= 0) return;
         // 핀토콘이 없다면 반환

@@ -1,6 +1,6 @@
 import { TEST_DOMAIN } from 'constant';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useYoutubeSoundStore } from 'store';
+import { usePinUserStore, useYoutubeSoundStore } from 'store';
 import usePointChargeStore from 'store/modal/point-charge-modal.store';
 import useWebSocketStore from 'store/web-socket.store';
 
@@ -25,6 +25,8 @@ const WSSubscription = () => {
                 if (status === "거절") {
                     setMessage("충전 거절");
                 } else if (status === "승인") {
+                    const { pinUser, setPinUser } = usePinUserStore.getState();
+                    pinUser && setPinUser({ ...pinUser, point: pinUser.point + pointChargeRequest.chargePoint });
                     setMessage("충전 완료");
                 }
                 setTimeout(() => setMessage("포인트 충전"), 3000);

@@ -10,6 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PointChargeRequestResponseDto {
+    private int chargePoint;
     private Long pointChargeId;
     private String status;
 }

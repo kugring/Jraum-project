@@ -116,31 +116,28 @@ const OptionBadges = ({ menuId, options, tem }: { menuId: number, options: Order
   )
 }
 
-
 //      component: 주문 아이템 가격 컴포넌트        //
 const Price = ({ price, menuId, options }: { price: number, menuId: number, options: OrderOption[] }) => {
 
-
   //      state: 주문 아이템 옵션들 상태        //
-  const getOrderItem = useOrderStore(state => state.getOrderItem)
-  const orderItem = getOrderItem(menuId, options);
+  const orderItem = useOrderStore(state => state.getOrderItem(menuId, options));
+  const quantity = useOrderStore(state => state.getQuantity(menuId, options));
 
   //      state: 주문 아이템 옵션들의 합계 결제 금액        //
-  const optionsPrice = orderItem!.options.reduce((optionTotal, option) => {
-    const optionInfo = orderItem!.menuInfo.options.find(opt => opt.optionId === option.optionId);
+  const optionsPrice = orderItem?.options?.reduce((optionTotal, option) => {
+    const optionInfo = orderItem.menuInfo?.options?.find(opt => opt.optionId === option.optionId);
     const optionPrice = optionInfo ? optionInfo.price : 0; // 옵션 가격
     return optionTotal + (optionPrice * option.quantity);
-  }, 0);
+  }, 0) ?? 0;
 
   //          state: 주문의 최종 결제 금액 상태 (교역자 금액제외 추가함)            //
-  const OrderItemPrice = orderItem?.options.some(option => option.optionId === staffOptionId)
-    ? 0
-    : (price + optionsPrice) * (orderItem?.quantity ?? 0);
-
+  const OrderItemPrice = orderItem?.options?.some(option => option.optionId === staffOptionId)
+    ? 0 
+    : (price + optionsPrice) * quantity;
 
   //      render: 주문 아이템 가격 렌더링       //
   return (
-    <PriceE>{formattedPoint(OrderItemPrice)}원</PriceE>
+    <PriceE>{formattedPoint(OrderItemPrice ?? 0)}원</PriceE>
   )
 }
 

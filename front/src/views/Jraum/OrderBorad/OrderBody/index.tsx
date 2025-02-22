@@ -18,12 +18,12 @@ const OrderBody = () => {
       {orderList.map((orderItem, index) => (
         <OrderCard
           key={`${orderItem.menuId}-${index}`}
+          tem={orderItem.menuInfo?.temperature!}
           name={orderItem.menuInfo?.name!}
           image={orderItem.menuInfo?.image!}
           price={orderItem.menuInfo?.price!}
-          tem={orderItem.menuInfo?.temperature!}
-          options={orderItem.options}
           menuId={orderItem.menuId}
+          options={orderItem.options}
           orderItem={orderItem}
         />
       ))}

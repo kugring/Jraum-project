@@ -119,11 +119,6 @@ public class OrderServiceImplement implements OrderService {
                 orderDetail.setMenu(Menu);
                 // 아이템 수량
                 orderDetail.setQuantity(detailDto.getQuantity());
-                // 교역자 여부
-                orderDetail.setStaff(detailDto.getStaff());
-                System.out.println("DTO변환 이전"+detailDto.getMenuId());
-                System.out.println("DTO변환 이전"+detailDto.getQuantity());
-                System.out.println("DTO변환 이전"+detailDto.getStaff());
                 // OrderDetailOption 리스트 생성 및 추가
                 List<OrderDetailOption> orderDetailOptions = detailDto.getOptions().stream().map(optionDto -> {
                     // 등록할 아이템의 옵션 생성
@@ -147,21 +142,18 @@ public class OrderServiceImplement implements OrderService {
             // 직원 주문은 0원, 일반 주문은 정상 가격 계산
             int totalPrice = orderDetails.stream()
                     .mapToInt(orderDetail -> {
-                        PostOrderDetailRequestDto matchingDto = dto.getOrderList().stream()
-                                .filter(d -> d.getMenuId().equals(orderDetail.getMenu().getMenuId()))
-                                .findFirst()
-                                .orElse(null);
-                                System.out.println("DTO변환중"+orderDetail.getStaff());
-
-                        if (matchingDto != null && orderDetail.getStaff() == 1) {
-                            return 0; // 직원 주문이면 0원
+                        // 교역자 옵션(optionId: 100)이 있는지 확인
+                        boolean hasStaffOption = orderDetail.getOptions().stream()
+                                .anyMatch(option -> option.getMenuOption().getOptionId() == 100);
+                        
+                        // 교역자 옵션이 있으면 해당 주문 항목의 가격을 0으로 설정
+                        if (hasStaffOption) {
+                            return 0;
                         }
-
-
                         int menuPrice = orderDetail.getMenu().getPrice();
                         int itemQuantity = orderDetail.getQuantity();
 
-                        // 기본 메뉴 가격에 옵션 가격의 총합을 추가합니다.
+                        // 일반 옵션 가격 계산
                         int optionTotalPrice = orderDetail.getOptions().stream()
                                 .mapToInt(option -> option.getQuantity() * option.getMenuOption().getPrice())
                                 .sum();
@@ -403,20 +395,44 @@ public class OrderServiceImplement implements OrderService {
         return GetOrderListResponseDto.success(list);
     }
 
+    // findTotalPriceByOrderId 메서드를 수정하여 교역자 옵션이 있는 경우 가격을 0으로 처리
+    private int calculateOrderPrice(Order order) {
+        return order.getOrderDetails().stream()
+                .mapToInt(orderDetail -> {
+                    // 교역자 옵션(optionId: 100)이 있는지 확인
+                    boolean hasStaffOption = orderDetail.getOptions().stream()
+                            .anyMatch(option -> option.getMenuOption().getOptionId() == 100);
+                    
+                    // 교역자 옵션이 있으면 해당 주문 항목의 가격을 0으로 설정
+                    if (hasStaffOption) {
+                        return 0;
+                    }
+
+                    int menuPrice = orderDetail.getMenu().getPrice();
+                    int itemQuantity = orderDetail.getQuantity();
+
+                    // 일반 옵션 가격 계산
+                    int optionTotalPrice = orderDetail.getOptions().stream()
+                            .mapToInt(option -> option.getQuantity() * option.getMenuOption().getPrice())
+                            .sum();
+
+                    return (menuPrice + optionTotalPrice) * itemQuantity;
+                }).sum();
+    }
+
     @Override
     public ResponseEntity<? super PatchOrderRefundResponseDto> patchOrderRefund(String userId,
             PatchOrderRefundRequestDto dto) {
         try {
-            // userId로 데이터 조회
             User manager = userRepository.findByUserId(userId);
-            // 정보가 없다면 예외처리
-            if (manager == null)
-                return PinCheckResponseDto.pinCheckFail();
-            if (!manager.getRole().trim().equals("ROLE_ADMIN")) {
+            if (manager == null || !manager.getRole().trim().equals("ROLE_ADMIN")) {
                 return PinCheckResponseDto.pinCheckFail();
             }
-            int refundPrice = orderRepository.findTotalPriceByOrderId(dto.getOrderId());
+
             Order order = orderRepository.findByOrderId(dto.getOrderId());
+            // 교역자 옵션을 고려한 환불 금액 계산
+            int refundPrice = calculateOrderPrice(order);
+            
             order.setStatus("환불");
             User user = order.getUser();
             int finalPrice = user.getPoint() + refundPrice;
@@ -434,16 +450,15 @@ public class OrderServiceImplement implements OrderService {
     public ResponseEntity<? super PatchOrderRefundCancelResponseDto> patchOrderRefundCancel(String userId,
             PatchOrderRefundCancelRequestDto dto) {
         try {
-            // userId로 데이터 조회
             User manager = userRepository.findByUserId(userId);
-            // 정보가 없다면 예외처리
-            if (manager == null)
-                return PinCheckResponseDto.pinCheckFail();
-            if (!manager.getRole().trim().equals("ROLE_ADMIN")) {
+            if (manager == null || !manager.getRole().trim().equals("ROLE_ADMIN")) {
                 return PinCheckResponseDto.pinCheckFail();
             }
-            int totalPrice = orderRepository.findTotalPriceByOrderId(dto.getOrderId());
+
             Order order = orderRepository.findByOrderId(dto.getOrderId());
+            // 교역자 옵션을 고려한 취소 금액 계산
+            int totalPrice = calculateOrderPrice(order);
+            
             order.setStatus("대기");
             User user = order.getUser();
             int balance = user.getPoint() - totalPrice;
@@ -462,21 +477,16 @@ public class OrderServiceImplement implements OrderService {
 
     @Override
     public ResponseEntity<? super DeleteOrderResponseDto> deleteOrder(String managerId, DeleteOrderRequestDto dto) {
-
-        System.out.println("managerId: " + managerId);
-        System.out.println("orderId: " + dto.getOrderId());
         try {
-            // userId로 데이터 조회
             User manager = userRepository.findByUserId(managerId);
-            // 정보가 없다면 예외처리
-            if (manager == null)
-                return PinCheckResponseDto.pinCheckFail();
-            if (!manager.getRole().trim().equals("ROLE_ADMIN")) {
+            if (manager == null || !manager.getRole().trim().equals("ROLE_ADMIN")) {
                 return PinCheckResponseDto.pinCheckFail();
             }
-            int refundPrice = orderRepository.findTotalPriceByOrderId(dto.getOrderId());
-            System.out.println("refundPrice: " + refundPrice);
+
             Order order = orderRepository.findByOrderId(dto.getOrderId());
+            // 교역자 옵션을 고려한 환불 금액 계산
+            int refundPrice = calculateOrderPrice(order);
+            
             order.setStatus("삭제");
             User user = order.getUser();
             int finalPrice = user.getPoint() + refundPrice;

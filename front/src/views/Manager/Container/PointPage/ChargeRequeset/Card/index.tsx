@@ -40,7 +40,7 @@ const Card = ({ request }: { request: ChargeRequestListItem }) => {
         if (code === 'NMG') alert('유효하지 않은 관리자입니다.');
         if (code !== 'SU') return;
 
-        manager?.sendMessage('/send/pointCharge/requestOk', { pointChargeId: request.pointChargeId, status: "승인" }); // 메시지 전송
+        manager?.sendMessage('/send/pointCharge/requestOk', { pointChargeId: request.pointChargeId, status: "승인", chargePoint: request.chargePoint }); // 메시지 전송
         toast.success('충전이 승인되었습니다.', {
             autoClose: 500,
             position: "top-center",

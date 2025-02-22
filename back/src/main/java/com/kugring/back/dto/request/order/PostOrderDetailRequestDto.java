@@ -21,8 +21,4 @@ public class PostOrderDetailRequestDto {
 
     @NotNull
     private List<PostOrderDetailOptionRequestDto> options; // 옵션 리스트
-
-    // 일부러 null은 허용
-    private int staff;  // 직원 주문인지 여부
-
 }

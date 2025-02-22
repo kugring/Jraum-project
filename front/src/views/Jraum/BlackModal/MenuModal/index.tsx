@@ -90,9 +90,9 @@ const SaveOrder = ({ staticOrderItem }: { staticOrderItem: OrderListItem }) => {
 //                  component: 교역자 여부 확인 컴포넌트                   //
 const StaffCheckBox = () => {
 
-    //              state: 교역자 여부 상태                 //
+    //              state: 주문 아이템 교역자 여부 상태                 //
     const staffExist = useOrderItemStore(state => state.hasStaffDiscount());
-    //              state: 교역자 여부 상태                 //
+    //              state: 주문 리스트 교역자 여부 상태                 //
     const listStaffExist = useOrderStore(state => state.hasStaffDiscount());
 
     //              state: 회원 정보로 단체인 상태                 //
