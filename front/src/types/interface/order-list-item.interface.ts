@@ -6,5 +6,4 @@ export default interface OrderListItem {
   quantity: number;
   options: OrderOption[];
   menuInfo: MenuInfo;
-  staff: number;
 }

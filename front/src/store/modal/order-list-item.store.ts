@@ -1,3 +1,4 @@
+import { staffOptionId } from "constant";
 import { MenuInfo, OrderListItem, OrderOption } from "types/interface";
 import { create } from "zustand";
 
@@ -12,7 +13,6 @@ interface OrderItemStore {
   decOpQty: (optionId: number) => void;
   setMenuId: (menuId: number) => void;
   addOption: (orderOption: OrderOption) => void;
-  setStaff: (staff: number) => void;
   addOptions: (orderOptions: OrderOption[]) => void;
   setMenuInfo: (menuInfo: MenuInfo) => void;
   removeOption: (optionId: number) => void;
@@ -20,6 +20,7 @@ interface OrderItemStore {
   setShowOption: (optionDetail: string) => void;
   getTotalPrice: () => number;
   resetOrderItem: () => void;
+  hasStaffDiscount: () => boolean;
 }
 
 const useOrderItemStore = create<OrderItemStore>((set, get) => ({
@@ -60,9 +61,6 @@ const useOrderItemStore = create<OrderItemStore>((set, get) => ({
   // 메뉴 Id 설정
   setMenuId: (menuId) => set((state) => ({ orderItem: { ...state.orderItem, menuId: menuId } })),
 
-  // 교역자 여부 설정
-  setStaff: (staff) => set((state) => ({ orderItem: { ...state.orderItem, staff: staff } })),
-
   // 옵션 개별 추가
   addOption: (orderOption) => set((state) => ({ orderItem: { ...state.orderItem, options: [...state.orderItem.options, orderOption] } })),
 
@@ -85,7 +83,7 @@ const useOrderItemStore = create<OrderItemStore>((set, get) => ({
   resetOrderItem: () => set((state) => ({ ...state, orderItem: { menuId: 0, quantity: 1, options: [], menuInfo: { menuId: 0, name: '', image: '', price: 0, temperature: '', options: [], sortedOptionCategory: [] }, staff: 0 } })),
 
   getTotalPrice: () => {
-    const { orderItem } = get(); // get()을 사용하여 state를 가져옴
+    const { orderItem } = get();
     const { menuInfo, quantity, options } = orderItem;
 
     // 메뉴 가격
@@ -97,10 +95,14 @@ const useOrderItemStore = create<OrderItemStore>((set, get) => ({
     const orderOptions = options || [];
 
     const optionTotalPrice = orderOptions.reduce((sum, orderOption) => {
-      // 메뉴 옵션 중 일치하는 옵션 찾기
       const matchingMenuOption = menuOptions.find(
         (menuOption) => menuOption.optionId === orderOption.optionId
       );
+
+      // 교역자 옵션(optionId: 100 -> constant에 상수로 지정되어있음)이 있는 경우 전체 가격을 0으로 설정
+      if (orderOption.optionId === staffOptionId) {
+        return 0;
+      }
 
       if (matchingMenuOption) {
         return sum + matchingMenuOption.price * orderOption.quantity;
@@ -108,8 +110,13 @@ const useOrderItemStore = create<OrderItemStore>((set, get) => ({
       return sum;
     }, 0);
 
-    // (메뉴 가격 + 옵션 총합 가격) * 메뉴 수량
     return (menuPrice + optionTotalPrice) * menuQuantity;
+  },
+
+  // 교역자 할인 여부 확인 함수 추가
+  hasStaffDiscount: () => {
+    const { orderItem } = get();
+    return orderItem.options.some(option => option.optionId === staffOptionId);
   },
 
 }));

@@ -90,28 +90,35 @@ const SaveOrder = ({ staticOrderItem }: { staticOrderItem: OrderListItem }) => {
 //                  component: 교역자 여부 확인 컴포넌트                   //
 const StaffCheckBox = () => {
 
-    //              state: 교역자 여부 상태 (1: true, 0: false)                 //
-    const staff = useOrderItemStore(state => state.orderItem.staff);
-
-    //              state: 주문 리스트에 교역자 주문이 있는지 확인하는 함수              //
-    const staffExist = useOrderStore(state => state.hasStaffOrder());
+    //              state: 교역자 여부 상태                 //
+    const staffExist = useOrderItemStore(state => state.hasStaffDiscount());
+    //              state: 교역자 여부 상태                 //
+    const listStaffExist = useOrderStore(state => state.hasStaffDiscount());
 
     //              state: 회원 정보로 단체인 상태                 //
     const isGroup = usePinUserStore(state => state.pinUser?.position === "단체");
 
     //              function: 교역자 여부 토글 함수                 //
     const handleToggle = () => {
-        const setStaff = useOrderItemStore.getState().setStaff;
-        setStaff(staff === 1 ? 0 : 1); // 1이면 0으로, 0이면 1로 변경
+        if (staffExist) {
+            const removeOption = useOrderItemStore.getState().removeOption;
+            removeOption(100);
+        } else {
+            const addOption = useOrderItemStore.getState().addOption;
+            addOption({
+                optionId: 100,
+                quantity: 1
+            });
+        }
     };
 
     //                  render: 스태프 체크박스 렌더링                //
     return (
         <>
-            {!staffExist && isGroup &&
-                <StaffCheckBoxE $select={staff === 1} onClick={handleToggle}>
+            {isGroup && !listStaffExist &&
+                <StaffCheckBoxE $select={staffExist} onClick={handleToggle}>
                     <div>교역자</div>
-                    { staff === 1 ? <ImCheckboxChecked /> : <ImCheckboxUnchecked /> }
+                    { staffExist ? <ImCheckboxChecked /> : <ImCheckboxUnchecked /> }
                 </StaffCheckBoxE>
             }
         </>

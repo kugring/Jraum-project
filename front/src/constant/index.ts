@@ -30,6 +30,8 @@ export const buttonOptions = ["온도", "얼음", "컵크기", "샷조절", "샷
 
 export const countOptions = ["시럽"]
 
+export const staffOptionId = 100;
+
 
 // 원 단위로 포맷
 export const formattedPoint = (point: number) => {

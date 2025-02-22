@@ -1,3 +1,4 @@
+import { staffOptionId } from "constant";
 import { OrderListItem, OrderOption } from "types/interface";
 import { create } from "zustand";
 
@@ -14,12 +15,12 @@ interface OrderStore {
   getOrderItem: (menuId: number, options: OrderOption[]) => OrderListItem | undefined; // 추가된 함수
   setWaitingNum: (waitingNum: number) => void;
   getTotalPrice: () => number;
-  hasStaffOrder: () => boolean;
   resetOrderList: () => void; // 주문 리스트 초기화
   updateOrderItem: (orderItem: OrderListItem, updatedItem: OrderListItem) => void; // 주문 항목 업데이트
   removeOrderItem: (menuId: number, options: OrderOption[]) => void; // 주문 항목 제거
   filterZeroOptions: () => OrderListItem[];
   getOrderListLength: () => number | 0;
+  hasStaffDiscount: () => boolean; // 교역자 할인 여부 확인 함수 추가
 }
 
 const useOrderStore = create<OrderStore>((set, get) => ({
@@ -54,37 +55,27 @@ const useOrderStore = create<OrderStore>((set, get) => ({
   // 주문 리스트 전체 설정
   setOrderList: (newOrderList) => set({ orderList: newOrderList }),
 
-  // 주문 항목 추가 (중복 시 quantity 증가, staff 고려)
+  // 주문 항목 추가 (중복 시 quantity 증가)
   addOrderItem: (orderItem) =>
     set((state) => {
       const existingIndex = state.orderList.findIndex((item) => {
-        // 각 options 배열을 정렬하여 비교
         const sortedItemOptions = JSON.stringify(item.options.sort((a, b) => a.optionId - b.optionId));
         const sortedOrderItemOptions = JSON.stringify(orderItem.options.sort((a, b) => a.optionId - b.optionId));
 
         return (
           item.menuId === orderItem.menuId &&
-          sortedItemOptions === sortedOrderItemOptions &&
-          item.staff === orderItem.staff // staff 값도 동일한지 비교
+          sortedItemOptions === sortedOrderItemOptions
         );
       });
 
       if (existingIndex !== -1) {
-        // 기존 항목이 있다면 quantity 증가
         const updatedOrderList = [...state.orderList];
         updatedOrderList[existingIndex].quantity += orderItem.quantity;
-
-        return {
-          orderList: updatedOrderList,
-        };
+        return { orderList: updatedOrderList };
       }
 
-      // 기존 항목이 없으면 새 항목 추가
-      return {
-        orderList: [...state.orderList, orderItem],
-      };
+      return { orderList: [...state.orderList, orderItem] };
     }),
-
 
   // 주문 항목 업데이트 (menuId와 options 조합으로 찾기)
   updateOrderItem: (orderItem, updatedItem) =>
@@ -128,15 +119,15 @@ const useOrderStore = create<OrderStore>((set, get) => ({
         item.menuId === menuId && JSON.stringify(item.options) === JSON.stringify(options)
     );
   },
-
   // 총 가격 계산
   getTotalPrice: () => {
     return get().orderList.reduce((total, orderItem) => {
-      
-      // 직원이면 가격을 0원 처리
-      if (orderItem.staff) return total;
+      // 교역자 옵션이 있는 경우 해당 주문 항목의 가격을 0으로 설정
+      const hasStaffOption = orderItem.options.some(option => option.optionId === staffOptionId);
+      if (hasStaffOption) {
+        return total;
+      }
 
-      // 메뉴 가격과 수량이 undefined일 경우 기본값을 0으로 설정
       const menuPrice = orderItem.menuInfo?.price || 0;
       const menuQuantity = orderItem.quantity || 0;
 
@@ -145,21 +136,23 @@ const useOrderStore = create<OrderStore>((set, get) => ({
       const orderOptions = orderItem.options || [];
 
       const optionsTotal = orderOptions.reduce((optTotal, orderOption) => {
-        // 메뉴 옵션 중 일치하는 옵션 찾기
         const optionInfo = menuOptions.find(
           (menuOption) => menuOption.optionId === orderOption.optionId
         );
-
-        // 옵션 정보가 존재할 경우 옵션 가격 * 옵션 수량
         const optionPrice = optionInfo ? optionInfo.price * orderOption.quantity : 0;
         return optTotal + optionPrice;
       }, 0);
 
-      // (메뉴 개당 가격 + 옵션 총합 가격) * 메뉴 수량
       const itemTotal = (menuPrice + optionsTotal) * menuQuantity;
-
       return total + itemTotal;
     }, 0);
+  },
+
+  // 교역자 할인이 적용된 주문이 있는지 확인
+  hasStaffDiscount: () => {
+    return get().orderList.some(orderItem => 
+      orderItem.options.some(option => option.optionId === staffOptionId)
+    );
   },
 
   // 옵션 수량이 0인 항목 제거하고, 업데이트된 orderList를 반환
@@ -172,13 +165,6 @@ const useOrderStore = create<OrderStore>((set, get) => ({
     set({ orderList: updatedOrderList });
     return updatedOrderList;
   },
-
-  // 직원 주문 여부 확인 함수 추가
-  hasStaffOrder: () => {
-    return get().orderList.some((orderItem) => orderItem.staff === 1);
-  },
-  
-
 }));
 
 export default useOrderStore;

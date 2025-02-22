@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { memo } from 'react';
 import useOrderStore from 'store/modal/order-list.store';
-import { buttonOptions, formattedPoint, optionCategories } from 'constant';
+import { buttonOptions, formattedPoint, optionCategories, staffOptionId } from 'constant';
 import OrderCardCount from './OrderCardCount';
 import { OrderListItem, OrderOption } from 'types/interface';
 
@@ -12,12 +12,11 @@ interface OrderItemBoxProps {
   price: number;
   image: string;
   menuId: number;
-  staff: number;
   options: OrderOption[];
 }
 
 //      component: 주문 아이템 박스 컴포넌트          //
-const OrderItemBox = ({ name, image, price, menuId, tem, staff, options }: OrderItemBoxProps) => {
+const OrderItemBox = ({ name, image, price, menuId, tem, options }: OrderItemBoxProps) => {
 
 
 
@@ -33,18 +32,19 @@ const OrderItemBox = ({ name, image, price, menuId, tem, staff, options }: Order
         </Info>
       </InfoBox>
       <OrderCardCount menuId={menuId} options={options} />
-      <OptionBadges menuId={menuId} options={options} tem={tem} staff={staff} />
+      <OptionBadges menuId={menuId} options={options} tem={tem}/>
     </OrderItemBoxE>
   );
 };
 export default memo(OrderItemBox, (prevProps, nextProps) => { return prevProps.menuId === nextProps.menuId });
 
 //      component: 옵션 뱃지들 컴포넌트       //
-const OptionBadges = ({ menuId, options, tem, staff }: { menuId: number, options: OrderOption[], tem: string, staff: number }) => {
+const OptionBadges = ({ menuId, options, tem }: { menuId: number, options: OrderOption[], tem: string }) => {
 
   //      state: 주문 아이템 옵션들 상태        //
   const getOrderItem = useOrderStore(state => state.getOrderItem)
   const orderItem = getOrderItem(menuId, options);
+  const staffExist = orderItem?.options.some(option => option.optionId === staffOptionId);
 
   //        function: 필요한 옵션만 필터하는 함수         //
   const processAndSortOptions = (orderItem: OrderListItem) => {
@@ -102,7 +102,7 @@ const OptionBadges = ({ menuId, options, tem, staff }: { menuId: number, options
   return (
     <OptionBadgesE>
       <Badge $category={tem}>{tem}</Badge>
-      {staff === 1 && <Badge $category="STAFF">교역자</Badge>}
+      {staffExist && <Badge $category="STAFF">교역자</Badge>}
       {menuOptions.map((item) => (
         <Badge key={item?.detail} $category={item?.category!}>
           {buttonOptions.includes(item?.category!) ?
@@ -133,7 +133,7 @@ const Price = ({ price, menuId, options }: { price: number, menuId: number, opti
   }, 0);
 
   //          state: 주문의 최종 결제 금액 상태 (교역자 금액제외 추가함)            //
-  const OrderItemPrice = orderItem?.staff
+  const OrderItemPrice = orderItem?.options.some(option => option.optionId === staffOptionId)
     ? 0
     : (price + optionsPrice) * (orderItem?.quantity ?? 0);
 
