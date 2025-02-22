@@ -2,11 +2,11 @@ name: Deploy to EC2 and S3
 
 on:
   push:
-    branches: 
+    branches:
       - main
 
-jobs: 
-  deploy-backend: 
+jobs:
+  deploy-backend:
     runs-on: ubuntu-latest
 
     steps:
@@ -67,13 +67,24 @@ jobs:
         run: |
           scp -r ./back/build/ ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/build
 
-      # 8. EC2에서 JAR 파일 실행 (예: Spring Boot)
+      # 8. EC2 환경 변수 설정 및 적용
+      - name: Set Environment Variable on EC2
+        run: |
+          ssh ubuntu@${{ secrets.EC2_HOST }} << EOF
+          echo 'GOOGLE_APPLICATION_CREDENTIALS=/home/ubuntu/.google_tts_key.json' | sudo tee -a /etc/environment
+          source /etc/environment
+          EOF
+
+      # 9. EC2에서 JAR 파일 실행 (환경 변수 적용 후 실행)
       - name: Run backend on EC2
         run: |
           ssh ubuntu@${{ secrets.EC2_HOST }} << EOF
-          source ~/.bashrc  # .bashrc 로드
-          pkill -f 'java -jar' || true  # 이전 프로세스 종료
-          nohup java -jar /home/ubuntu/build/libs/jraum-0.0.1-SNAPSHOT.jar > app.log 2>&1 &  # 새로운 JAR 파일 실행
+          pkill -f 'java -jar' || true  # 기존 프로세스 종료
+          export GOOGLE_APPLICATION_CREDENTIALS=/home/ubuntu/top-decoder-447304-e6-47f6f31a0362.json
+          echo "GOOGLE_APPLICATION_CREDENTIALS is set to \$GOOGLE_APPLICATION_CREDENTIALS"
+          nohup java -jar /home/ubuntu/build/libs/jraum-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+          sleep 5
+          tail -n 20 /home/ubuntu/app.log
           EOF
 
 
@@ -106,4 +117,3 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
-
