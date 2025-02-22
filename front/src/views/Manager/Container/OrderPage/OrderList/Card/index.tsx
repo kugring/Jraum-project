@@ -8,7 +8,7 @@ import { memo, useState } from 'react'
 import { BiSolidBellRing } from "react-icons/bi";
 import { useWebSocketStore } from 'store'
 import { useBlackModalStore } from 'store/modal'
-import { defaultUserImage, formattedDate, formattedPoint } from 'constant'
+import { defaultUserImage, formattedDate, formattedPoint, staffOptionId } from 'constant'
 import { deleteOrderRequest, patchOrderApproveRequest, patchOrderRefundCancelRequest, patchOrderRefundRequest } from 'apis'
 import { DeleteOrderRequestDto, PatchOrderApproveRequestDto, PatchOrderRefundCancelRequestDto, PatchOrderRefundRequestDto } from 'apis/request/order'
 import { PatchOrderApproveResponseDto, PatchOrderRefundCancelResponseDto, PatchOrderRefundResponseDto } from 'apis/response/order'
@@ -21,8 +21,21 @@ const Card = ({ order }: { order: OrderList }) => {
     const [cookies] = useCookies(['managerToken'])
     //          state: 주문 상태            //
     const [status, setStatus] = useState(order.status);
+
+    // status가 '삭제'인 경우 null을 반환하여 렌더링하지 않음
+    if (status === '삭제') return null;
+
     //          state: 포지션 상태          //
     const position = [order.division, order.position].filter(Boolean).join(' / ') || '';
+
+    //          state: 교역자 할인 금액 계산          //
+    const staffDiscountAmount = order.orderDetails.reduce((total, item) => {
+        const isStaff = item.options.some(option => option.optionId === staffOptionId);
+        return total + (isStaff ? item.price : 0);
+    }, 0);
+
+    //          state: 실제 결제 금액 계산          //
+    const actualTotalPrice = order.totalPrice - staffDiscountAmount;
 
     //          function: 블랙 모달과 알림창 모달을 위한 함수               //
     const setWhiteModal = useBlackModalStore.getInitialState().setWhiteModal;
@@ -178,7 +191,11 @@ const Card = ({ order }: { order: OrderList }) => {
                         <InfoRow key={item.orderDetailId}>
                             <MenuName>{item.name}</MenuName>
                             <MenuQuantity>{item.quantity}</MenuQuantity>
-                            <MenuPrice>{formattedPoint(item.price)}원</MenuPrice>
+                            <MenuPrice>
+                                {item.options.some(option => option.optionId === staffOptionId) 
+                                    ? '(교역자) 0원' 
+                                    : `${formattedPoint(item.price * item.quantity)}원`}
+                            </MenuPrice>
                         </InfoRow>
                     ))}
                 </InfoBody>
@@ -186,14 +203,16 @@ const Card = ({ order }: { order: OrderList }) => {
             <TotalOrderInfo>
                 <TotalTitle>합계</TotalTitle>
                 <TotalQuantity>{order.totalQuantity}</TotalQuantity>
-                <TotalPrice>{formattedPoint(order.totalPrice)}원</TotalPrice>
+                <TotalPrice>
+                    {formattedPoint(actualTotalPrice)}원
+                </TotalPrice>
             </TotalOrderInfo>
             <Buttons>
                 {(() => {
                     switch (status) {
                         case '완료':
                             return (<>
-                                <Cancel onClick={orderRefundAlertModalOpen}>삭제</Cancel>
+                                <Cancel onClick={orderRefundAlertModalOpen}>환불</Cancel>
                                 <Completed onClick={() => orderSendTTSAlertModalOpen(order.orderId)}>
                                     완료됨 &nbsp;
                                     <BiSolidBellRing color='var(--copperBrown)' size={16} />
@@ -206,9 +225,6 @@ const Card = ({ order }: { order: OrderList }) => {
                             </>)
                         case '환불':
                             return <Canceled onClick={orderRefundCancelAlertModalOpen}>환불 처리됨</Canceled>
-                                ;
-                        case '삭제':
-                            return <Canceled>삭제됨</Canceled>
                                 ;
                         default:
                             return null; // 조건에 맞는 값이 없을 때는 아무것도 렌더링하지 않음
