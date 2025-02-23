@@ -40,8 +40,6 @@ const ChargeStatus = () => {
         if (code === 'NMN') alert('존재하지 않는 메뉴입니다.');
         if (code !== 'SU') return;
         const { status, pointChargeId } = responseBody as GetPointChargeStatusResponseDto;
-        console.log("상태: " + status);
-        console.log("토큰: " + cookies);
         if (status) {
             // 요청 상태 확인
             if (status === "미승인") {

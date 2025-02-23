@@ -35,33 +35,37 @@ const MenuCard = ({ menuId, image, name, price, temperature }: MenuCardProps) =>
     //      function: 주문 아이템에 옵션을 추가하는 함수           //
     const addOptions = useOrderItemStore((state) => state.addOptions);
     //          function: MenuBlackModalStore로 데이터 저장하는 함수         //
-    const menuModalOpen = () => {
-        getMenuOptionRequest(menuId).then(getMenuOptionResponse);
+    const menuModalOpen = async () => {
+        // 먼저 로딩 상태 표시나 모달을 열고 시작
+        setWhiteModal('메뉴');
+        openModal();
+        
+        // 그 다음 데이터 요청
+        const responseBody = await getMenuOptionRequest(menuId);
+        getMenuOptionResponse(responseBody);
     }
     //          function: get MenuOption Resposne 처리 함수           //
     const getMenuOptionResponse = (responseBody: GetMenuOptionResponseDto | ResponseDto | null) => {
-        if (!responseBody) return;
-        const { code } = responseBody;
-        if (code === 'DBE') alert("데이터베이스 오류입니다.");
-        if (code === 'NMN') alert("존재하지 않는 메뉴 입니다.");
-        if (code !== 'SU') return;
-        if (code === 'SU') {
-            // 해당 Dto에서 데이터를 가져와서 options를 추출해와서 const로 담는다.
-            const { options } = responseBody as GetMenuOptionResponseDto;
-            // 메뉴 모달에서 useEffect로 처리하지 않고 시작될때 부터 데이터 설정하고 시작해야 렌더링이 덜하다.
-            const menuInfoData = newMenuInfo(menuId, name, price, image, temperature, options, sortedCategories(options));
-            resetOrderItem();
-            setShowOption(sortedCategories(options)[0])
-            defaultOptionSetting(options);
-            setMenuInfo(menuInfoData);
-            setMenuId(menuId);
-            setWhiteModal('메뉴')
-
-            // 데이터 설정이 끝난 후 모달 열기
-            if (menuInfoData) {
-                setTimeout(() => openModal(), 0);
-            }
+        if (!responseBody) {
+            openModal();
+            return;
         }
+        const { code } = responseBody;
+        if (code !== 'SU') {
+            if (code === 'DBE') alert("데이터베이스 오류입니다.");
+            if (code === 'NMN') alert("존재하지 않는 메뉴 입니다.");
+            openModal();
+            return;
+        }
+
+        const { options } = responseBody as GetMenuOptionResponseDto;
+        const menuInfoData = newMenuInfo(menuId, name, price, image, temperature, options, sortedCategories(options));
+        
+        resetOrderItem();
+        setShowOption(sortedCategories(options)[0]);
+        defaultOptionSetting(options);
+        setMenuInfo(menuInfoData);
+        setMenuId(menuId);
     }
     //      function: new MenuInfo 객체 생성           //
     const newMenuInfo = (menuId: number, name: string, price: number, image: string, temperature: string, options: OptionListItem[], sortedOptionCategory: string[]): MenuInfo => {

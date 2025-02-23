@@ -270,6 +270,7 @@ export const patchMenuSuquenceRequest = async (requestBody: patchMenuSuquenceReq
 const GET_MENU_OPTION_URL = (menuId: number | string) => `${API_DOMAIN}/menu/${menuId}/option`;
 
 export const getMenuOptionRequest = async (menuId: number | string) => {
+    console.log("menuId: " + menuId);
     const result = await axios.get(GET_MENU_OPTION_URL(menuId))
         .then(responseHandler<GetActiveMenuListResponseDto>)
         .catch(errorHandler)

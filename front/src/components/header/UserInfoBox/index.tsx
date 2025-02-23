@@ -5,6 +5,7 @@ import { useCookies } from 'react-cookie';
 import { FaSignOutAlt } from 'react-icons/fa';
 import { usePinUserStore } from 'store';
 import { defaultUserImage, formattedDate, formattedPoint, JRAUM_PATH } from 'constant';
+import { useOrderStore } from 'store/modal';
 
 //          component: 회원 정보 박스 컴포넌트              //
 const UserInfoBox = () => {
@@ -55,10 +56,13 @@ const IconE = memo(() => {
     const setPayment = usePinUserStore.getState().setPayment;
     //      function: 핀회원 정보 reset 처리 함수         //
     const resetPinUser = usePinUserStore.getState().resetPinUser;
+    //      function: 주문 리스트 초기화 함수         //
+    const resetOrderList = useOrderStore.getState().resetOrderList;
     //      event handler: 처음으로 시작하기 함수            //
     const onCLickGoBackToStart = () => {
         resetPinUser();  // 핀회원 정보 리셋
         setPayment('');  // 결제 방식 초기화
+        resetOrderList(); // 주문 리스트 초기화
         setCookie('pinToken', '', { expires: new Date(0), path: JRAUM_PATH() }); // 쿠키 삭제
     };
     //          render: 리셋 아이콘 렌더링            //
