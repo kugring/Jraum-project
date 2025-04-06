@@ -85,21 +85,21 @@ public class WebSecurityConfig {
 
     @Bean
     protected CorsConfigurationSource corsConfigurationSource() {
-
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-       
-
-        // 모든 ip에 응답 허용
-        corsConfiguration.addAllowedOriginPattern("*");
-        // corsConfiguration.addAllowedOrigin("https://hyunam.site");
-        corsConfiguration.addAllowedMethod("*");
+        
+        // 특정 도메인만 허용
+        corsConfiguration.addAllowedOrigin("https://hyunam.site");
+        corsConfiguration.addAllowedOrigin("https://www.hyunam.site");
+        corsConfiguration.addAllowedMethod("GET");
+        corsConfiguration.addAllowedMethod("POST");
+        corsConfiguration.addAllowedMethod("PUT");
+        corsConfiguration.addAllowedMethod("DELETE");
+        corsConfiguration.addAllowedMethod("PATCH");
         corsConfiguration.addAllowedHeader("*");
-        // setAllowCredentials를 true로 설정시 * (아스타)로 설정이 불가능하고 반드시 명시적으로 직접 기입해야함
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.setMaxAge(3600L);
 
-         // 반환할 configurationSource이다. UrlBased가 뭘까? 인스턴트 생성이라고 하네?
-         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);
 
         return source;
