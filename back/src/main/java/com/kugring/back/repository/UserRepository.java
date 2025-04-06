@@ -14,6 +14,8 @@ import com.kugring.back.repository.resultSet.GetSortedUserResultSet;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
+      // 아이디 중복 체크
+      boolean existsByUserId(String userId);
       // 제이라움으로 회원가입할때 사용함
       boolean existsByPin(String pin);
 

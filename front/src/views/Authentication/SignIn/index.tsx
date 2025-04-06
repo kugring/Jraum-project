@@ -14,12 +14,10 @@ export default function SignIn() {
     const idRef = useRef<HTMLInputElement | null>(null);
     const passwordRef = useRef<HTMLInputElement | null>(null);
 
-    const [cookie, setCookie] = useCookies();
+    const [, setCookie] = useCookies();
 
     const [id, setId] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-
-    const [isError, setError] = useState<boolean>(false);
 
     const [message, setMessage] = useState<string>('');
 

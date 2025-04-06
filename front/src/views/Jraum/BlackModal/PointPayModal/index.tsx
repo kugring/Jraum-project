@@ -9,6 +9,7 @@ import { PostPointOrderRequestDto } from 'apis/request/order';
 import { PostPointOrderResponseDto } from 'apis/response/order';
 import { usePinUserStore, useWebSocketStore } from 'store';
 import { useOrderStore, useBlackModalStore, usePointChargeStore } from 'store/modal';
+import { HashLoader } from 'react-spinners';
 
 //                  component: 결제 모달 컴포넌트               //
 const PointPayModal = () => {
@@ -71,7 +72,7 @@ const PointPayModal = () => {
     }
 
     //                  function: 결제를 진행하는 함수                  //
-    const paymentActive = () => {;
+    const paymentActive = () => {
         if (isProcessing) return; // ✅ 이미 결제 중이면 추가 요청 방지
         setIsProcessing(true); // ✅ 결제 요청 시작
 
@@ -81,7 +82,7 @@ const PointPayModal = () => {
         };
 
         console.log(requestBody);
-        
+
 
         postPointOrderRequest(requestBody, cookies.pinToken)
             .then(postPointOrderResponse)
@@ -94,6 +95,32 @@ const PointPayModal = () => {
         return () => setIsProcessing(false);
     }, []);
 
+
+    // 결제 버튼 컴포넌트
+    const PaymentButton = ({ point, totalPrice, isProcessing, onPayment, onCharge }: {
+        point: number;
+        totalPrice: number;
+        isProcessing: boolean;
+        onPayment: () => void;
+        onCharge: () => void;
+    }) => {
+        const hasEnoughPoints = point >= totalPrice;
+        
+        return (
+            <>
+                {hasEnoughPoints ? (
+                    <PayButton onClick={onPayment} $action={isProcessing}>
+                        {'결제하기'}
+                        {isProcessing && <HashLoader size={24} color='#CA9067' />}
+                    </PayButton>
+                ) : (
+                    <PointCharge $action={isProcessing} onClick={onCharge}>
+                        {'충전하기'}
+                    </PointCharge>
+                )}
+            </>
+        );
+    };
 
     //          render: 결제 모달 렌더링            //
     return (
@@ -114,11 +141,13 @@ const PointPayModal = () => {
             </Info>
             <Buttons>
                 <Close onClick={closeModal}>{'이전'}</Close>
-                {point! >= totalPrice ?
-                    <PayButton onClick={paymentActive}>{'결제하기'}</PayButton>
-                    :
-                    <PointCharge onClick={pointChargeModal}>{'충전하기'}</PointCharge>
-                }
+                <PaymentButton 
+                    point={point!} 
+                    totalPrice={totalPrice} 
+                    isProcessing={isProcessing} 
+                    onPayment={paymentActive} 
+                    onCharge={pointChargeModal} 
+                />
             </Buttons>
         </PayModalE>
     )
@@ -223,7 +252,7 @@ const Close = styled.div`
     }
 `
 
-const PayButton = styled.div`
+const PayButton = styled.div<{ $action: boolean }>`
     flex: 1;
     display: flex;
     justify-content: center;
@@ -232,6 +261,43 @@ const PayButton = styled.div`
     border-radius: 6px;
     border: 4px solid var(--coralPink);
     background: var(--orange);
+
+    
+    transform: all 1s;
+
+
+    @keyframes changeStyles {
+    0% {
+        border: 4px solid var(--pinkBeige);
+
+    }
+    30% {
+        border: 4px solid var(--lightBrown);
+
+    }
+    60% {
+        border: 4px solid var(--lightBrown);
+        opacity: 0.8;
+    }
+    100% {
+        border: 4px solid var(--pinkBeige);
+    }
+}
+
+    ${({ $action }) => !$action ?
+        `
+        color: #FFF;
+        border: 4px solid var(--coralPink);
+        background: var(--orange);
+    `
+        :
+        `
+        color: var(--lightBrown);
+        background: var(--creamyYellow);
+        opacity: 0.8;
+        animation: changeStyles 6s infinite;
+    `
+    }
 `
 
 const PointCharge = styled(PayButton)`

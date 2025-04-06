@@ -3,10 +3,12 @@ package com.kugring.back.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kugring.back.dto.request.auth.IdCheckRequestDto;
 import com.kugring.back.dto.request.auth.JraumSignUpRequestDto;
 import com.kugring.back.dto.request.auth.NicknameDpCheckRequestDto;
 import com.kugring.back.dto.request.auth.PinCheckRequestDto;
 import com.kugring.back.dto.request.auth.PinDpCheckRequestDto;
+import com.kugring.back.dto.response.auth.IdCheckResponseDto;
 import com.kugring.back.dto.response.auth.JraumSignUpResponseDto;
 import com.kugring.back.dto.response.auth.NicknameDpCheckResponseDto;
 import com.kugring.back.dto.response.auth.PinCheckResponseDto;
@@ -22,20 +24,19 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@RestController // controller가 아니라 RestController로 지정한 이유는 이렇게 해야 ResponseBody 반환해주기 때문이다.
+@RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
   private final AuthService authService;
 
-  // @PostMapping("/id-check")
-  // public ResponseEntity<? super IdCheckResponseDto> idCheck(@RequestBody @Valid
-  // IdCheckRequestDto requestBody) {
-  // ResponseEntity<? super IdCheckResponseDto> response =
-  // authService.idCheck(requestBody);
-  // return response;
-  // }
+  @PostMapping("/id-check")
+  public ResponseEntity<? super IdCheckResponseDto> idCheck(@RequestBody @Valid IdCheckRequestDto requestBody) {
+    ResponseEntity<? super IdCheckResponseDto> response = authService.idCheck(requestBody);
+    return response;
+  }
+
 
   // @PostMapping("/email-certification")
   // public ResponseEntity<? super EmailCertificationResponseDto>

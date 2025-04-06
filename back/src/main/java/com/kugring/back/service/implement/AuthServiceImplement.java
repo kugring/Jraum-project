@@ -5,11 +5,13 @@ import org.springframework.http.ResponseEntity;
 // import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.kugring.back.dto.request.auth.IdCheckRequestDto;
 import com.kugring.back.dto.request.auth.JraumSignUpRequestDto;
 import com.kugring.back.dto.request.auth.NicknameDpCheckRequestDto;
 import com.kugring.back.dto.request.auth.PinCheckRequestDto;
 import com.kugring.back.dto.request.auth.PinDpCheckRequestDto;
 import com.kugring.back.dto.response.ResponseDto;
+import com.kugring.back.dto.response.auth.IdCheckResponseDto;
 import com.kugring.back.dto.response.auth.JraumSignUpResponseDto;
 import com.kugring.back.dto.response.auth.NicknameDpCheckResponseDto;
 import com.kugring.back.dto.response.auth.PinCheckResponseDto;
@@ -37,25 +39,24 @@ public class AuthServiceImplement implements AuthService {
   // 시큐리티 cryto에서 제공하는
   // passwordEncoder이다!
 
-  // @Override
-  // public ResponseEntity<? super IdCheckResponseDto> idCheck(IdCheckRequestDto
-  // dto) {
+  @Override
+  public ResponseEntity<? super IdCheckResponseDto> idCheck(IdCheckRequestDto dto) {
 
-  // try {
+    try {
 
-  // String userId = dto.getId();
-  // boolean isExisted = userRepository.existsByUserId(userId);
-  // if (isExisted)
-  // return IdCheckResponseDto.duplicateId();
+      String userId = dto.getId();
+      boolean isExisted = userRepository.existsByUserId(userId);
+      if (isExisted)
+        return IdCheckResponseDto.duplicateId();
 
-  // } catch (Exception exception) {
-  // exception.printStackTrace();
-  // return ResponseDto.databaseError();
-  // }
+    } catch (Exception exception) {
+      exception.printStackTrace();
+      return ResponseDto.databaseError();
+    }
 
-  // return IdCheckResponseDto.success();
+    return IdCheckResponseDto.success();
 
-  // }
+  }
 
   // @Override
   // public ResponseEntity<? super EmailCertificationResponseDto>
@@ -273,7 +274,7 @@ public class AuthServiceImplement implements AuthService {
       if (!manager.getRole().trim().equals("ROLE_ADMIN")) {
         return PinCheckResponseDto.pinCheckFail();
       }
-      
+
       boolean existsPin = userRepository.existsByPin(dto.getPin());
       if (existsPin) {
         return JraumSignUpResponseDto.duplicatePin();
@@ -287,7 +288,8 @@ public class AuthServiceImplement implements AuthService {
   }
 
   @Override
-  public ResponseEntity<? super NicknameDpCheckResponseDto> nicknameDpCheck(String userId, NicknameDpCheckRequestDto dto) {
+  public ResponseEntity<? super NicknameDpCheckResponseDto> nicknameDpCheck(String userId,
+      NicknameDpCheckRequestDto dto) {
     try {
       // userId로 데이터 조회
       User manager = userRepository.findByUserId(userId);
