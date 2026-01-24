@@ -88,8 +88,8 @@ public class WebSecurityConfig {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         
         // 특정 도메인만 허용
-        corsConfiguration.addAllowedOrigin("https://hyunam.site");
-        corsConfiguration.addAllowedOrigin("https://www.hyunam.site");
+        corsConfiguration.addAllowedOrigin("https://hyunam.cloud");
+        corsConfiguration.addAllowedOrigin("https://www.hyunam.cloud");
         corsConfiguration.addAllowedMethod("GET");
         corsConfiguration.addAllowedMethod("POST");
         corsConfiguration.addAllowedMethod("PUT");

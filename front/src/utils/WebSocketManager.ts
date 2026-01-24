@@ -12,7 +12,7 @@ export class WebSocketManager {
 
   constructor(private url: string) {
     // WebSocket 연결 주소를 인자로 받아 저장합니다.
-    // 예: 'https://hyunam.site/ws'
+    // 예: 'https://hyunam.cloud/ws'
   }
 
   /**
