@@ -13,7 +13,7 @@ function App() {
     useEffect(() => {
       document.title = getPageTitle(location.pathname);
     }, [location.pathname]);
-
+ 
     //              render: 어플레키에션 렌더링                //
     return element;
 }
