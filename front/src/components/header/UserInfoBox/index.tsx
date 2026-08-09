@@ -8,7 +8,7 @@ import { defaultUserImage, formattedDate, formattedPoint, JRAUM_PATH } from 'con
 import { useOrderStore } from 'store/modal';
 
 //          component: 회원 정보 박스 컴포넌트              //
-const UserInfoBox = () => {
+const UserInfoBox = () => { 
 
     //      state: 핀 회원 정보         //
     const name = usePinUserStore(state => state.pinUser?.nickname || state.pinUser?.name || '');
