@@ -67,24 +67,40 @@ jobs:
         run: |
           scp -r ./back/build/ ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/build
 
-      # 8. EC2 환경 변수 설정 및 적용
-      - name: Set Environment Variable on EC2
+      # 8. EC2에서 systemd 서비스로 실행
+      #    - 앱이 죽거나 서버가 재부팅돼도 저절로 다시 켜짐
+      #    - 로그는 journald 에 쌓임(용량 자동 제한). 보기: journalctl -u jraum -f
+      #    - 구글 TTS 키 경로는 서비스 설정(Environment)에 넣음
+      - name: Run backend on EC2 (systemd)
         run: |
-          ssh ubuntu@${{ secrets.EC2_HOST }} << EOF
-          echo 'GOOGLE_APPLICATION_CREDENTIALS=/home/ubuntu/.google_tts_key.json' | sudo tee -a /etc/environment
-          source /etc/environment
-          EOF
+          ssh ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+          JAVA_BIN=$(command -v java)
+          sudo tee /etc/systemd/system/jraum.service > /dev/null << UNIT
+          [Unit]
+          Description=Jraum backend
+          After=network-online.target
+          Wants=network-online.target
 
-      # 9. EC2에서 JAR 파일 실행 (환경 변수 적용 후 실행)
-      - name: Run backend on EC2
-        run: |
-          ssh ubuntu@${{ secrets.EC2_HOST }} << EOF
-          pkill -f 'java -jar' || true  # 기존 프로세스 종료
-          export GOOGLE_APPLICATION_CREDENTIALS=/home/ubuntu/top-decoder-447304-e6-47f6f31a0362.json
-          echo "GOOGLE_APPLICATION_CREDENTIALS is set to \$GOOGLE_APPLICATION_CREDENTIALS"
-          nohup java -jar /home/ubuntu/build/libs/jraum-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
-          sleep 5
-          tail -n 20 /home/ubuntu/app.log
+          [Service]
+          User=ubuntu
+          WorkingDirectory=/home/ubuntu
+          Environment=GOOGLE_APPLICATION_CREDENTIALS=/home/ubuntu/top-decoder-447304-e6-47f6f31a0362.json
+          ExecStart=$JAVA_BIN -jar /home/ubuntu/build/libs/jraum-0.0.1-SNAPSHOT.jar
+          Restart=always
+          RestartSec=5
+          SuccessExitStatus=143
+
+          [Install]
+          WantedBy=multi-user.target
+          UNIT
+          sudo systemctl daemon-reload
+          sudo systemctl enable jraum
+          sudo systemctl stop jraum || true
+          pkill -f 'java -jar' || true  # 예전 nohup 으로 띄운 프로세스 정리
+          sudo systemctl start jraum
+          sleep 20
+          sudo journalctl -u jraum -n 30 --no-pager
+          sudo systemctl is-active jraum
           EOF
 
 
